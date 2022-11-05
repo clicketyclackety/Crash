@@ -1,4 +1,5 @@
 ﻿using Crash.UI;
+using Crash.Utilities;
 using Rhino;
 using Rhino.PlugIns;
 using System;
@@ -23,7 +24,7 @@ namespace Crash
         protected override LoadReturnCode OnLoad(ref string errorMessage)
         {
             new InteractivePipe() { Enabled = true };
-
+            LocalCache.Instance = new LocalCache();
             return base.OnLoad(ref errorMessage);
         }
 

@@ -5,7 +5,7 @@
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build-server",
             "program": "${workspaceFolder}/Crash.Server/bin/Debug/net6.0/Crash.Server.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
@@ -20,6 +20,20 @@
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             }
+        },
+        {
+            "name": "Run Rhino 8 WIP",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-plugin",
+            "program": "/Applications/RhinoWIP.app/Contents/MacOS/Rhinoceros",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "env": {
+                "RHINO_PLUGIN_PATH": "${workspaceFolder}/Crash/bin/Debug/net48/Crash.rhp"
+            } 
         }
 
     ],

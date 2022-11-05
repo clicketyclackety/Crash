@@ -7,7 +7,12 @@ namespace Crash.Server
 
     public interface ICrashClient
     {
-        Task ReceiveMessage(string user, Speck speck);
+        Task Update(string user, Guid id, Speck speck);
+        Task Add(string user, Speck speck);
+        Task Delete(string user, Guid id);
+        Task Done(string user);
+        Task Select(string user, Guid id);
+        Task Unselect(string user, Guid id);
     }
 
     public class CrashHub : Hub<ICrashClient>
@@ -18,14 +23,46 @@ namespace Crash.Server
             _context = context;
         }
 
-        public async Task SendMessage(string user, Speck speck)
-            => await Clients.All.ReceiveMessage(user, speck);
 
-        public async Task Poke()
+        public async Task Add(string user, Speck speck)
         {
-            var speck = new Speck();
-            _context.Specks.Add(speck);
+            try
+            {
+                _context.Specks.Add(speck);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception Add: {ex}");
+            }
+            await Clients.Others.Add(user, speck);
         }
+
+        public async Task Update(string user, Guid id, Speck speck)
+        {
+        }
+
+        public async Task Delete(string user, Guid id)
+        {
+
+        }
+
+        public async Task Done(string user)
+        {
+
+        }
+
+        public async Task Select(string user, Guid id)
+        {
+
+        }
+
+        public async Task Unselect(string user, Guid id)
+        {
+
+        }
+
+
 
         public override Task OnConnectedAsync()
         {

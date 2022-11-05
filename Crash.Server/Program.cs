@@ -27,14 +27,7 @@ app.MapGet("/", () => "Hello World!");
 
 app.MapHub<CrashHub>("/Crash");
 
-
 app.MigrateDatabase<CrashContext>();
-
-//var crashContext = app.Services.<CrashContext>();
-//var speck = new SpeckLib.Speck();
-//crashContext.Specks.Add(speck);
-//crashContext.SaveChanges();
-
 
 app.Run();
 

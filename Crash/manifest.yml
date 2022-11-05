@@ -13,5 +13,6 @@ description: >
   Multi user Rhino plugin enables to collaborate realtime in Rhino
 keywords:
   - Multiuser
+  - Crash
 icon: icon.png
 url: "https://github.com/clicketyclackety/Crash"

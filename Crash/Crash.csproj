@@ -6,6 +6,7 @@
     <Title>Crash</Title>
     <Description>Description of Crash</Description>
     <TargetExt>.rhp</TargetExt>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +19,12 @@
   
   <ItemGroup>
     <ProjectReference Include="..\SpeckLib\SpeckLib.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="manifest.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   
   <PropertyGroup Condition="$(Configuration) == 'Debug' AND $([MSBuild]::IsOSPlatform(Windows))">

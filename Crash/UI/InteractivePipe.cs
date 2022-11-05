@@ -69,7 +69,7 @@ namespace Crash.UI
             while(enumer.MoveNext())
             {
                 Speck speck = enumer.Current;
-                Color nameCol = Utilities.User.UserColor(speck.Owner);
+                var nameCol = new Utilities.User(speck.Owner).color;
                 DrawSpeck(e, speck, nameCol);
             }
 

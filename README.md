@@ -8,17 +8,14 @@
 [![MIT License][license-shield]][license-url]
 
 <!-- PROJECT LOGO -->
-<br />
 <div align="center">
   <a href="https://github.com/clicketyclackety/Crash">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="Logo.png" alt="Logo" width="400" height="300">
   </a>
 
-<h3 align="center">CRASH!</h3>
 
   <p align="center">
     A multi-user collaborative environment for Rhino
-    <br />
     <br />
     <a href="https://github.com/clicketyclackety/Crash">View Demo</a>
     ·
@@ -49,7 +46,6 @@
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
@@ -113,8 +109,6 @@ The following steps show a complete workflow of how the system works. For this e
 9. After the database is updated (on this deleted baked object), it invokes the delete function on all clients to remove this object from their Rhino model.
 10. All users now have the same objects in their model (baked and ghost objects).
 11. John selects an element and is thinking of what change he needs to do this object. As soon as he selects this object, his client machine would send the server and invoke the command to modify this object and mark it as locked. This would not allow any other user to select it until he presses "Im done!" button.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ROADMAP -->

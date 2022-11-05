@@ -1,0 +1,17 @@
+name: Crash
+version: 1.0.0
+authors:
+  - Callum Sykes
+  - Lukas Fuhrimann
+  - Curtis Wensley
+  - Russell Feathers
+  - Erika Santos
+  - Morteza Karimi
+  - Moustafa El-Sawy
+
+description: >
+  Multi user Rhino plugin enables to collaborate realtime in Rhino
+keywords:
+  - Multiuser
+icon: icon.png
+url: "https://github.com/clicketyclackety/Crash"

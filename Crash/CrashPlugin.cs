@@ -1,4 +1,6 @@
-﻿using Rhino;
+﻿using Crash.UI;
+using Rhino;
+using Rhino.PlugIns;
 using System;
 
 namespace Crash
@@ -17,6 +19,17 @@ namespace Crash
         {
             Instance = this;
         }
+
+        protected override LoadReturnCode OnLoad(ref string errorMessage)
+        {
+            new InteractivePipe() { Enabled = true };
+
+            return base.OnLoad(ref errorMessage);
+        }
+
+        public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
+
+        protected override string LocalPlugInName => "Crash";
 
         ///<summary>Gets the only instance of the CrashPlugin plug-in.</summary>
         public static CrashPlugin Instance { get; private set; }

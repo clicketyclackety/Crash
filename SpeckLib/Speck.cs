@@ -8,6 +8,7 @@ namespace SpeckLib
 
         Guid _id;
         DateTime _stamp;
+        string _owner;
 
         public Guid Id
         {
@@ -19,6 +20,12 @@ namespace SpeckLib
         {
             get => _stamp;
             set => _stamp = value;
+        }
+
+        public string Owner 
+        {
+            get => _owner;
+            set => _owner = value;
         }
 
         public Speck()

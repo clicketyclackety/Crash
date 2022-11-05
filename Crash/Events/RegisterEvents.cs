@@ -13,6 +13,8 @@ namespace Crash.Events
 			RhinoDoc.AddRhinoObject += AddItem.Event;
 			RhinoDoc.DeleteRhinoObject += RemoveItem.Event;
 			RhinoDoc.SelectObjects += SelectItem.Event;
+			RhinoDoc.DeselectObjects += SelectItem.Event;
+
 
 		}
 
@@ -21,6 +23,8 @@ namespace Crash.Events
 			RhinoDoc.AddRhinoObject -= AddItem.Event;
 			RhinoDoc.DeleteRhinoObject -= RemoveItem.Event;
 			RhinoDoc.SelectObjects -= SelectItem.Event;
+			RhinoDoc.DeselectObjects -= SelectItem.Event;
+
 		}
 
 	}

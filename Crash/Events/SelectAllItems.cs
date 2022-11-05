@@ -12,12 +12,14 @@ namespace Crash.Events
     {
         internal static void Event(object sender, RhinoDeselectAllObjectsEventArgs e)
         {
-            foreach (RhinoObject robj in e.Document.Objects.GetSelectedObjects(false,false).ToList())
+            ObjectEnumeratorSettings settings = new ObjectEnumeratorSettings();
+            settings.ActiveObjects = true;
+            foreach (RhinoObject robj in e.Document.Objects.GetObjectList(settings).ToList())
             {
                 if (robj.IsLocked)
                     continue;
                 else
-                    RequestManager.LocalClient.Unselect(robj.Id);
+                    RequestManager.LocalClient?.Unselect(robj.Id);
 
             }
         }

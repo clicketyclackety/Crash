@@ -19,10 +19,10 @@ namespace Crash.Events
 
                 if(e.Selected)
                 {
-                    RequestManager.LocalClient.Select(robj.Id);
+                    RequestManager.LocalClient?.Select(robj.Id);
                 }
                 else
-                    RequestManager.LocalClient.Unselect(robj.Id);
+                    RequestManager.LocalClient?.Unselect(robj.Id);
 
             }
         }

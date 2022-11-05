@@ -11,6 +11,7 @@ namespace Crash.Server
         Task Done(string user);
         Task Select(string user, Guid id);
         Task Unselect(string user, Guid id);
+        Task Initialize(Speck[] specks);
     }
 
     public class CrashHub : Hub<ICrashClient>
@@ -64,12 +65,11 @@ namespace Crash.Server
         }
 
 
-
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
-            // send 3dm and current state??
+            await base.OnConnectedAsync();
 
-            return base.OnConnectedAsync();
+            //await Clients.Caller.Initialize(...);
         }
     }
 }

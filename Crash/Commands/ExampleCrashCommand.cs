@@ -6,7 +6,7 @@ using Rhino.Input.Custom;
 using System;
 using System.Collections.Generic;
 
-namespace Crash
+namespace Crash.Commands
 {
     public class CrashCommand : Command
     {

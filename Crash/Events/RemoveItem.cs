@@ -1,4 +1,5 @@
-﻿using Rhino.DocObjects;
+﻿using Crash.Utilities;
+using Rhino.DocObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace Crash.Events
         internal static void Event(object sender, RhinoObjectEventArgs e)
         {
             //TODO: if an item is removed, remove the item from the database
+            RequestManager.LocalClient?.Delete(e.ObjectId);
+
         }
     }
 }

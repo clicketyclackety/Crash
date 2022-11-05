@@ -1,10 +1,8 @@
-﻿using Crash.Server.Model;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using SpeckLib;
 
 namespace Crash.Server
 {
-
     public interface ICrashClient
     {
         Task Update(string user, Guid id, Speck speck);
@@ -17,8 +15,8 @@ namespace Crash.Server
 
     public class CrashHub : Hub<ICrashClient>
     {
-        CrashContext _context;
-        public CrashHub(CrashContext context)
+        Model.CrashContext _context;
+        public CrashHub(Model.CrashContext context)
         {
             _context = context;
         }
@@ -28,18 +26,21 @@ namespace Crash.Server
         {
             try
             {
-                _context.Specks.Add(speck);
+                _context.Specks.Add(Model.Speck.From(speck));
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception Add: {ex}");
+                Console.WriteLine($"Exception: {ex}");
             }
             await Clients.Others.Add(user, speck);
         }
 
+
         public async Task Update(string user, Guid id, Speck speck)
         {
+            var oldSpeck = _context.Specks.FirstOrDefault(r => r.Id == id);
+
         }
 
         public async Task Delete(string user, Guid id)

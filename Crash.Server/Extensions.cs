@@ -10,6 +10,9 @@ namespace Crash.Server
             var serviceScopeFactory = (IServiceScopeFactory?)webHost
                 .Services.GetService(typeof(IServiceScopeFactory));
 
+            if (serviceScopeFactory == null)
+                throw new InvalidOperationException("Cannot Get IServiceScopeFactory");
+
             using (var scope = serviceScopeFactory.CreateScope())
             {
                 var services = scope.ServiceProvider;

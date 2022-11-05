@@ -11,23 +11,20 @@ namespace Crash.Events
     {
         internal static void Event(object sender, RhinoObjectSelectionEventArgs e)
         {
-            //Test if the selected item is selected in the database
-            bool isOwned = false;
-
-            //If you unselect, udpate the database
-            if (!e.Selected)
+            foreach(RhinoObject robj in e.RhinoObjects)
             {
+                //Test if the selected item is selected in the database
+                bool isOwned = false;
 
+                //If you unselect, udpate the database
+                if (!e.Selected)
+                {
+
+                }
+                //if it gets selected and its already owned by someone, unselect the object
+                if (e.Selected && isOwned)
+                    robj.Select(false);
             }
-            //if it gets selected and its already owned by someone, unselect the object
-            if(e.Selected && isOwned)
-                e.RhinoObjects.Select(x => x.Select(false));
-            
-            
-          
-
-
-
         }
 
     }

@@ -13,8 +13,10 @@ namespace Crash.Events
         {
             foreach(RhinoObject robj in e.RhinoObjects)
             {
-                //TODO: Test if the selected item is selected in the database
-                bool isOwned = false;
+                if (robj.IsLocked)
+                    continue;
+
+                if(e.Selected)
 
                 //If you unselect, udpate the database to unlock the item
                 if (!e.Selected)

@@ -8,24 +8,18 @@ using System.Threading.Tasks;
 
 namespace Crash.Events
 {
-    internal static class SelectItem
+    internal static class SelectAllItems
     {
-        internal static void Event(object sender, RhinoObjectSelectionEventArgs e)
+        internal static void Event(object sender, RhinoDeselectAllObjectsEventArgs e)
         {
-            foreach(RhinoObject robj in e.RhinoObjects)
+            foreach (RhinoObject robj in e.Document.Objects.GetSelectedObjects(false,false).ToList())
             {
                 if (robj.IsLocked)
                     continue;
-
-                if(e.Selected)
-                {
-                    RequestManager.LocalClient.Select(robj.Id);
-                }
                 else
                     RequestManager.LocalClient.Unselect(robj.Id);
 
             }
         }
-
     }
 }

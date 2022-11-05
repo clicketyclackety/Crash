@@ -1,4 +1,6 @@
 ﻿using Rhino.DocObjects;
+using SpeckLib;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +13,10 @@ namespace Crash.Events
     {
         internal static void Event(object sender, RhinoObjectEventArgs e)
         {
+            if (e.ObjectId == Guid.Empty)
+                return;
 
+            Speck speck = new Speck(e.ObjectId);
         }
     }
 }

@@ -27,6 +27,12 @@ namespace SpeckLib
             _stamp = DateTime.UtcNow;
         }
 
+        public Speck(Guid id)
+        {
+            _id = id;
+            _stamp = DateTime.UtcNow;
+        }
+
 
     }
 

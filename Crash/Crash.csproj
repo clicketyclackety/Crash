@@ -16,6 +16,10 @@
     <PackageReference Include="RhinoCommon" Version="7.21.22208.13001" IncludeAssets="compile;build" />
   </ItemGroup>
   
+  <ItemGroup>
+    <ProjectReference Include="..\SpeckLib\SpeckLib.csproj" />
+  </ItemGroup>
+  
   <PropertyGroup Condition="$(Configuration) == 'Debug' AND $([MSBuild]::IsOSPlatform(Windows))">
     <StartProgram>C:\Program Files\Rhino 7\System\Rhino.exe</StartProgram>
     <StartArguments></StartArguments>

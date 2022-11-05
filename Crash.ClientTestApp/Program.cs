@@ -6,11 +6,24 @@ namespace Crash.ClientTestApp
     {
         static void Main(string[] args)
         {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Missing argument 'user'");
+                return;
+            
+            }
+            string userId = args[0];
+
             Console.WriteLine("Crash Test App");
             Console.WriteLine("\tc = Create Speck");
             Console.WriteLine("\tq = Quit");
 
-            var client = new CrashClient("user1", new Uri("http://localhost:5141/Crash"));
+            var client = new CrashClient(userId, new Uri("http://localhost:5141/Crash"));
+
+            client.OnAdd += (user, speck) =>
+            {
+                Console.WriteLine($"Added! {speck.Id}");
+            };
 
             client.StartAsync().Wait();
 

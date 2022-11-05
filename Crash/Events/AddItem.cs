@@ -1,4 +1,5 @@
-﻿using Rhino.DocObjects;
+﻿using Crash.Utilities;
+using Rhino.DocObjects;
 using SpeckLib;
 
 using System;
@@ -14,10 +15,9 @@ namespace Crash.Events
         internal static void Event(object sender, RhinoObjectEventArgs e)
         {
             //TODO: if an item is added, add it to the database
-            if (e.ObjectId == Guid.Empty)
-                return;
-
             Speck speck = new Speck(e.ObjectId);
+            RequestManager.LocalClient?.Add(speck);
+
         }
     }
 }

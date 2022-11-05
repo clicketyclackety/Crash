@@ -64,12 +64,12 @@ namespace Crash.UI
 
             e.Display.DrawBox(box, Color.Red);
 
-            IEnumerable<Speck> specks = Drawables.Values.ToList().OrderBy(s => s.Owner);
+            IEnumerable<Speck> specks = Drawables.Values.ToList().OrderBy(s => s?.Owner);
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
             {
                 Speck speck = enumer.Current;
-                Color nameCol = Utilities.User.UserColor(speck.Owner);
+                var nameCol = new Utilities.User(speck.Owner).color;
                 DrawSpeck(e, speck, nameCol);
             }
 

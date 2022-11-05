@@ -19,6 +19,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\Crash.Client\Crash.Client.csproj" />
     <ProjectReference Include="..\SpeckLib\SpeckLib.csproj" />
   </ItemGroup>
   

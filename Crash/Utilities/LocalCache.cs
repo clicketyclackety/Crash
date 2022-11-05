@@ -128,5 +128,35 @@ namespace Crash.Utilities
 
         #endregion
 
+        #region Event Listeners
+
+        internal static void OnAdd(string name, Speck speck)
+        {
+            Instance.UpdateSpeck(speck);
+        }
+        
+        internal static void OnDelete(string name, Guid speckId)
+        {
+            Speck speck = new Speck(speckId) { Owner = name };
+            Instance.RemoveSpeck(speck);
+        }
+
+        internal static void OnUpdate(string name, Guid speckID, Speck speck)
+        {
+            // TODO : ...
+        }
+
+        public static void CollaboratorIsDone(string name)
+        {
+            string sanitisedName = name.ToLower();
+            IEnumerable<Speck> ToBake = LocalCache.Instance.GetSpecks().
+                                        Where(s => s.Owner.ToLower() == sanitisedName);
+
+            LocalCache.Instance.BakeSpecks(ToBake);
+            LocalCache.Instance.RemoveSpecks(ToBake);
+        }
+
+        #endregion
+
     }
 }

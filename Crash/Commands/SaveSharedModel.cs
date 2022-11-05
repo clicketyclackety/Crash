@@ -1,4 +1,5 @@
-﻿using Rhino;
+﻿using Crash.Utilities;
+using Rhino;
 using Rhino.Commands;
 using Rhino.Geometry;
 using Rhino.Input;
@@ -24,7 +25,8 @@ namespace Crash.Commands
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            
+            Reconciliation.StartOrContinueLocalClient();
+
             return Result.Success;
         }
 

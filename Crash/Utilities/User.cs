@@ -21,6 +21,8 @@ namespace Crash.Utilities
             return color;
         }
 
+        public static string CurrentUser = System.Environment.UserName;
+
     }
 
 }

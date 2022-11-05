@@ -11,6 +11,18 @@ namespace Crash.Utilities
     public static class Reconciliation
     {
 
+        internal static Crash.CrashClient LocalClient;
+
+        public static void StartOrContinueLocalClient()
+        {
+            if (null == LocalClient)
+            {
+                // TODO : Add a URI
+                CrashClient client = new CrashClient(User.CurrentUser, null);
+                Reconciliation.LocalClient = client;
+            }
+        }
+
         public static void Update()
         {
 

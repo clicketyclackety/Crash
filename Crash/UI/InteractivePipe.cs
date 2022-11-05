@@ -52,6 +52,9 @@ namespace Crash.UI
 
         public void CalculateBoundingBox(object sender, CalculateBoundingBoxEventArgs e)
         {
+            // TODO : Iterate through specks, add boundingbox of geometry to bbox;
+
+            // Dummy box
             e.IncludeBoundingBox(bbox);
         }
 
@@ -60,6 +63,13 @@ namespace Crash.UI
             BoundingBox box = new BoundingBox(0, 0, 0, 100, 200, 300);
 
             e.Display.DrawBox(box, Color.Red);
+
+            IEnumerable<Speck> specks = Drawables.Values.ToList();
+            var enumer = specks.GetEnumerator();
+            while(enumer.MoveNext())
+            {
+                // Draw Speck here!
+            }
 
             UpdateBoundingBox(e);
         }

@@ -1,4 +1,4 @@
-using Crash.UI;
+﻿using Crash.UI;
 using Rhino;
 using Rhino.PlugIns;
 using System;
@@ -26,6 +26,10 @@ namespace Crash
 
             return base.OnLoad(ref errorMessage);
         }
+
+        public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
+
+        protected override string LocalPlugInName => "Crash";
 
         ///<summary>Gets the only instance of the CrashPlugin plug-in.</summary>
         public static CrashPlugin Instance { get; private set; }

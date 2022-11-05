@@ -31,6 +31,18 @@ namespace Crash.Utilities
 
         public static string CurrentUser = System.Environment.UserName;
 
+    // public static User CurrentUser
+    // {
+    //     get
+    //     {
+    //         return "";
+    //     }
+    //     set
+    //     {
+    //         name = value;
+    //     }
+    // }
+
     }
 
 }

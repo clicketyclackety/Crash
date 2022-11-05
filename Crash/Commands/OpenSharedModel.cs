@@ -26,8 +26,9 @@ namespace Crash.Commands
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            RequestManager.StartOrContinueLocalClient();
-
+            var URL="";
+            var res = Rhino.Input.RhinoGet.GetString("File URL", true, ref URL);
+            RequestManager.StartOrContinueLocalClient(URL);
 
             return Result.Success;
         }

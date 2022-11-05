@@ -13,7 +13,7 @@ namespace Crash.Utilities
 
         internal static Crash.CrashClient LocalClient;
 
-        public static void StartOrContinueLocalClient()
+        public static void StartOrContinueLocalClient(string URL)
         {
             if (null == LocalClient)
             {

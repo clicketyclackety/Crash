@@ -14,6 +14,7 @@ namespace Crash.Events
 			RhinoDoc.DeleteRhinoObject += RemoveItem.Event;
 			RhinoDoc.SelectObjects += SelectItem.Event;
 			RhinoDoc.DeselectObjects += SelectItem.Event;
+			RhinoDoc.DeselectAllObjects += SelectAllItems.Event;
 		}
 
 		internal static void DeRegisterEvents()
@@ -22,6 +23,8 @@ namespace Crash.Events
 			RhinoDoc.DeleteRhinoObject -= RemoveItem.Event;
 			RhinoDoc.SelectObjects -= SelectItem.Event;
 			RhinoDoc.DeselectObjects -= SelectItem.Event;
+			RhinoDoc.DeselectAllObjects -= SelectAllItems.Event;
+
 		}
 
 	}

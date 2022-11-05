@@ -61,7 +61,9 @@ Bla Bla
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
-* [![Next][Next.js]][Next-url]
+* [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
+* [SignalR](https://learn.microsoft.com/en-us/aspnet/signalr/overview/getting-started/introduction-to-signalr)
+* ...
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
@@ -94,7 +96,6 @@ This is an example of how to list things you need to use the software and how to
    const API_KEY = 'ENTER YOUR API';
    ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 <!-- INNERWORKS EXAMPLES -->
 ## Innerworks

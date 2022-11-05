@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Crash.Utilities
 {
 
-    public static class Reconciliation
+    public static class RequestManager
     {
 
         internal static Crash.CrashClient LocalClient;
@@ -17,20 +17,11 @@ namespace Crash.Utilities
         {
             if (null == LocalClient)
             {
+                Events.EventManagement.RegisterEvents();
                 // TODO : Add a URI
                 CrashClient client = new CrashClient(User.CurrentUser, null);
-                Reconciliation.LocalClient = client;
+                RequestManager.LocalClient = client;
             }
-        }
-
-        public static void Update()
-        {
-
-        }
-
-        public static async Task ImDone()
-        {
-            // Send your username to the server
         }
 
         public static async Task CollaboratorIsDone(string name)
@@ -41,33 +32,6 @@ namespace Crash.Utilities
 
             LocalCache.Instance.BakeSpecks(ToBake);
             LocalCache.Instance.RemoveSpecks(ToBake);
-        }
-
-        private static bool UpdateCD()
-        {
-            return true;
-        }
-
-        private static bool BakeSpeck()
-        {
-            return true;
-        }
-
-        private static bool IsMe()
-        {
-            return true;
-        }
-
-        private static bool IsSelected()
-        {
-            return true;
-
-        }
-
-        private static bool PerformAction()
-        {
-            return true;
-
         }
 
     }

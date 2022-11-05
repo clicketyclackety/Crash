@@ -13,7 +13,6 @@
     <img src="Logo.png" alt="Logo" width="400" height="300">
   </a>
 
-
   <p align="center">
     A multi-user collaborative environment for Rhino
     <br />
@@ -53,7 +52,14 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
-Bla Bla
+This project has been completed as part of the TT AEC Hackathon 2022 - New York. This plugin/application allows users to collaborate on a single central Rhino model. The Team Members for this awesome project are (in alphabetical order):
+* [Callum Sykes](https://www.linkedin.com/in/callumsykes/)
+* [Curtis Wensley](https://www.linkedin.com/in/cwensley/)
+* [Erika Santos](https://www.linkedin.com/in/erikasantosr/)
+* [Lukas Fuhrimann](https://www.linkedin.com/in/lfuhrimann/)
+* [Moustafa El-Sawy](https://www.linkedin.com/in/moustafakelsawy/)
+* [Morteza Karimi](https://www.linkedin.com/in/morteza-karimi-78813a67/)
+* [Russel Feathers](https://www.linkedin.com/in/russell-feathers/)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
@@ -141,7 +147,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
-Big thanks to AEC Tech 2022 for arranging this event. This team has been a great collaboration of several great minds. Please check out other hackathon projects and future hackathon events hosted by [AECTech](https://www.aectech.us/).
+Big thanks to AEC Tech 2022 for arranging this event. This project has been a great collaboration of several great minds. Please check out other hackathon projects and future hackathon events hosted by [AECTech](https://www.aectech.us/).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

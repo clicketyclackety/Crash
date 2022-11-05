@@ -24,16 +24,6 @@ namespace Crash.Utilities
             }
         }
 
-        public static async Task CollaboratorIsDone(string name)
-        {
-            string sanitisedName = name.ToLower();
-            IEnumerable<Speck> ToBake = LocalCache.Instance.GetSpecks().
-                                        Where(s => s.Owner.ToLower() == sanitisedName);
-
-            LocalCache.Instance.BakeSpecks(ToBake);
-            LocalCache.Instance.RemoveSpecks(ToBake);
-        }
-
     }
 
 }

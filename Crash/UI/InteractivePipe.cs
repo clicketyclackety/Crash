@@ -64,7 +64,7 @@ namespace Crash.UI
 
             e.Display.DrawBox(box, Color.Red);
 
-            IEnumerable<Speck> specks = Drawables.Values.ToList().OrderBy(s => s.Owner);
+            IEnumerable<Speck> specks = Drawables.Values.ToList().OrderBy(s => s?.Owner);
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
             {

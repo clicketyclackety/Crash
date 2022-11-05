@@ -26,7 +26,7 @@ namespace Crash.Commands
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            Reconciliation.StartOrContinueLocalClient();
+            RequestManager.StartOrContinueLocalClient();
 
 
             return Result.Success;

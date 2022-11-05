@@ -13,7 +13,7 @@ namespace Crash.Events
     {
         internal static void Event(object sender, RhinoObjectEventArgs e)
         {
-            //if an item is added, add it to the database
+            //TODO: if an item is added, add it to the database
             if (e.ObjectId == Guid.Empty)
                 return;
 

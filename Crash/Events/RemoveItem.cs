@@ -11,7 +11,7 @@ namespace Crash.Events
     {
         internal static void Event(object sender, RhinoObjectEventArgs e)
         {
-            //if an item is removed, remove the item from the database
+            //TODO: if an item is removed, remove the item from the database
         }
     }
 }

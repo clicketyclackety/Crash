@@ -64,11 +64,13 @@ namespace Crash.UI
 
             e.Display.DrawBox(box, Color.Red);
 
-            IEnumerable<Speck> specks = Drawables.Values.ToList();
+            IEnumerable<Speck> specks = Drawables.Values.ToList().OrderBy(s => s.Owner);
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
             {
-                // Draw Speck here!
+                Speck speck = enumer.Current;
+                Color nameCol = Utilities.User.UserColor(speck.Owner);
+                DrawSpeck(e, speck, nameCol);
             }
 
             UpdateBoundingBox(e);
@@ -77,6 +79,36 @@ namespace Crash.UI
         private void UpdateBoundingBox(DrawEventArgs e)
         {
             bbox = new BoundingBox(-1000, -1000, -1000, 1000, 1000, 1000);
+        }
+
+        DisplayMaterial cachedMaterial = new DisplayMaterial(Color.Blue);
+        private void DrawSpeck(DrawEventArgs e, Speck speck, Color color)
+        {
+            GeometryBase geom = null; // speck.Geometry;
+            if (cachedMaterial.Diffuse != color)
+            {
+                cachedMaterial = new DisplayMaterial(color);
+            }
+
+            if (geom is Curve cv)
+            {
+                e.Display.DrawCurve(cv, color);
+            }
+            else if (geom is Brep brep)
+            {
+                e.Display.DrawBrepShaded(brep, cachedMaterial);
+            }
+            else if (geom is Mesh mesh)
+            {
+                e.Display.DrawMeshShaded(mesh, cachedMaterial);
+            }
+        }
+
+        private void DrawNothing() { }
+
+        private void DrawCurve(Curve curve)
+        {
+
         }
 
 

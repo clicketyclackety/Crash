@@ -40,7 +40,6 @@ namespace SpeckLib
             _stamp = DateTime.UtcNow;
         }
 
-
     }
 
 }

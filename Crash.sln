@@ -7,20 +7,26 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash", "Crash\Crash.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpeckLib", "SpeckLib\SpeckLib.csproj", "{C8623934-01EB-48B2-B486-4355D5F80ADD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server", "Crash.Server\Crash.Server.csproj", "{546E1EBF-7B4C-49C4-92F4-4325C248A473}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FF5923AC-5721-4C5D-B92D-36FA02C68515}.Debug|x64.ActiveCfg = Debug|x64
-		{FF5923AC-5721-4C5D-B92D-36FA02C68515}.Debug|x64.Build.0 = Debug|x64
-		{FF5923AC-5721-4C5D-B92D-36FA02C68515}.Release|x64.ActiveCfg = Release|x64
-		{FF5923AC-5721-4C5D-B92D-36FA02C68515}.Release|x64.Build.0 = Release|x64
-		{C8623934-01EB-48B2-B486-4355D5F80ADD}.Debug|x64.ActiveCfg = Debug|x64
-		{C8623934-01EB-48B2-B486-4355D5F80ADD}.Debug|x64.Build.0 = Debug|x64
-		{C8623934-01EB-48B2-B486-4355D5F80ADD}.Release|x64.ActiveCfg = Release|x64
-		{C8623934-01EB-48B2-B486-4355D5F80ADD}.Release|x64.Build.0 = Release|x64
+		{FF5923AC-5721-4C5D-B92D-36FA02C68515}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF5923AC-5721-4C5D-B92D-36FA02C68515}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF5923AC-5721-4C5D-B92D-36FA02C68515}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF5923AC-5721-4C5D-B92D-36FA02C68515}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8623934-01EB-48B2-B486-4355D5F80ADD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8623934-01EB-48B2-B486-4355D5F80ADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8623934-01EB-48B2-B486-4355D5F80ADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8623934-01EB-48B2-B486-4355D5F80ADD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{546E1EBF-7B4C-49C4-92F4-4325C248A473}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{546E1EBF-7B4C-49C4-92F4-4325C248A473}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{546E1EBF-7B4C-49C4-92F4-4325C248A473}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{546E1EBF-7B4C-49C4-92F4-4325C248A473}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

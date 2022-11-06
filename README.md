@@ -98,7 +98,7 @@ Thanks again for checking out CRASH! Please follow the steps below to get starte
 ### Prerequisites
 You will need the following libraries and/or software installed before getting to the fun!
 * [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
-* [.NET CORE 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+* [.NET Core 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 * [Rhino 7.21+](https://www.rhino3d.com/download/)
 * [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 
@@ -138,15 +138,15 @@ Rhino will launch in debug mode.
 ## Workflow Overview
 Crash works by allowing back & forth communication of clients with a central server to either send changes or receive changes. The server keeps record of a list of objects along with relevant attributes to allow the functionality required. One important distinction here is that the database/server will hold two types of objects; baked and ghost objects. Baked objects are drawn into the Rhino model while Non-Baked (called ghost here) objects are "Pipeline" objects. Communication between the client and database occurs in the form of invoking end points on either side and sending over "Speck" objects that contain all the required information.
 
-The following steps show a complete workflow of how the system works. For this example, there are 3 users (Bob, John, Marry) working on a central model called "NYC Building 5".
-1. Bob has a current Rhino model. He realizes the deadline is coming up and will need help from John & Marry.
+The following steps show a complete workflow of how the system works. For this example, there are 3 users (Bob, John, Mary) working on a central model called "NYC Building 5".
+1. Bob has a current Rhino model. He realizes the deadline is coming up and will need help from John & Mary.
 2. Bob initiates a shared model using Crash. This will create a server on his machine locally. Initially the server database is empty and Bob is the initiator so his machine would send all the current Rhino Geometry in his file to the server as a List of speck objects and invoke the appropriate command on the server.
 3. The server launches, receives data from the first initialization & populates its database with the list of objects received.
 4. John launches Rhino with an empty file. John then starts up Crash and selects to link to "NYC Building 5". The server instantly sends him all the list of objects in the database and invokes client side end points to re-create these objects in his model (both baked and ghost objects).
 5. Johns starts to draw new geometrical objects. After every action he performs (Add/Deleting/Updating), the client (John) invokes the appropriate command on the server and sends the required information as speck objects. Currently all new objects are considered ghost objects. All users see these new ghost objects in their views but are unable to select them or modify them.
 6. John is done creating new geometry and would like to "commit" these changes to other users. He presses the "Im done!" button. This invokes a command on the server to convert all objects owned/created by John and change their status from ghost to baked objects. This change is then pushed to all clients and they will see these objects turn into a baked object.
-7. Marry launches Rhino with an empty file. Marry then starts up Crash and selects to link to "NYC Building 5". The server instantly sends her all the list of objects in the database and invokes client side end points to re-create these objects in her model (both baked and ghost objects).
-8. Marry decides to select and delete one of the objects she sees. This will invoke the delete command on the server side and update the database.
+7. Mary launches Rhino with an empty file. Mary then starts up Crash and selects to link to "NYC Building 5". The server instantly sends her all the list of objects in the database and invokes client side end points to re-create these objects in her model (both baked and ghost objects).
+8. Mary decides to select and delete one of the objects she sees. This will invoke the delete command on the server side and update the database.
 9. After the database is updated (on this deleted baked object), it invokes the delete function on all clients to remove this object from their Rhino model.
 10. All users now have the same objects in their model (baked and ghost objects).
 11. John selects an element and is thinking of what change he needs to do this object. As soon as he selects this object, his client machine would send the server and invoke the command to modify this object and mark it as locked. This would not allow any other user to select it until he presses "Im done!" button.

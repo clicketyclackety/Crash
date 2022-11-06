@@ -63,8 +63,8 @@ This project has been completed as part of the TT AEC Hackathon 2022 - New York.
 * [Curtis Wensley](https://www.linkedin.com/in/cwensley/)
 * [Erika Santos](https://www.linkedin.com/in/erikasantosr/)
 * [Lukas Fuhrimann](https://www.linkedin.com/in/lfuhrimann/)
-* [Moustafa El-Sawy](https://www.linkedin.com/in/moustafakelsawy/)
 * [Morteza Karimi](https://www.linkedin.com/in/morteza-karimi-78813a67/)
+* [Moustafa El-Sawy](https://www.linkedin.com/in/moustafakelsawy/)
 * [Russell Feathers](https://www.linkedin.com/in/russell-feathers/)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

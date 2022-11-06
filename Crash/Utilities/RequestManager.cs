@@ -17,10 +17,11 @@ namespace Crash.Utilities
         {
             if (null == LocalClient)
             {
-                Events.EventManagement.RegisterEvents();
                 // TODO : Add a URI
                 CrashClient client = new CrashClient(User.CurrentUser, null);
                 RequestManager.LocalClient = client;
+
+                Events.EventManagement.RegisterEvents();
             }
         }
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Crash.Utilities;
+using Rhino.DocObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +21,9 @@ namespace Crash.Events
         internal static void OnSelect(string name, Guid speckId)
         {
             var _doc = Rhino.RhinoDoc.ActiveDoc;
-            _doc.Objects.Lock(speckId, true);
+            Guid rObjId = LocalCache.GetHost(speckId);
+            _doc.Objects.Lock(rObjId, true);
+            _doc.Views.Redraw();
         }
 
         /// <summary>
@@ -30,7 +34,9 @@ namespace Crash.Events
         internal static void OnUnSelect(string name, Guid speckId)
         {
             var _doc = Rhino.RhinoDoc.ActiveDoc;
-            _doc.Objects.Unlock(speckId, true);
+            Guid rObjId = LocalCache.GetHost(speckId);
+            _doc.Objects.Unlock(rObjId, true);
+            _doc.Views.Redraw();
         }
 
     }

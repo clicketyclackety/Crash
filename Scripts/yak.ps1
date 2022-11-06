@@ -1,6 +1,9 @@
 param (
     [Parameter(Mandatory=$false, HelpMessage="What Config was Project built for?")]
-    [string]$configuration="Debug"
+    [string]$configuration="Debug",
+
+    [Parameter(Mandatory=$false, HelpMessage="Push to yak server?")]
+    [bool]$publish=$False
 )
 
 $script_dir = $PSScriptRoot
@@ -21,5 +24,9 @@ Set-Location $buildDir
 
 $yakexe = "C:\Program Files\Rhino 7\System\Yak.exe"
 & $yakexe build --platform win
+
+if($publish -eq $True) {
+    & $yakexe push "$buildDir\crash-1.0.0-rh7_21-win.yak"
+}
 
 Set-Location $loc

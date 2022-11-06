@@ -10,13 +10,26 @@ using System.Threading.Tasks;
 
 namespace Crash
 {
+    /// <summary>
+    /// Crash server class
+    /// </summary>
     public class CrashServer : IDisposable
     {
         Process process;
+
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public CrashServer()
         {
         }
 
+        /// <summary>
+        /// Method to start the server
+        /// </summary>
+        /// <param name="url">url</param>
+        /// <param name="isMac">is mac</param>
+        /// <param name="isArm64">is arm64</param>
         public void Start(Uri url, bool isMac = false, bool isArm64 = false)
         {
             if (process != null)
@@ -42,13 +55,18 @@ namespace Crash
             process = Process.Start(startInfo);
         }
 
+        /// <summary>
+        /// Stop connection
+        /// </summary>
         public void Stop()
         {
             process?.Kill();
             process = null;
         }
 
-
+        /// <summary>
+        /// Dispose
+        /// </summary>
         public void Dispose()
         {
             // stop the server!

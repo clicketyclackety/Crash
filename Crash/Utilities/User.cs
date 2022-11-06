@@ -7,13 +7,25 @@ using System.Security.Cryptography;
 
 namespace Crash.Utilities
 {
-
+    /// <summary>
+    /// User class
+    /// </summary>
     public class User
     {
+        /// <summary>
+        /// Name of the user
+        /// </summary>
+        public string name { get; set; }
 
-        public string name;
-        public Color color;
+        /// <summary>
+        /// Color of the user
+        /// </summary>
+        public Color color { get; set; }
 
+        /// <summary>
+        /// User Constructor 
+        /// </summary>
+        /// <param name="inputName">the name of the user</param>
         public User(string inputName)
         {
             name = inputName;
@@ -30,6 +42,9 @@ namespace Crash.Utilities
             }
         }
 
+        /// <summary>
+        /// Current user
+        /// </summary>
         public static User CurrentUser {get; set;}
 
     }

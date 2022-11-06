@@ -2,6 +2,9 @@
 
 namespace Crash.ClientTestApp
 {
+    /// <summary>
+    /// Test program for server connection
+    /// </summary>
     internal class Program
     {
         static void Main(string[] args)

@@ -234,7 +234,7 @@ namespace Crash.Utilities
 
         #region Event Listeners
         /// <summary>
-        /// On add event
+        /// On add event. A user has added an element elsewhere.
         /// </summary>
         /// <param name="name">the name </param>
         /// <param name="speck">the speck</param>
@@ -247,7 +247,7 @@ namespace Crash.Utilities
         }
         
         /// <summary>
-        /// On delete event
+        /// On delete event. A user has deleted an element elsewhere.
         /// </summary>
         /// <param name="name">the name</param>
         /// <param name="speckId">speck id</param>
@@ -276,9 +276,9 @@ namespace Crash.Utilities
         }
 
         /// <summary>
-        /// Collaboration is done event
+        /// Collaboration is done event. A user has called the Release command.
         /// </summary>
-        /// <param name="name">the name of the collaboration</param>
+        /// <param name="name">The name of the collaboration</param>
         public static void CollaboratorIsDone(string name)
         {
             if (string.IsNullOrEmpty(name)) return;

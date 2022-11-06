@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Crash.Events
 {
+    /// <summary>
+    /// Select all items event handler
+    /// </summary>
     internal static class SelectAllItems
     {
         internal static void Event(object sender, RhinoDeselectAllObjectsEventArgs e)

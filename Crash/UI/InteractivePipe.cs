@@ -12,11 +12,17 @@ using System.Threading.Tasks;
 
 namespace Crash.UI
 {
+    /// <summary>
+    /// Interactive pipeline for crash geometry display
+    /// </summary>
     public sealed class InteractivePipe
     {
         private BoundingBox bbox;
         private bool enabled { get; set; }
 
+        /// <summary>
+        /// Pipeline enabled
+        /// </summary>
         public bool Enabled
         {
             get => enabled;
@@ -40,17 +46,30 @@ namespace Crash.UI
             }
         }
 
+        /// <summary>
+        /// The drawable items
+        /// </summary>
         internal ConcurrentDictionary<Guid, Speck> Drawables { get; set; }
 
+        /// <summary>
+        /// The interactive pipeline instance
+        /// </summary>
         public InteractivePipe Instance;
 
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public InteractivePipe()
         {
             Drawables = new ConcurrentDictionary<Guid, Speck>();
             Instance = this;
         }
 
-
+        /// <summary>
+        /// Method to calculate the bounding box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void CalculateBoundingBox(object sender, CalculateBoundingBoxEventArgs e)
         {
             // TODO : Iterate through specks, add boundingbox of geometry to bbox;
@@ -59,6 +78,11 @@ namespace Crash.UI
             e.IncludeBoundingBox(bbox);
         }
 
+        /// <summary>
+        /// Post draw object events
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void PostDrawObjects(object sender, DrawEventArgs e)
         {
             BoundingBox box = new BoundingBox(0, 0, 0, 100, 200, 300);

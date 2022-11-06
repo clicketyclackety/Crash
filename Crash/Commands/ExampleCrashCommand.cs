@@ -8,8 +8,14 @@ using System.Collections.Generic;
 
 namespace Crash.Commands
 {
+    /// <summary>
+    /// The crash command
+    /// </summary>
     public class CrashCommand : Command
     {
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public CrashCommand()
         {
             // Rhino only creates one instance of each command class defined in a

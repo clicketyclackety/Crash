@@ -4,10 +4,14 @@ using Rhino.Commands;
 
 namespace Crash.Events
 {
-
+	/// <summary>
+	/// THe rhino event manager
+	/// </summary>
 	internal static class EventManagement
 	{
-
+		/// <summary>
+		/// Register events
+		/// </summary>
 		internal static void RegisterEvents()
 		{
 			// Remove all events first just in case.
@@ -32,6 +36,9 @@ namespace Crash.Events
 
         }
 
+		/// <summary>
+		/// De register events
+		/// </summary>
 		internal static void DeRegisterEvents()
 		{
 			RhinoDoc.AddRhinoObject -= AddItem.Event;

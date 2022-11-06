@@ -10,21 +10,32 @@ using System.Threading;
 
 namespace Crash.Commands
 {
-
+    /// <summary>
+    /// Open shared model command
+    /// </summary>
     public sealed class OpenSharedModel : Command
     {
-
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public OpenSharedModel()
         {
             Instance = this;
         }
 
+        /// <summary>
+        /// The crash server
+        /// </summary>
         CrashServer server;
 
-
+        /// <summary>
+        /// The instance
+        /// </summary>
         public static OpenSharedModel Instance { get; private set; }
 
-        
+        /// <summary>
+        /// The command name
+        /// </summary>
         public override string EnglishName => "OpenSharedModel";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)

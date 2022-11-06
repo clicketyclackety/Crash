@@ -49,6 +49,8 @@ namespace Crash.Utilities
         /// <returns>returns the update task</returns>
         public async Task UpdateSpeck(Speck speck)
         {
+            if (speck == null) return;
+
             // Cache
             if (_cache.ContainsKey(speck.Id))
             {
@@ -90,9 +92,15 @@ namespace Crash.Utilities
         /// <param name="speck">the speck to bake</param>
         internal void BakeSpeck(Speck speck)
         {
+            if (speck == null) return;
+
             var _doc = Rhino.RhinoDoc.ActiveDoc;
             GeometryBase geom = speck.GetGeom();
+            if (null == geom) return;
+
             Guid id = _doc.Objects.Add(geom);
+            if (Guid.Empty == id) return;
+
             RhinoObject rObj = _doc.Objects.Find(id);
 
             SyncHost(rObj, speck);
@@ -100,6 +108,8 @@ namespace Crash.Utilities
 
         public static void SyncHost(RhinoObject rObj, Speck speck)
         {
+            if (null == speck || rObj == null) return;
+
             // Data
             string key = "SPECKID";
             if (rObj.UserDictionary.TryGetGuid(key, out _))
@@ -141,6 +151,7 @@ namespace Crash.Utilities
         void DeleteSpeck(Speck speck)
         {
             RemoveSpeck(speck);
+            if (null == speck) return;
 
             var _doc = Rhino.RhinoDoc.ActiveDoc;
             Guid hostId = GetHost(speck.Id);
@@ -156,6 +167,8 @@ namespace Crash.Utilities
         /// <param name="specks">the specks to delete</param>
         void DeleteSpecks(IEnumerable<Speck> specks)
         {
+            if (null == specks) return;
+
             var enumer = specks.GetEnumerator();
             while (enumer.MoveNext())
             {
@@ -172,6 +185,8 @@ namespace Crash.Utilities
         /// <param name="speck">the speck to remove</param>
         internal void RemoveSpeck(Speck speck)
         {
+            if (null == speck) return;
+
             _cache.TryRemove(speck.Id, out _);
         }
 
@@ -181,6 +196,8 @@ namespace Crash.Utilities
         /// <param name="specks">the specks to remove</param>
         internal void RemoveSpecks(IEnumerable<Speck> specks)
         {
+            if (null == specks) return;
+
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
             {
@@ -198,6 +215,8 @@ namespace Crash.Utilities
         /// <param name="e"></param>
         private void RhinoApp_Idle(object sender, EventArgs e)
         {
+            if (null == ToBake || null == ToRemove) return;
+
             if (ToBake.Count > 0)
             {
                 BakeSpecks(ToBake);
@@ -221,6 +240,8 @@ namespace Crash.Utilities
         /// <param name="speck">the speck</param>
         internal static void OnAdd(string name, Speck speck)
         {
+            if (null == speck) return;
+
             Instance.UpdateSpeck(speck);
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
@@ -232,6 +253,8 @@ namespace Crash.Utilities
         /// <param name="speckId">speck id</param>
         internal static void OnDelete(string name, Guid speckId)
         {
+            if (Guid.Empty == speckId || string.IsNullOrEmpty(name)) return;
+
             Speck speck = new Speck(speckId) { Owner = name };
             Instance.DeleteSpeck(speck);
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
@@ -243,8 +266,12 @@ namespace Crash.Utilities
         /// <param name="name">the name</param>
         /// <param name="speckID">the speck id</param>
         /// <param name="speck">the speck</param>
-        internal static void OnUpdate(string name, Guid speckID, Speck speck)
+        internal static void OnUpdate(string name, Guid speckId, Speck speck)
         {
+            if (null == speck ||
+                Guid.Empty == speckId ||
+                string.IsNullOrEmpty(name)) return;
+
             // TODO : ...
         }
 
@@ -254,6 +281,8 @@ namespace Crash.Utilities
         /// <param name="name">the name of the collaboration</param>
         public static void CollaboratorIsDone(string name)
         {
+            if (string.IsNullOrEmpty(name)) return;
+
             SomeoneIsDone = true;
             string sanitisedName = name.ToLower();
             IEnumerable<Speck> ToBake = LocalCache.Instance.GetSpecks().

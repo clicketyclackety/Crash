@@ -132,9 +132,14 @@ namespace Crash.UI
         /// <param name="speck"></param>
         private void UpdateBoundingBox(Speck speck)
         {
-            BoundingBox speckBox = speck.GetGeom().GetBoundingBox(false);
-            speckBox.Inflate(1.25);
-            bbox.Union(speckBox);
+            GeometryBase? geom = speck.GetGeom();
+            if (geom is object)
+            {
+                BoundingBox speckBox = geom.GetBoundingBox(false);
+                speckBox.Inflate(1.25);
+                bbox.Union(speckBox);
+            }
+
         }
 
         /// Re-using materials is much faster
@@ -148,6 +153,8 @@ namespace Crash.UI
         private void DrawSpeck(DrawEventArgs e, Speck speck, Color color)
         {
             GeometryBase geom = speck.GetGeom();
+            if (geom == null) return;
+
             if (cachedMaterial.Diffuse != color)
             {
                 cachedMaterial = new DisplayMaterial(color);
@@ -168,6 +175,10 @@ namespace Crash.UI
             else if (geom is Extrusion ext)
             {
                 e.Display.DrawExtrusionWires(ext, cachedMaterial.Diffuse);
+            }
+            else if (geom is TextEntity te)
+            {
+                e.Display.DrawText(te, cachedMaterial.Diffuse);
             }
             else
             {

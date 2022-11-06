@@ -63,7 +63,7 @@ This project has been completed as part of the TT AEC Hackathon 2022 - New York.
 * [Curtis Wensley](https://www.linkedin.com/in/cwensley/)
 * [Erika Santos](https://www.linkedin.com/in/erikasantosr/)
 * [Lukas Fuhrimann](https://www.linkedin.com/in/lfuhrimann/)
-* [Morteza Karimi](https://www.linkedin.com/in/morteza-karimi-78813a67/)
+* [Morteza Karimi](https://github.com/karimi)
 * [Moustafa El-Sawy](https://www.linkedin.com/in/moustafakelsawy/)
 * [Russell Feathers](https://www.linkedin.com/in/russell-feathers/)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -88,7 +88,19 @@ You will need the following libraries and/or software installed before getting t
 3. Search for Crash and press Install.
 4. Close and Re-launch Rhino 7.
 
-### INSERT STEPS FOR MULTI USERS SUNDAY WHEN TESTING
+### Using Crash
+To host a new shared model:
+1. Type `StartSharedModel` command in Rhino.
+2. Enter your name when prompted.
+3. Specify an open port on your machine to run the server
+4. Others can join the session using url `<your_ip_address>:<port>`
+
+To Join a shared model:
+1. Type `OpenSharedModel` command in Rhino.
+2. Enter your name when prompted.
+3. Enter the server URL from step 4 above.
+
+You're now connected in a collaborative session. To commit your changes to the central model use the `Release` command.
 
 <!-- DEVELOPER GETTING STARTED -->
 ## Developer Getting Started
@@ -115,8 +127,16 @@ Clone the repo
    
 ## Building
 
+### Windows
+Open Crash repository in Visual Studio:
+  1. Set Crash as startup project.
+  2. Build solution.
+  3. Drag and drop `Crash\Crash\bin\Debug\net48\Crash.rhp` into an open Rhino window.
+  4. Re-open Rhino.
+  5. Happy debugging.
+
 ### MacOS
-Run build tasks `⇧⌘B` in this order:
+Open Crash repository in VS Code run build tasks `⇧⌘B` in this order:
   1. `buid-plugin`
   2. `build-server`
   3. `publish-server`
@@ -157,16 +177,7 @@ See the [open issues](https://github.com/clicketyclackety/Crash/issues) for a fu
 
 <!-- CONTRIBUTING -->
 ## Contributing
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+[Please see contribution guide](CONTRIBUTING.md)
 
 <!-- LICENSE -->
 ## License

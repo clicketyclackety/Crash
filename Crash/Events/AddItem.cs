@@ -21,6 +21,9 @@ namespace Crash.Events
             if (LocalCache.SomeoneIsDone) return;
 
             Speck speck = new Speck(e.ObjectId, User.CurrentUser.name, e.TheObject.Geometry.ToJSON(null));
+
+            LocalCache.SyncHost(e.TheObject, speck);
+
             RequestManager.LocalClient?.Add(speck);
         }
     }

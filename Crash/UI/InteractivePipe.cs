@@ -135,7 +135,7 @@ namespace Crash.UI
 
             if (geom is Curve cv)
             {
-                e.Display.DrawCurve(cv, color);
+                e.Display.DrawCurve(cv, color, 2);
             }
             else if (geom is Brep brep)
             {
@@ -144,6 +144,14 @@ namespace Crash.UI
             else if (geom is Mesh mesh)
             {
                 e.Display.DrawMeshShaded(mesh, cachedMaterial);
+            }
+            else if (geom is Extrusion ext)
+            {
+                e.Display.DrawExtrusionWires(ext, cachedMaterial.Diffuse);
+            }
+            else
+            {
+                ;
             }
         }
 

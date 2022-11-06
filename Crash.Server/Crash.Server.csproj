@@ -10,7 +10,8 @@
   <PropertyGroup Condition="$(Publish) == 'True'">
     <PublishDir>..\Crash\bin\$(Configuration)\net48\Server\$(RuntimeIdentifier)\</PublishDir>
     <PublishSingleFile>true</PublishSingleFile>
-	<SelfContained>true</SelfContained>
+	  <SelfContained>true</SelfContained>
+    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
 	<PropertyGroup Condition="$(Publish) == ''">

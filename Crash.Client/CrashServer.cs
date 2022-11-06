@@ -64,8 +64,18 @@ namespace Crash
         /// </summary>
         public void Stop()
         {
-            process?.Kill();
-            process = null;
+            try
+            {
+                process?.Kill();
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                process = null;
+            }
         }
 
         /// <summary>

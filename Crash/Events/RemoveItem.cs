@@ -18,7 +18,6 @@ namespace Crash.Events
         {
             //TODO: if an item is removed, remove the item from the database
             RequestManager.LocalClient?.Delete(e.ObjectId);
-
         }
 
     }

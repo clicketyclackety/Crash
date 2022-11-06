@@ -284,9 +284,9 @@ namespace Crash.Utilities
             if (string.IsNullOrEmpty(name)) return;
 
             SomeoneIsDone = true;
-            string sanitisedName = name.ToLower();
+            string? sanitisedName = name?.ToLower();
             IEnumerable<Speck> ToBake = LocalCache.Instance.GetSpecks().
-                                        Where(s => s.Owner.ToLower() == sanitisedName);
+                                        Where(s => s.Owner?.ToLower() == sanitisedName).Where(s => s is object);
 
             LocalCache.Instance.BakeSpecks(ToBake);
             LocalCache.Instance.RemoveSpecks(ToBake);

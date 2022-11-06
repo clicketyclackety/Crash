@@ -17,6 +17,7 @@ namespace Crash.UI
     /// </summary>
     public sealed class InteractivePipe
     {
+        private BoundingBox bbox;
 
         private bool enabled { get; set; }
 
@@ -63,6 +64,7 @@ namespace Crash.UI
         {
             Drawables = new ConcurrentDictionary<Guid, Speck>();
             Instance = this;
+            bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
         }
 
         /// <summary>
@@ -72,16 +74,7 @@ namespace Crash.UI
         /// <param name="e"></param>
         public void CalculateBoundingBox(object sender, CalculateBoundingBoxEventArgs e)
         {
-            IEnumerable<Speck> specks = Drawables.Values.ToList().OrderBy(s => s?.Owner);
-            var enumer = specks.GetEnumerator();
-            while (enumer.MoveNext())
-            {
-                Speck speck = enumer.Current;
-                BoundingBox bbox = speck.GetGeom().GetBoundingBox(false);
-                bbox.Inflate(1.25);
-
-                e.IncludeBoundingBox(bbox);
-            }
+            e.IncludeBoundingBox(bbox);
         }
 
         /// <summary>
@@ -102,14 +95,16 @@ namespace Crash.UI
                 Speck speck = enumer.Current;
                 var nameCol = new Utilities.User(speck.Owner).color;
                 DrawSpeck(e, speck, nameCol);
-            }
 
-            UpdateBoundingBox(e);
+                UpdateBoundingBox(speck);
+            }
         }
 
-        private void UpdateBoundingBox(DrawEventArgs e)
+        private void UpdateBoundingBox(Speck speck)
         {
-            bbox = new BoundingBox(-1000, -1000, -1000, 1000, 1000, 1000);
+            BoundingBox speckBox = speck.GetGeom().GetBoundingBox(false);
+            speckBox.Inflate(1.25);
+            bbox.Union(speckBox);
         }
 
         DisplayMaterial cachedMaterial = new DisplayMaterial(Color.Blue);

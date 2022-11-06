@@ -99,13 +99,32 @@ You will need the following libraries and/or software installed before getting t
 * [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
 * [.NET CORE 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 * [Rhino 7.21+](https://www.rhino3d.com/download/)
+* [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 
-## Building
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+### Prerequisites (MacOS)
+You can also build and debug on MacOS using VS Code!
+* [Visual Studio Code](https://code.visualstudio.com/)
+* [Rhino 8 WIP](https://www.rhino3d.com/download/rhino/wip) is required on ARM machines.
+
+## Getting Source
+
+Clone the repo
    ```sh
    git clone https://github.com/clicketyclackety/Crash.git
    ```
+   
+## Building
+
+### MacOS
+Run build tasks `⇧⌘B` in this order:
+  1. `buid-plugin`
+  2. `build-server`
+  3. `publish-server`
+From `Run and Debug` tab run `Run Rhino 8 WIP`
+
+Rhino will launch in debug mode.
+
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- WORKFLOW EXAMPLES -->
@@ -139,7 +158,15 @@ See the [open issues](https://github.com/clicketyclackety/Crash/issues) for a fu
 <!-- CONTRIBUTING -->
 ## Contributing
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-If you have a suggestion that would make this better, please take a look at the [CONTRIBUTING.md](https://github.com/clicketyclackety/Crash/blob/main/CONTRIBUTING.md) guide to get started
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- LICENSE -->
 ## License

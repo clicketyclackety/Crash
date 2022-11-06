@@ -17,7 +17,7 @@ namespace Crash.UI
     /// </summary>
     public sealed class InteractivePipe
     {
-        private BoundingBox bbox;
+
         private bool enabled { get; set; }
 
         /// <summary>
@@ -72,10 +72,16 @@ namespace Crash.UI
         /// <param name="e"></param>
         public void CalculateBoundingBox(object sender, CalculateBoundingBoxEventArgs e)
         {
-            // TODO : Iterate through specks, add boundingbox of geometry to bbox;
+            IEnumerable<Speck> specks = Drawables.Values.ToList().OrderBy(s => s?.Owner);
+            var enumer = specks.GetEnumerator();
+            while (enumer.MoveNext())
+            {
+                Speck speck = enumer.Current;
+                BoundingBox bbox = speck.GetGeom().GetBoundingBox(false);
+                bbox.Inflate(1.25);
 
-            // Dummy box
-            e.IncludeBoundingBox(bbox);
+                e.IncludeBoundingBox(bbox);
+            }
         }
 
         /// <summary>

@@ -89,6 +89,8 @@ To Join a shared model:
 2. Enter your name when prompted.
 3. Enter the server URL from step 4 above.
 
+![start-share](https://github.com/clicketyclackety/Crash/blob/main/start-share.gif)
+
 You're now connected in a collaborative session. To commit your changes to the central model use the `Release` command.
 
 <!-- DEVELOPER GETTING STARTED -->
@@ -157,7 +159,7 @@ The following steps show a complete workflow of how the system works. For this e
 - [X] Local web server 
 - [X] Rhino plugin (window)
 - [X] Deploy plugin to YAK
-- [ ] Deploy webserver (AWS)
+- [X] Deploy webserver (Azure)
 - [ ] Version control
 - [ ] CI
     - [ ] Unit tests

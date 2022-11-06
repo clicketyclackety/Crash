@@ -55,7 +55,10 @@ namespace Crash.Server
         {
             try
             {
-                _context.Specks.Remove(_context.Specks.FirstOrDefault(r => r.Id == id));
+                var speck = _context.Specks.FirstOrDefault(r => r.Id == id);
+                if (speck != null)
+                    return;
+                _context.Specks.Remove(speck);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -94,7 +97,9 @@ namespace Crash.Server
         {
             try
             {
-                Model.Speck modSpec = _context.Specks.FirstOrDefault(r => r.Id == id);
+                var modSpec = _context.Specks.FirstOrDefault(r => r.Id == id);
+                if (modSpec == null)
+                    return;
                 modSpec.Temporary = true;
                 modSpec.LockedBy = user;
                 _context.Specks.Update(modSpec);
@@ -111,7 +116,9 @@ namespace Crash.Server
         {
             try
             {
-                Model.Speck unSelect = _context.Specks.FirstOrDefault(r => r.Id == id);
+                var unSelect = _context.Specks.FirstOrDefault(r => r.Id == id);
+                if (unSelect == null)
+                    return;
                 unSelect.Temporary = false;
                 unSelect.LockedBy = null;
                 _context.Specks.Update(unSelect);

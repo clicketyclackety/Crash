@@ -75,9 +75,6 @@ namespace Crash.Utilities
             GeometryBase geom = speck.GetGeom();
             Guid id = _doc.Objects.Add(geom);
             RhinoObject rObj = _doc.Objects.Find(id);
-            
-            // To ensure consistancy
-            rObj.Id = speck.Id;
         }
 
         /// <summary>
@@ -195,7 +192,7 @@ namespace Crash.Utilities
         internal static void OnDelete(string name, Guid speckId)
         {
             Speck speck = new Speck(speckId) { Owner = name };
-            Instance.RemoveSpeck(speck);
+            Instance.DeleteSpeck(speck);
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
 

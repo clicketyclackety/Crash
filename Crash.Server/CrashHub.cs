@@ -126,8 +126,15 @@ namespace Crash.Server
 
         public async Task Initialize(Speck[] specks)
         {
+            List<Model.Speck> newDb = new List<Model.Speck>();
+            foreach (var speck in specks)
+            {
+                newDb.Add(Model.Speck.From(speck));
+            }
+            _context.Specks.AddRange(newDb);
+            await _context.SaveChangesAsync();
 
-
+            //await Clients.Others.Initialize(specks);
         }
 
 
@@ -135,7 +142,7 @@ namespace Crash.Server
         {
             await base.OnConnectedAsync();
 
-            await Clients.Caller.Initialize();
+            //await Clients.Caller.Initialize();
         }
     }
 }

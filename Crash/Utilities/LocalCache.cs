@@ -67,6 +67,18 @@ namespace Crash.Utilities
             return _cache.Values;
         }
 
+        public static RhinoObject GetHost(Speck speck)
+        {
+            if (!Instance._SpeckToRhino.TryGetValue(speck.Id, out Guid hostId)) return null;
+            return Rhino.RhinoDoc.ActiveDoc.Objects.Find(hostId);
+        }
+
+        public static Guid GetHost(Guid speckId)
+        {
+            Instance._SpeckToRhino.TryGetValue(speckId, out Guid hostId);
+            return hostId;
+        }
+
         #endregion
 
         #region bake specks

@@ -99,13 +99,32 @@ You will need the following libraries and/or software installed before getting t
 * [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
 * [.NET CORE 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 * [Rhino 7.21+](https://www.rhino3d.com/download/)
+* [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 
-## Building
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+### Prerequisites (MacOS)
+You can also build and debug on MacOS using VS Code!
+* [Visual Studio Code](https://code.visualstudio.com/)
+* [Rhino 8 WIP](https://www.rhino3d.com/download/rhino/wip) is required on ARM machines.
+
+## Getting Source
+
+Clone the repo
    ```sh
    git clone https://github.com/clicketyclackety/Crash.git
    ```
+   
+## Building
+
+### MacOS
+Run build tasks `⇧⌘B` in this order:
+  1. `buid-plugin`
+  2. `build-server`
+  3. `publish-server`
+From `Run and Debug` tab run `Run Rhino 8 WIP`
+
+Rhino will launch in debug mode.
+
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- WORKFLOW EXAMPLES -->

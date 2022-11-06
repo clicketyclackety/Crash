@@ -56,8 +56,7 @@ namespace Crash.Commands
 
             try
             {
-                RequestManager.StartOrContinueLocalClient(new Uri($"http://localhost:{port}/Crash"));
-                _LocalClientStarted = true;
+                RequestManager.StartOrContinueLocalClient(new Uri($"http://127.0.0.1:{port}/Crash"));                _LocalClientStarted = true;
             }
             catch(UriFormatException ex)
             {

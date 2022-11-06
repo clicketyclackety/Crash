@@ -56,7 +56,21 @@ namespace Crash
             _connection.On<string, Guid>("Select", (user, id) => OnSelect?.Invoke(user, id));
             _connection.On<string, Guid>("Unselect", (user, id) => OnUnselect?.Invoke(user, id));
             _connection.On<Speck[]>("Initialize", (specks) => OnInitialize?.Invoke(specks));
+            _connection.Closed += Connection_Closed;
+            _connection.Reconnecting += Connection_Reconnecting;
 
+        }
+
+        private Task Connection_Reconnecting(Exception arg)
+        {
+            Console.WriteLine(arg);
+            return Task.CompletedTask;
+        }
+
+        private Task Connection_Closed(Exception arg)
+        {
+            Console.WriteLine(arg);
+            return Task.CompletedTask;
         }
 
         /// <summary>

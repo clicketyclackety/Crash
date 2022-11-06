@@ -107,7 +107,7 @@ You can also build and debug on MacOS using VS Code!
 * [Visual Studio Code](https://code.visualstudio.com/)
 * [Rhino 8 WIP](https://www.rhino3d.com/download/rhino/wip) is required on ARM machines.
 
-## Getting Source
+### Getting Source
 
 Clone the repo
    ```sh

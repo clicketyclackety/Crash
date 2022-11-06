@@ -9,9 +9,16 @@ using System.Threading.Tasks;
 
 namespace Crash.Utilities
 {
+    /// <summary>
+    /// Speck utility class
+    /// </summary>
     internal static class SpeckUtils
     {
-
+        /// <summary>
+        /// Get geometry from speck payload
+        /// </summary>
+        /// <param name="speck">the speck</param>
+        /// <returns></returns>
         public static GeometryBase? GetGeom(this Speck speck)
         {
             GeometryBase geom = (GeometryBase)GeometryBase.FromJSON(speck.Payload);

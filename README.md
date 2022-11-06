@@ -35,13 +35,20 @@
       </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
+      <a href="#poweruser-getting-started">Poweruser Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
+        <li><a href="#installing-crash-from-yak">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#innerworks">Innerworks</a></li>
+    <li>
+      <a href="#developer-getting-started">Developer Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites-1">Prerequisites</a></li>
+        <li><a href="#building">Building</a></li>
+      </ul>
+    </li>
+    <li><a href="#workflow-overview">Workflow Overview</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -51,7 +58,6 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
 This project has been completed as part of the TT AEC Hackathon 2022 - New York. This plugin/application allows users to collaborate on a single central Rhino model. The Team Members for this awesome project are (in alphabetical order):
 * [Callum Sykes](https://www.linkedin.com/in/callumsykes/)
 * [Curtis Wensley](https://www.linkedin.com/in/cwensley/)
@@ -65,42 +71,45 @@ This project has been completed as part of the TT AEC Hackathon 2022 - New York.
 ### Built With
 * [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 * [SignalR](https://learn.microsoft.com/en-us/aspnet/signalr/overview/getting-started/introduction-to-signalr)
-* ...
+* [SQLite](https://www.sqlite.org/index.html)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-<!-- GETTING STARTED -->
-## Getting Started
-Thanks for checking out CRASH! Please follow the following steps to get started in no time! Please make sure you have all the <a href="#prerequisites">Prerequisites</a> to have a smooth and fun experience!
-1. step 1
-2. step 2
-3. ...
+<!-- POWERUSER GETTING STARTED -->
+## Poweruser Getting Started
+Thanks for checking out CRASH! Please follow the steps below to get started in no time! Please make sure you have all the <a href="#prerequisites">Prerequisites</a> to have a smooth and fun experience!
 
 ### Prerequisites
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+You will need the following libraries and/or software installed before getting to the fun!
+* [Rhino 7.21+](https://www.rhino3d.com/download/)
 
-### Installation
+### Installing CRASH from YAK
+1. Launch Rhino 7
+2. Type in PackageManager or go to Tools --> Package Manager
+3. Search for Crash and press Install.
+4. Close and Re-launch Rhino 7.
+
+### INSERT STEPS FOR MULTI USERS SUNDAY WHEN TESTING
+
+<!-- DEVELOPER GETTING STARTED -->
+## Developer Getting Started
+Thanks again for checking out CRASH! Please follow the steps below to get started and diving into the code in no time! Please sure sure you have all the <a href="#prerequisites-1">Prerequisites</a> to have a smooth, unbuggy and fun experience!
+
+### Prerequisites
+You will need the following libraries and/or software installed before getting to the fun!
+* [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
+* [.NET CORE 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+* [Rhino 7.21+](https://www.rhino3d.com/download/)
+
+## Building
 1. Get a free API Key at [https://example.com](https://example.com)
 2. Clone the repo
    ```sh
    git clone https://github.com/clicketyclackety/Crash.git
    ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- INNERWORKS EXAMPLES -->
-## Innerworks
+<!-- WORKFLOW EXAMPLES -->
+## Workflow Overview
 Crash works by allowing back & forth communication of clients with a central server to either send changes or receive changes. The server keeps record of a list of objects along with relevant attributes to allow the functionality required. One important distinction here is that the database/server will hold two types of objects; baked and ghost objects. Baked objects are drawn into the Rhino model while Non-Baked (called ghost here) objects are "Pipeline" objects. Communication between the client and database occurs in the form of invoking end points on either side and sending over "Speck" objects that contain all the required information.
 
 The following steps show a complete workflow of how the system works. For this example, there are 3 users (Bob, John, Marry) working on a central model called "NYC Building 5".
@@ -147,7 +156,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
-Big thanks to AEC Tech 2022 for arranging this event. This project has been a great collaboration of several great minds. Please check out other hackathon projects and future hackathon events hosted by [AECTech](https://www.aectech.us/).
+Big thanks to AEC Tech 2022 for arranging this event! Also we would like to thank McNeel for all their awesome work! This project has been a great collaboration of several great minds. Please check out other hackathon projects and future hackathon events hosted by [AECTech](https://www.aectech.us/).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

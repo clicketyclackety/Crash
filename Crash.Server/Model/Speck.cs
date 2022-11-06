@@ -58,7 +58,17 @@
             s.Stamp = speck.Stamp;
             s.Owner = speck.Owner;
             s.Temporary = true;
-            // s.Payload = speck.Payload;
+            s.Payload = speck.Payload;
+            return s;
+        }
+
+        internal static SpeckLib.Speck To(Speck speck)
+        {
+            SpeckLib.Speck s = new SpeckLib.Speck();
+            s.Id = speck.Id;
+            s.Stamp = speck.Stamp;
+            s.Owner = speck.Owner;
+            s.Payload = speck.Payload;
             return s;
         }
 

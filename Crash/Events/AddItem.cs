@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace Crash.Events
 {
+    /// <summary>
+    /// Add item event handler
+    /// </summary>
     internal static class AddItem
     {
         internal static void Event(object sender, RhinoObjectEventArgs e)

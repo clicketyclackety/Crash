@@ -11,19 +11,24 @@ using System.Security.Policy;
 
 namespace Crash.Commands
 {
-
+    /// <summary>
+    /// Command to start the shared model
+    /// </summary>
     public sealed class StartSharedModel : Command
     {
-
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public StartSharedModel()
         {
             Instance = this;
         }
 
-        
+        /// <summary>
+        /// Command Instance
+        /// </summary>
         public static StartSharedModel Instance { get; private set; }
 
-        
         public override string EnglishName => "StartSharedModel";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)

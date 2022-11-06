@@ -9,18 +9,24 @@ using System.Collections.Generic;
 
 namespace Crash.Commands
 {
-
+    /// <summary>
+    /// Release command
+    /// </summary>
     public sealed class ReleaseCommand : Command
     {
-
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public ReleaseCommand()
         {
             Instance = this;
         }
 
+        /// <summary>
+        /// Command instance
+        /// </summary>
         public static ReleaseCommand Instance { get; private set; }
 
-        
         public override string EnglishName => "Release";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)

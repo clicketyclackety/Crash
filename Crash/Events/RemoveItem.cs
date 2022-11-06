@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 
 namespace Crash.Events
 {
-
+    /// <summary>
+    /// Remove item event handler
+    /// </summary>
     internal static class RemoveItem
     {
 

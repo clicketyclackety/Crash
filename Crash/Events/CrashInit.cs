@@ -1,4 +1,5 @@
 ﻿using Crash.Utilities;
+using Eto.Forms;
 using SpeckLib;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,8 @@ namespace Crash.Events
             Rhino.RhinoApp.WriteLine("Loading specks ...");
             LocalCache.Instance.BakeSpecks(specks);
             IsInit = false;
+
+            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
     }

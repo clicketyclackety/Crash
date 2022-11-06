@@ -184,6 +184,7 @@ namespace Crash.Utilities
         internal static void OnAdd(string name, Speck speck)
         {
             Instance.UpdateSpeck(speck);
+            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
         
         /// <summary>
@@ -195,6 +196,7 @@ namespace Crash.Utilities
         {
             Speck speck = new Speck(speckId) { Owner = name };
             Instance.RemoveSpeck(speck);
+            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
         /// <summary>
@@ -222,6 +224,7 @@ namespace Crash.Utilities
             LocalCache.Instance.BakeSpecks(ToBake);
             LocalCache.Instance.RemoveSpecks(ToBake);
             SomeoneIsDone = false;
+            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
         #endregion

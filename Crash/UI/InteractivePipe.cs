@@ -22,7 +22,7 @@ namespace Crash.UI
         private bool enabled { get; set; }
 
         /// <summary>
-        /// Pipeline enabled
+        /// Pipeline enabled, disabling hides it
         /// </summary>
         public bool Enabled
         {
@@ -100,6 +100,10 @@ namespace Crash.UI
             }
         }
 
+        /// <summary>
+        /// Updates the BoundingBox of the Pipeline
+        /// </summary>
+        /// <param name="speck"></param>
         private void UpdateBoundingBox(Speck speck)
         {
             BoundingBox speckBox = speck.GetGeom().GetBoundingBox(false);
@@ -107,7 +111,14 @@ namespace Crash.UI
             bbox.Union(speckBox);
         }
 
+        /// Re-using materials is much faster
         DisplayMaterial cachedMaterial = new DisplayMaterial(Color.Blue);
+        /// <summary>
+        /// Draws a Speck in the pipeline.
+        /// </summary>
+        /// <param name="e">The EventArgs from the DisplayConduit</param>
+        /// <param name="speck">The Speck</param>
+        /// <param name="color">The colour for the speck, based on the user.</param>
         private void DrawSpeck(DrawEventArgs e, Speck speck, Color color)
         {
             GeometryBase geom = speck.GetGeom();
@@ -129,14 +140,6 @@ namespace Crash.UI
                 e.Display.DrawMeshShaded(mesh, cachedMaterial);
             }
         }
-
-        private void DrawNothing() { }
-
-        private void DrawCurve(Curve curve)
-        {
-
-        }
-
 
     }
 

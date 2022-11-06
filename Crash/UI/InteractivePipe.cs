@@ -84,11 +84,7 @@ namespace Crash.UI
         /// <param name="e"></param>
         public void PostDrawObjects(object sender, DrawEventArgs e)
         {
-            BoundingBox box = new BoundingBox(0, 0, 0, 100, 200, 300);
-
-            e.Display.DrawBox(box, Color.Red);
-
-            IEnumerable<Speck> specks = Drawables.Values.ToList().OrderBy(s => s?.Owner);
+            IEnumerable<Speck> specks = LocalCache.Instance.GetSpecks();
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
             {

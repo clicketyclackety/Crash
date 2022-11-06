@@ -91,17 +91,50 @@ namespace Crash.Events
 			{
 				Speck speck = enumer.Current;
 				GeometryBase geom = speck.GetGeom();
-				BoundingBox box = geom.GetBoundingBox(true);
-				if(Intersection.LineBox(line, box, 100, out _))
+                switch (geom)
                 {
-					selectedUser = speck.Owner;
-					tagLocation = box.Center;
-					return true;
-                }
+					case (Curve curve):
+						CurveIntersections intersect = Intersection.CurveLine(curve, line, 100, 100);
+						if (intersect == null)
+						{
+							break;
+						}
+
+						selectedUser = speck.Owner;
+						tagLocation = intersect.First().PointA;
+						return true;
+						
+					case (Brep brep):
+						BoundingBox box = brep.GetBoundingBox(true);
+						if (Intersection.LineBox(line, box, 100, out _))
+						{
+							selectedUser = speck.Owner;
+							tagLocation = box.Center;
+							return true;
+						}
+						break;
+					case (Mesh mesh):
+						if (Intersection.MeshLine(mesh, line, out _)?.Count()>0)
+						{
+							selectedUser = speck.Owner;
+							tagLocation = Point3d.Origin;
+
+							return true;
+						}
+						break;
+					case (Extrusion extrusion):
+						break;
+				}				
 			}
-			
+
+			bool changed = false;
+			if (selectedUser != string.Empty || tagLocation != Point3d.Unset)
+				changed = true;
 			selectedUser = string.Empty;
 			tagLocation = Point3d.Unset;
+			if(changed)
+				Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
+
 			return false;
 		}
 	}

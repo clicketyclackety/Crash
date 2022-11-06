@@ -101,8 +101,8 @@ namespace Crash.UI
             else
             {
                 var nameCol = new Utilities.User(MouseEvent.selectedUser).color;
-                
-                e.Display.Draw2dText(MouseEvent.selectedUser, nameCol, new Point2d(MouseEvent.tagLocation.X,MouseEvent.tagLocation.Y), true, 100);
+                Point2d location = Rhino.RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.WorldToClient(MouseEvent.tagLocation);
+                e.Display.Draw2dText(MouseEvent.selectedUser, nameCol, location, true, 20);
             }
         }
 

@@ -13,13 +13,13 @@ namespace Crash.Events
         internal static void OnSelect(string name, Guid speckId)
         {
             var _doc = Rhino.RhinoDoc.ActiveDoc;
-            _doc.Objects.Select(speckId, true);
+            _doc.Objects.Lock(speckId, true);
         }
 
         internal static void OnUnSelect(string name, Guid speckId)
         {
             var _doc = Rhino.RhinoDoc.ActiveDoc;
-            _doc.Objects.Select(speckId, false);
+            _doc.Objects.Unlock(speckId, true);
         }
 
     }

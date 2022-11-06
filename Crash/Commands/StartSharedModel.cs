@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using Crash.Utilities;
 using System.Drawing;
+using System.Security.Policy;
 
 namespace Crash.Commands
 {
@@ -31,6 +32,9 @@ namespace Crash.Commands
             var res = Rhino.Input.RhinoGet.GetString("Your Name", true, ref name);
             User user = new User(name);
             User.CurrentUser = user;
+
+            // Start Server Host
+
             return Result.Success;
         }
 

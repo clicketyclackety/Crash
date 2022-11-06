@@ -13,12 +13,13 @@ namespace Crash.Utilities
 
         internal static Crash.CrashClient LocalClient;
 
-        public static void StartOrContinueLocalClient(string URL)
+        public static void StartOrContinueLocalClient(string filename)
         {
             if (null == LocalClient)
             {
                 // TODO : Add a URI
-                CrashClient client = new CrashClient(User.CurrentUser.name, null);
+                Uri uri = new Uri($"<url>/{filename}");
+                CrashClient client = new CrashClient(User.CurrentUser.name, uri);
                 RequestManager.LocalClient = client;
 
                 Events.EventManagement.RegisterEvents();

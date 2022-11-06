@@ -30,23 +30,12 @@
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
     </li>
     <li>
-      <a href="#poweruser-getting-started">Poweruser Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installing-crash-from-yak">Installation</a></li>
-      </ul>
+      <a href="#baby-poweruser-getting-started">Poweruser Getting Started</a>
     </li>
     <li>
-      <a href="#developer-getting-started">Developer Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites-1">Prerequisites</a></li>
-        <li><a href="#building">Building</a></li>
-      </ul>
+      <a href="#man_technologist-woman_technologist-developer-getting-started">Developer Getting Started</a>
     </li>
     <li><a href="#workflow-overview">Workflow Overview</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
@@ -75,7 +64,7 @@ This project has been completed as part of the TT AEC Hackathon 2022 - New York.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- POWERUSER GETTING STARTED -->
-## Poweruser Getting Started
+## :baby: Poweruser Getting Started
 Thanks for checking out CRASH! Please follow the steps below to get started in no time! Please make sure you have all the <a href="#prerequisites">Prerequisites</a> to have a smooth and fun experience!
 
 ### Prerequisites
@@ -103,7 +92,7 @@ To Join a shared model:
 You're now connected in a collaborative session. To commit your changes to the central model use the `Release` command.
 
 <!-- DEVELOPER GETTING STARTED -->
-## Developer Getting Started
+## :man_technologist: :woman_technologist: Developer Getting Started
 Thanks again for checking out CRASH! Please follow the steps below to get started and diving into the code in no time! Please sure sure you have all the <a href="#prerequisites-1">Prerequisites</a> to have a smooth, unbuggy and fun experience!
 
 ### Prerequisites
@@ -125,9 +114,9 @@ Clone the repo
    git clone https://github.com/clicketyclackety/Crash.git
    ```
    
-## Building
+### Building
 
-### Windows
+#### Windows
 Open Crash repository in Visual Studio:
   1. Set Crash as startup project.
   2. Build solution.
@@ -135,7 +124,7 @@ Open Crash repository in Visual Studio:
   4. Re-open Rhino.
   5. Happy debugging.
 
-### MacOS
+#### MacOS
 Open Crash repository in VS Code run build tasks `⇧⌘B` in this order:
   1. `buid-plugin`
   2. `build-server`
@@ -143,8 +132,6 @@ Open Crash repository in VS Code run build tasks `⇧⌘B` in this order:
 From `Run and Debug` tab run `Run Rhino 8 WIP`
 
 Rhino will launch in debug mode.
-
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- WORKFLOW EXAMPLES -->

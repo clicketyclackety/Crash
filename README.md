@@ -154,10 +154,19 @@ The following steps show a complete workflow of how the system works. For this e
 
 <!-- ROADMAP -->
 ## Roadmap
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-    - [ ] Nested Feature
+- [X] Local web server 
+- [X] Rhino plugin (window)
+- [X] Deploy plugin to YAK
+- [ ] Deploy webserver (AWS)
+- [ ] Version control
+- [ ] CI
+    - [ ] Unit tests
+    - [ ] Push to deploy
+- [ ] Expand Supported types
+    - [ ] Layers
+    - [ ] Object attributes
+    - [ ] Document settings
+- [ ] Authorization and access management
 
 See the [open issues](https://github.com/clicketyclackety/Crash/issues) for a full list of proposed features (and known issues).
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

@@ -17,7 +17,6 @@ namespace Crash.Events
             //TODO: if an item is added, add it to the database
             Speck speck = new Speck(e.ObjectId);
             RequestManager.LocalClient?.Add(speck);
-
         }
     }
 }

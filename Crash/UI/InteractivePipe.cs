@@ -180,6 +180,10 @@ namespace Crash.UI
             {
                 e.Display.DrawText(te, cachedMaterial.Diffuse);
             }
+            else if (geom is TextDot td)
+            {
+                e.Display.DrawDot(td, Color.White, cachedMaterial.Diffuse, cachedMaterial.Diffuse);
+            }
             else
             {
                 ;

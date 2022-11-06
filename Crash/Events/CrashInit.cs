@@ -13,10 +13,14 @@ namespace Crash.Events
     /// </summary>
     internal static class CrashInit
     {
+        public static bool IsInit { get; set; }
+
         internal static void OnInit(IEnumerable<Speck> specks)
         {
+            IsInit = true;
             Rhino.RhinoApp.WriteLine("Loading specks ...");
             LocalCache.Instance.BakeSpecks(specks);
+            IsInit = false;
         }
 
     }

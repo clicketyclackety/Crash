@@ -16,6 +16,8 @@ namespace Crash.Utilities
     /// </summary>
     public sealed class LocalCache
     {
+        public static bool SomeoneIsDone { get; set; }
+
         private ConcurrentDictionary<Guid, Speck> _cache { get; set; }
 
         private List<Speck> ToBake = new List<Speck>();
@@ -212,12 +214,14 @@ namespace Crash.Utilities
         /// <param name="name">the name of the collaboration</param>
         public static void CollaboratorIsDone(string name)
         {
+            SomeoneIsDone = true;
             string sanitisedName = name.ToLower();
             IEnumerable<Speck> ToBake = LocalCache.Instance.GetSpecks().
                                         Where(s => s.Owner.ToLower() == sanitisedName);
 
             LocalCache.Instance.BakeSpecks(ToBake);
             LocalCache.Instance.RemoveSpecks(ToBake);
+            SomeoneIsDone = false;
         }
 
         #endregion

@@ -17,6 +17,9 @@ namespace Crash.Events
     {
         internal static void Event(object sender, RhinoObjectEventArgs e)
         {
+            if (CrashInit.IsInit) return;
+            if (LocalCache.SomeoneIsDone) return;
+
             Speck speck = new Speck(e.ObjectId, User.CurrentUser.name, e.TheObject.Geometry.ToJSON(null));
             RequestManager.LocalClient?.Add(speck);
         }

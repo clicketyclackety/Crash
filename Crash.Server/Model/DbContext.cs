@@ -4,6 +4,9 @@ using SpeckLib;
 
 namespace Crash.Server.Model
 {
+    /// <summary>
+    /// Implementation of DbContext to be used as SqLite DB Session
+    /// </summary>
     public class CrashContext : DbContext
     {
         public CrashContext(DbContextOptions<CrashContext> options)

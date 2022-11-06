@@ -15,11 +15,11 @@ Set-Location $buildDir
 
 # Build servers
 & dotnet publish -c $configuration -r win-x64 "$base_dir/Crash.Server/Crash.Server.csproj" /p:Publish=True
-& dotnet publish -c $configuration -r osx-x64 "$base_dir/Crash.Server/Crash.Server.csproj" /p:Publish=True
-& dotnet publish -c $configuration -r osx-arm64 "$base_dir/Crash.Server/Crash.Server.csproj" /p:Publish=True
+# & dotnet publish -c $configuration -r osx-x64 "$base_dir/Crash.Server/Crash.Server.csproj" /p:Publish=True
+# & dotnet publish -c $configuration -r osx-arm64 "$base_dir/Crash.Server/Crash.Server.csproj" /p:Publish=True
 
 
 $yakexe = "C:\Program Files\Rhino 7\System\Yak.exe"
-& $yakexe build
+& $yakexe build --platform win
 
 Set-Location $loc

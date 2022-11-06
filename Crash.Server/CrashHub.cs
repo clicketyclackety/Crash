@@ -3,6 +3,9 @@ using SpeckLib;
 
 namespace Crash.Server
 {
+    /// <summary>
+    /// EndPoints Interface
+    /// </summary>
     public interface ICrashClient
     {
         Task Update(string user, Guid id, Speck speck);
@@ -14,14 +17,28 @@ namespace Crash.Server
         Task Initialize(Speck[] specks);
     }
 
+    /// <summary>
+    /// Server Implementation of ICrashClient EndPoints
+    /// </summary>
     public class CrashHub : Hub<ICrashClient>
     {
         Model.CrashContext _context;
+
+        /// <summary>
+        /// Initialize with SqLite DB
+        /// </summary>
+        /// <param name="context"></param>
         public CrashHub(Model.CrashContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Add Speck to SqLite DB and notify other clients
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="speck"></param>
+        /// <returns></returns>
         public async Task Add(string user, Speck speck)
         {
             try
@@ -36,11 +53,22 @@ namespace Crash.Server
             await Clients.Others.Add(user, speck);
         }
 
+        /// <summary>
+        /// Update Item in SqLite DB and notify other clients
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="id"></param>
+        /// <param name="speck"></param>
+        /// <returns></returns>
         public async Task Update(string user, Guid id, Speck speck)
         {
             try
             {
-                _context.Specks.Remove(_context.Specks.FirstOrDefault(r => r.Id == id));
+                var removeSpeck = _context.Specks.FirstOrDefault(r => r.Id == id);
+                if (removeSpeck != null)
+                {
+                    _context.Specks.Remove(removeSpeck);
+                }
                 _context.Specks.Add(Model.Speck.From(speck));
                 await _context.SaveChangesAsync();
             }
@@ -51,12 +79,18 @@ namespace Crash.Server
             await Clients.Others.Update(user, id, speck);
         }
 
+        /// <summary>
+        /// Delete Item in SqLite DB and notify other clients
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task Delete(string user, Guid id)
         {
             try
             {
                 var speck = _context.Specks.FirstOrDefault(r => r.Id == id);
-                if (speck != null)
+                if (speck == null)
                     return;
                 _context.Specks.Remove(speck);
                 await _context.SaveChangesAsync();
@@ -68,6 +102,11 @@ namespace Crash.Server
             await Clients.Others.Delete(user, id);
         }
 
+        /// <summary>
+        /// Unlock Item in SqLite DB and notify other clients
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task Done(string user)
         {
             try
@@ -93,6 +132,12 @@ namespace Crash.Server
 
         }
 
+        /// <summary>
+        /// Lock Item in SqLite DB and notify other clients
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task Select(string user, Guid id)
         {
             try
@@ -112,6 +157,12 @@ namespace Crash.Server
             await Clients.Others.Select(user, id);
         }
 
+        /// <summary>
+        /// Unlock Item in SqLite DB and notify other clients
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task Unselect(string user, Guid id)
         {
             try
@@ -131,6 +182,10 @@ namespace Crash.Server
             await Clients.Others.Unselect(user, id);
         }
 
+        /// <summary>
+        /// On Connected send user specks from DB
+        /// </summary>
+        /// <returns></returns>
         public override async Task OnConnectedAsync()
         {
             await base.OnConnectedAsync();

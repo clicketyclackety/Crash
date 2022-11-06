@@ -58,6 +58,8 @@ namespace Crash.Utilities
             }
 
             _cache.TryAdd(speck.Id, speck);
+            if (string.IsNullOrEmpty(speck.Owner))
+                return;
         }
 
         /// <summary>

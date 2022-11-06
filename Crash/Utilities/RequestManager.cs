@@ -18,7 +18,7 @@ namespace Crash.Utilities
             if (null == LocalClient)
             {
                 // TODO : Add a URI
-                CrashClient client = new CrashClient(User.CurrentUser, null);
+                CrashClient client = new CrashClient(User.CurrentUser.name, null);
                 RequestManager.LocalClient = client;
 
                 Events.EventManagement.RegisterEvents();

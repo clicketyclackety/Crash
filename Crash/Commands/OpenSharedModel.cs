@@ -32,7 +32,7 @@ namespace Crash.Commands
             var name="";
             Rhino.Input.RhinoGet.GetString("Your Name", true, ref name);
             User user = new User(name);
-            Color color = user.color;
+            User.CurrentUser = user;
             var URL="";
             Rhino.Input.RhinoGet.GetString("File URL", true, ref URL);
 

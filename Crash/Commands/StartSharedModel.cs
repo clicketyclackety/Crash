@@ -30,7 +30,7 @@ namespace Crash.Commands
             var name="";
             var res = Rhino.Input.RhinoGet.GetString("Your Name", true, ref name);
             User user = new User(name);
-            Color color = user.color;
+            User.CurrentUser = user;
             return Result.Success;
         }
 

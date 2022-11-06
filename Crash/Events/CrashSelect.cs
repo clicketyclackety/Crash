@@ -23,6 +23,7 @@ namespace Crash.Events
             var _doc = Rhino.RhinoDoc.ActiveDoc;
             Guid rObjId = LocalCache.GetHost(speckId);
             _doc.Objects.Lock(rObjId, true);
+            _doc.Views.Redraw();
         }
 
         /// <summary>
@@ -35,6 +36,7 @@ namespace Crash.Events
             var _doc = Rhino.RhinoDoc.ActiveDoc;
             Guid rObjId = LocalCache.GetHost(speckId);
             _doc.Objects.Unlock(rObjId, true);
+            _doc.Views.Redraw();
         }
 
     }

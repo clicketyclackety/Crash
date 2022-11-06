@@ -141,7 +141,8 @@ namespace Crash.Utilities
             RemoveSpeck(speck);
 
             var _doc = Rhino.RhinoDoc.ActiveDoc;
-            RhinoObject rObj = _doc.Objects.Find(speck.Id);
+            Guid hostId = GetHost(speck.Id);
+            RhinoObject rObj = _doc.Objects.Find(hostId);
             if (rObj is object)
             {
                 _doc.Objects.Delete(rObj);

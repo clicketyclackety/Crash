@@ -28,6 +28,8 @@ namespace SpeckLib
             set => _owner = value;
         }
 
+        public string? Payload { get; set; }
+
         public Speck()
         {
             _id = Guid.NewGuid();

@@ -96,11 +96,11 @@ namespace Crash.Utilities
             rObj.UserDictionary.Set(key, speck.Id);
 
             // Key/Key
-            if (_SpeckToRhino.ContainsKey(speck.Id))
+            if (Instance._SpeckToRhino.ContainsKey(speck.Id))
             {
-                _SpeckToRhino.TryRemove(speck.Id, out _);
+                Instance._SpeckToRhino.TryRemove(speck.Id, out _);
             }
-            _SpeckToRhino.TryAdd(speck.Id, rObj.Id);
+            Instance._SpeckToRhino.TryAdd(speck.Id, rObj.Id);
         }
 
         /// <summary>

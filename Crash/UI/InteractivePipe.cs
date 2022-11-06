@@ -1,4 +1,5 @@
 ﻿using Crash.Utilities;
+using Rhino;
 using Rhino.Display;
 using Rhino.Geometry;
 using SpeckLib;
@@ -84,6 +85,7 @@ namespace Crash.UI
         /// <param name="e"></param>
         public void PostDrawObjects(object sender, DrawEventArgs e)
         {
+            HashSet<string> owners = new HashSet<string>();
             IEnumerable<Speck> specks = LocalCache.Instance.GetSpecks();
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
@@ -91,8 +93,36 @@ namespace Crash.UI
                 Speck speck = enumer.Current;
                 var nameCol = new Utilities.User(speck.Owner).color;
                 DrawSpeck(e, speck, nameCol);
-
+                owners.Add(speck.Owner);
                 UpdateBoundingBox(speck);
+            }
+
+            var userEnumer = owners.GetEnumerator();
+            int counter = 0;
+            while (userEnumer.MoveNext())
+            {
+                string user = userEnumer.Current;
+                var nameCol = new User(user).color;
+                DrawUser(e, user, nameCol,counter);
+                counter++;
+            }
+        }
+
+        private void DrawUser(DrawEventArgs e, string user, Color color, int counter)
+        {
+            try
+            {
+                Rectangle rect = RhinoDoc.ActiveDoc.Views.ActiveView.Bounds;
+                int xCoord = rect.X+50;
+                int yCoord = rect.Y+50;
+                yCoord += counter * 30;
+                Point2d point = new Point2d(xCoord, yCoord);
+                e.Display.Draw2dText(user, color, point, false, 20);
+            }
+            
+            catch
+            {
+                return;
             }
         }
 

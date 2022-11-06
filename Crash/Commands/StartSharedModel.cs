@@ -9,6 +9,7 @@ using Crash.Utilities;
 using System.Drawing;
 using System.Security.Policy;
 using System.Threading;
+using static System.Net.WebRequestMethods;
 
 namespace Crash.Commands
 {
@@ -32,8 +33,14 @@ namespace Crash.Commands
 
         public override string EnglishName => "StartSharedModel";
 
+        bool _LocalClientStarted = false;
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
+            if (_LocalClientStarted)
+            {
+                Rhino.RhinoApp.WriteLine("Server already started!");
+            }
+
             var name="";
             var res = Rhino.Input.RhinoGet.GetString("Your Name", true, ref name);
             User user = new User(name);
@@ -47,8 +54,15 @@ namespace Crash.Commands
 
             Thread.Sleep(2000);
 
-            RequestManager.StartOrContinueLocalClient(new Uri($"http://localhost:{port}/Crash"));
-
+            try
+            {
+                RequestManager.StartOrContinueLocalClient(new Uri($"http://localhost:{port}/Crash"));
+                _LocalClientStarted = true;
+            }
+            catch(UriFormatException ex)
+            {
+                Rhino.RhinoApp.Write("Please enter a valid URI!");
+            }
 
             return Result.Success;
         }

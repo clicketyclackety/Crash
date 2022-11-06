@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Crash.Utilities;
 using System.Drawing;
 using System.Security.Policy;
+using System.Threading;
 
 namespace Crash.Commands
 {
@@ -38,7 +39,16 @@ namespace Crash.Commands
             User user = new User(name);
             User.CurrentUser = user;
 
+            int port = 5000;
+            Rhino.Input.RhinoGet.GetInteger("Server port", false, ref port);
+
             // Start Server Host
+            ServerManager.StartOrContinueLocalServer($"http://0.0.0.0:{port}");
+
+            Thread.Sleep(2000);
+
+            RequestManager.StartOrContinueLocalClient(new Uri($"http://localhost:{port}/Crash"));
+
 
             return Result.Success;
         }

@@ -24,13 +24,17 @@ namespace Crash
         {
         }
 
+        ~CrashServer()
+        {
+            Dispose(false);
+        }
+
         /// <summary>
         /// Method to start the server
         /// </summary>
         /// <param name="url">url</param>
         /// <param name="isMac">is mac</param>
-        /// <param name="isArm64">is arm64</param>
-        public void Start(Uri url, bool isMac = false, bool isArm64 = false)
+        public void Start(string url, bool isMac = false)
         {
             if (process != null)
                 return;
@@ -50,7 +54,7 @@ namespace Crash
                 serverExecutable = Path.Combine(currentPath, "Server", "win-x64", "Crash.Server.exe");
 
             startInfo.FileName = serverExecutable;
-            startInfo.Arguments = $"--urls {url.AbsoluteUri}";
+            startInfo.Arguments = $"--urls \"{url}\"";
 
             process = Process.Start(startInfo);
         }
@@ -67,7 +71,13 @@ namespace Crash
         /// <summary>
         /// Dispose
         /// </summary>
-        public void Dispose()
+        public void Dispose() => Dispose(true);
+
+        /// <summary>
+        /// Disposes of the object, stopping the server if it is running
+        /// </summary>
+        /// <param name="disposing">true if disposing, false if GC'd</param>
+        public virtual void Dispose(bool disposing)
         {
             // stop the server!
             Stop();

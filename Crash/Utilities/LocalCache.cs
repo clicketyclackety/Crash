@@ -88,6 +88,7 @@ namespace Crash.Utilities
             {
                 BakeSpeck(enumer.Current);
             }
+            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
         #endregion

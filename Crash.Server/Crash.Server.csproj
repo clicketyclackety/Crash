@@ -8,14 +8,15 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Publish) == 'True'">
-    <PublishDir>..\Crash\bin\x64\$(Configuration)\net48\Server\$(RuntimeIdentifier)\</PublishDir>
+    <PublishDir>..\Crash\bin\$(Configuration)\net48\Server\$(RuntimeIdentifier)\</PublishDir>
     <PublishSingleFile>true</PublishSingleFile>
 	<SelfContained>true</SelfContained>
   </PropertyGroup>
 
 	<PropertyGroup Condition="$(Publish) == ''">
-	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<OutputPath>..\Crash\bin\x64\$(Configuration)\net48\Server\$(RuntimeIdentifier)\</OutputPath>
+	  <RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform(Windows))">win-x64</RuntimeIdentifier>
+	  <RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform(osx))">osx-x64</RuntimeIdentifier>
+		<OutputPath>..\Crash\bin\$(Configuration)\net48\Server\$(RuntimeIdentifier)\</OutputPath>
 		<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
 		<AppendRuntimeIdentifierToOutputPath>False</AppendRuntimeIdentifierToOutputPath>
 	</PropertyGroup>

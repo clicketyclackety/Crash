@@ -124,25 +124,12 @@ namespace Crash.Server
             await Clients.Others.Unselect(user, id);
         }
 
-        public async Task Initialize(Speck[] specks)
-        {
-            List<Model.Speck> newDb = new List<Model.Speck>();
-            foreach (var speck in specks)
-            {
-                newDb.Add(Model.Speck.From(speck));
-            }
-            _context.Specks.AddRange(newDb);
-            await _context.SaveChangesAsync();
-
-            //await Clients.Others.Initialize(specks);
-        }
-
-
         public override async Task OnConnectedAsync()
         {
             await base.OnConnectedAsync();
 
-            //await Clients.Caller.Initialize();
+            var specks = _context.Specks.Select(r => r.To()).ToArray();
+            await Clients.Caller.Initialize(specks);
         }
     }
 }

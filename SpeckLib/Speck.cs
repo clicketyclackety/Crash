@@ -42,11 +42,12 @@ namespace SpeckLib
             _stamp = DateTime.UtcNow;
         }
 
-        public Speck(Guid _id, string _owner, string? _payload = null)
+        public Speck(Guid id, string owner, string? payload = null)
         {
-            Id = _id;
-            Owner = _owner;
-            Payload = _payload;
+            _id = id;
+            _stamp = DateTime.UtcNow;
+            _owner = owner;
+            Payload = payload;
         }
 
     }

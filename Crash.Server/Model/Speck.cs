@@ -51,7 +51,7 @@
             _stamp = DateTime.UtcNow;
         }
 
-        internal static Speck From(SpeckLib.Speck speck)
+        public static Speck From(SpeckLib.Speck speck)
         {
             var s = new Speck();
             s.Id = speck.Id;
@@ -62,13 +62,13 @@
             return s;
         }
 
-        internal static SpeckLib.Speck To(Speck speck)
+        public SpeckLib.Speck To()
         {
             SpeckLib.Speck s = new SpeckLib.Speck();
-            s.Id = speck.Id;
-            s.Stamp = speck.Stamp;
-            s.Owner = speck.Owner;
-            s.Payload = speck.Payload;
+            s.Id = this.Id;
+            s.Stamp = this.Stamp;
+            s.Owner = this.Owner;
+            s.Payload = this.Payload;
             return s;
         }
 

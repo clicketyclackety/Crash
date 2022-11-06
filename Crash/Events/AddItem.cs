@@ -17,8 +17,7 @@ namespace Crash.Events
     {
         internal static void Event(object sender, RhinoObjectEventArgs e)
         {
-            //TODO: if an item is added, add it to the database
-            Speck speck = new Speck(e.ObjectId);
+            Speck speck = new Speck(e.ObjectId, User.CurrentUser.name, e.TheObject.Geometry.ToJSON(null));
             RequestManager.LocalClient?.Add(speck);
         }
     }

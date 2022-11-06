@@ -23,6 +23,13 @@ namespace Crash
             return base.OnLoad(ref errorMessage);
         }
 
+        protected override void OnShutdown()
+        {
+            ServerManager.LocalServer?.Dispose();
+            ServerManager.LocalServer = null;
+            base.OnShutdown();
+        }
+
         public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
 
         protected override string LocalPlugInName => "Crash";

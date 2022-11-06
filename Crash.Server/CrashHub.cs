@@ -124,12 +124,18 @@ namespace Crash.Server
             await Clients.Others.Unselect(user, id);
         }
 
+        public async Task Initialize(Speck[] specks)
+        {
+
+
+        }
+
 
         public override async Task OnConnectedAsync()
         {
             await base.OnConnectedAsync();
 
-            //await Clients.Caller.Initialize(...);
+            await Clients.Caller.Initialize();
         }
     }
 }

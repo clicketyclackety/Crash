@@ -88,7 +88,19 @@ You will need the following libraries and/or software installed before getting t
 3. Search for Crash and press Install.
 4. Close and Re-launch Rhino 7.
 
-### INSERT STEPS FOR MULTI USERS SUNDAY WHEN TESTING
+### Using Crash
+To host a new shared model:
+1. Type `StartSharedModel` command in Rhino.
+2. Enter your name when prompted.
+3. Specify an open port on your machine to run the server
+4. Others can join the session using url `<your_ip_address>:<port>`
+
+To Join a shared model:
+1. Type `OpenSharedModel` command in Rhino.
+2. Enter your name when prompted.
+3. Enter the server URL from step 4 above.
+
+You're now connected in a collaborative session. To commit your changes to the central model use the `Release` command.
 
 <!-- DEVELOPER GETTING STARTED -->
 ## Developer Getting Started

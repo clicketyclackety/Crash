@@ -90,6 +90,7 @@ namespace Crash.Utilities
         {
             var _doc = Rhino.RhinoDoc.ActiveDoc;
             GeometryBase geom = speck.GetGeom();
+            if (null == geom) return;
             Guid id = _doc.Objects.Add(geom);
             RhinoObject rObj = _doc.Objects.Find(id);
 

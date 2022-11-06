@@ -21,8 +21,18 @@ namespace Crash.Utilities
         /// <returns></returns>
         public static GeometryBase? GetGeom(this Speck speck)
         {
-            GeometryBase geom = (GeometryBase)GeometryBase.FromJSON(speck.Payload);
-            return geom;
+            try
+            {
+                var co = GeometryBase.FromJSON(speck.Payload);
+                GeometryBase geom = (GeometryBase)co;
+                return geom;
+            }
+            catch(Exception ex)
+            {
+                ;
+            }
+
+            return null;
         }
 
     }

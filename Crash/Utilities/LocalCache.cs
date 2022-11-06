@@ -19,6 +19,9 @@ namespace Crash.Utilities
         public static bool SomeoneIsDone { get; set; }
 
         private ConcurrentDictionary<Guid, Speck> _cache { get; set; }
+        
+        //                        <SpeckId, RhinoId>
+        private ConcurrentDictionary<Guid, Guid> _SpeckToRhino { get; set; }
 
         private List<Speck> ToBake = new List<Speck>();
         private List<Speck> ToRemove = new List<Speck>();
@@ -35,6 +38,7 @@ namespace Crash.Utilities
         {
             RhinoApp.Idle += RhinoApp_Idle;
             _cache = new ConcurrentDictionary<Guid, Speck>();
+            _SpeckToRhino = new ConcurrentDictionary<Guid, Guid>();
         }
 
         #region ConcurrentDictionary Methods
@@ -45,6 +49,7 @@ namespace Crash.Utilities
         /// <returns>returns the update task</returns>
         public async Task UpdateSpeck(Speck speck)
         {
+            // Cache
             if (_cache.ContainsKey(speck.Id))
             {
                 _cache.TryRemove(speck.Id, out _);
@@ -75,6 +80,27 @@ namespace Crash.Utilities
             GeometryBase geom = speck.GetGeom();
             Guid id = _doc.Objects.Add(geom);
             RhinoObject rObj = _doc.Objects.Find(id);
+
+            SyncHost(rObj, speck);
+        }
+
+        public static void SyncHost(RhinoObject rObj, Speck speck)
+        {
+            // Data
+            string key = "SPECKID";
+            if (rObj.UserDictionary.TryGetGuid(key, out _))
+            {
+                rObj.UserDictionary.Remove(key);
+            }
+
+            rObj.UserDictionary.Set(key, speck.Id);
+
+            // Key/Key
+            if (_SpeckToRhino.ContainsKey(speck.Id))
+            {
+                _SpeckToRhino.TryRemove(speck.Id, out _);
+            }
+            _SpeckToRhino.TryAdd(speck.Id, rObj.Id);
         }
 
         /// <summary>

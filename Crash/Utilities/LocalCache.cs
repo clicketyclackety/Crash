@@ -32,6 +32,7 @@ namespace Crash.Utilities
         public LocalCache()
         {
             RhinoApp.Idle += RhinoApp_Idle;
+            _cache = new ConcurrentDictionary<Guid, Speck>();
         }
 
         #region ConcurrentDictionary Methods

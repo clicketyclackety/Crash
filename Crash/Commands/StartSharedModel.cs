@@ -16,6 +16,7 @@ namespace Crash.Commands
     /// </summary>
     public sealed class StartSharedModel : Command
     {
+
         /// <summary>
         /// Empty constructor
         /// </summary>
@@ -25,20 +26,39 @@ namespace Crash.Commands
         }
 
         /// <summary>
+        /// The crash server
+        /// </summary>
+        CrashServer? server;
+
+        /// <summary>
         /// Command Instance
         /// </summary>
         public static StartSharedModel Instance { get; private set; }
 
         public override string EnglishName => "StartSharedModel";
 
+
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            var name="";
-            var res = Rhino.Input.RhinoGet.GetString("Your Name", true, ref name);
+            var name = "";
+            Rhino.Input.RhinoGet.GetString("Your Name", true, ref name);
             User user = new User(name);
             User.CurrentUser = user;
+            var URL = "http://localhost:5121";
+            Rhino.Input.RhinoGet.GetString("File URL", true, ref URL);
 
-            // Start Server Host
+            if (server != null)
+            {
+                server.Stop();
+            }
+
+            server = new CrashServer();
+
+            server.Start(new Uri(URL));
+
+            Thread.Sleep(2000);
+
+            RequestManager.StartOrContinueLocalClient(new Uri(URL + "/Crash"));
 
             return Result.Success;
         }

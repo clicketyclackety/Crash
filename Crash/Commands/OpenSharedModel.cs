@@ -24,11 +24,6 @@ namespace Crash.Commands
         }
 
         /// <summary>
-        /// The crash server
-        /// </summary>
-        CrashServer server;
-
-        /// <summary>
         /// The instance
         /// </summary>
         public static OpenSharedModel Instance { get; private set; }
@@ -40,24 +35,12 @@ namespace Crash.Commands
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-
-            var name="";
+            var name = "";
             Rhino.Input.RhinoGet.GetString("Your Name", true, ref name);
             User user = new User(name);
             User.CurrentUser = user;
-            var URL="http://localhost:5121";
+            var URL = "http://localhost:5121";
             Rhino.Input.RhinoGet.GetString("File URL", true, ref URL);
-
-            if (server != null)
-            {
-                server.Stop();
-            }
-
-            server = new CrashServer();
-
-            server.Start(new Uri(URL));
-
-            Thread.Sleep(2000);
 
             RequestManager.StartOrContinueLocalClient(new Uri(URL + "/Crash"));
 

@@ -1,7 +1,8 @@
 ﻿namespace Crash.Server.Model
 {
     /// <summary>
-    /// Model.Speck to be stored in SqLite DB. To/From methods convert from SpeckLib.Speck to/from Crash.Server.Model.Speck
+    /// Model.Speck to be stored in SqLite DB. To/From methods convert from SpeckLib.Speck to/from 
+    /// Crash.Server.Model.Speck
     /// </summary>
     public class Speck
     {

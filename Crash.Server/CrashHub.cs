@@ -18,7 +18,7 @@ namespace Crash.Server
     }
 
     /// <summary>
-    /// BackEnd Implementation of ICrashClient EndPoints
+    /// Server Implementation of ICrashClient EndPoints
     /// </summary>
     public class CrashHub : Hub<ICrashClient>
     {

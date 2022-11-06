@@ -115,8 +115,16 @@ Clone the repo
    
 ## Building
 
+### Windows
+Open Crash repository in Visual Studio:
+  1. Set Crash as startup project.
+  2. Build solution.
+  3. Drag and drop `Crash\Crash\bin\Debug\net48\Crash.rhp` into an open Rhino window.
+  4. Re-open Rhino.
+  5. Happy debugging.
+
 ### MacOS
-Run build tasks `⇧⌘B` in this order:
+Open Crash repository in VS Code run build tasks `⇧⌘B` in this order:
   1. `buid-plugin`
   2. `build-server`
   3. `publish-server`

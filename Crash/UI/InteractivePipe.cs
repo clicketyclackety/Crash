@@ -123,6 +123,8 @@ namespace Crash.UI
         private void DrawSpeck(DrawEventArgs e, Speck speck, Color color)
         {
             GeometryBase geom = speck.GetGeom();
+            if (geom == null) return;
+
             if (cachedMaterial.Diffuse != color)
             {
                 cachedMaterial = new DisplayMaterial(color);

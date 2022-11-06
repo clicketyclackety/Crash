@@ -1,4 +1,5 @@
-﻿using Crash.Utilities;
+﻿using Crash.Events;
+using Crash.Utilities;
 using Rhino.Display;
 using Rhino.Geometry;
 using SpeckLib;
@@ -93,6 +94,15 @@ namespace Crash.UI
                 DrawSpeck(e, speck, nameCol);
 
                 UpdateBoundingBox(speck);
+            }
+
+            if (MouseEvent.selectedUser == string.Empty || MouseEvent.tagLocation == Point3d.Unset)
+                return;
+            else
+            {
+                var nameCol = new Utilities.User(MouseEvent.selectedUser).color;
+                
+                e.Display.Draw2dText(MouseEvent.selectedUser, nameCol, new Point2d(MouseEvent.tagLocation.X,MouseEvent.tagLocation.Y), true, 100);
             }
         }
 

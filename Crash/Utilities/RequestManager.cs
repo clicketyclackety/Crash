@@ -1,4 +1,5 @@
-﻿using SpeckLib;
+﻿using Crash.Events;
+using SpeckLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,7 @@ namespace Crash.Utilities
                 RequestManager.LocalClient = client;
 
                 Events.EventManagement.RegisterEvents();
+                MouseEvent.CreateRegisterMouseEvent();
 
                 client.StartAsync();
 

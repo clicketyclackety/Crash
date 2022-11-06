@@ -1,5 +1,6 @@
 ﻿using Rhino;
 using Rhino.DocObjects;
+using Rhino.Geometry;
 using SpeckLib;
 using System;
 using System.Collections.Concurrent;
@@ -48,7 +49,8 @@ namespace Crash.Utilities
         internal void BakeSpeck(Speck speck)
         {
             var _doc = Rhino.RhinoDoc.ActiveDoc;
-            Guid id = _doc.Objects.Add(null); // speck.Geometry);
+            GeometryBase geom = speck.GetGeom();
+            Guid id = _doc.Objects.Add(geom);
             RhinoObject rObj = _doc.Objects.Find(id);
             
             // To ensure consistancy

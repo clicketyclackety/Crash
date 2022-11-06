@@ -42,6 +42,13 @@ namespace SpeckLib
             _stamp = DateTime.UtcNow;
         }
 
+        public Speck(Guid _id, string _owner, string? _payload = null)
+        {
+            Id = _id;
+            Owner = _owner;
+            Payload = _payload;
+        }
+
     }
 
 }

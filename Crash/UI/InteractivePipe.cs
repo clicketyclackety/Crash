@@ -1,4 +1,5 @@
-﻿using Rhino.Display;
+﻿using Crash.Utilities;
+using Rhino.Display;
 using Rhino.Geometry;
 using SpeckLib;
 using System;
@@ -84,7 +85,7 @@ namespace Crash.UI
         DisplayMaterial cachedMaterial = new DisplayMaterial(Color.Blue);
         private void DrawSpeck(DrawEventArgs e, Speck speck, Color color)
         {
-            GeometryBase geom = null; // speck.Geometry;
+            GeometryBase geom = speck.GetGeom();
             if (cachedMaterial.Diffuse != color)
             {
                 cachedMaterial = new DisplayMaterial(color);

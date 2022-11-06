@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-	  <RuntimeIdentifiers>win-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
+	  <RuntimeIdentifiers>win-x64;win-x86;osx-x64;osx-arm64</RuntimeIdentifiers>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

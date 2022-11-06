@@ -6,8 +6,7 @@ using Rhino.Input;
 using Rhino.Input.Custom;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using Crash.Utilities;
+using System.Threading;
 
 namespace Crash.Commands
 {
@@ -20,7 +19,9 @@ namespace Crash.Commands
             Instance = this;
         }
 
-        
+        CrashServer server;
+
+
         public static OpenSharedModel Instance { get; private set; }
 
         
@@ -33,10 +34,21 @@ namespace Crash.Commands
             Rhino.Input.RhinoGet.GetString("Your Name", true, ref name);
             User user = new User(name);
             User.CurrentUser = user;
-            var URL="";
+            var URL="http://localhost:5121";
             Rhino.Input.RhinoGet.GetString("File URL", true, ref URL);
 
-            RequestManager.StartOrContinueLocalClient(URL);
+            if (server != null)
+            {
+                server.Stop();
+            }
+
+            server = new CrashServer();
+
+            server.Start(new Uri(URL));
+
+            Thread.Sleep(2000);
+
+            RequestManager.StartOrContinueLocalClient(new Uri(URL + "/Crash"));
 
             return Result.Success;
         }

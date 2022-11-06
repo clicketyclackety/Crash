@@ -41,6 +41,7 @@ namespace Crash
             _connection.On<string, Guid>("Select", (user, id) => OnSelect?.Invoke(user, id));
             _connection.On<string, Guid>("Unselect", (user, id) => OnUnselect?.Invoke(user, id));
             _connection.On<Speck[]>("Initialize", (specks) => OnInitialize?.Invoke(specks));
+
         }
 
         public async Task Update(Guid id, Speck speck)

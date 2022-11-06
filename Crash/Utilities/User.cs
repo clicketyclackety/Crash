@@ -10,6 +10,7 @@ namespace Crash.Utilities
 
     public class User
     {
+
         public string name;
         public Color color;
 
@@ -29,7 +30,7 @@ namespace Crash.Utilities
             }
         }
 
-        public static string CurrentUser = System.Environment.UserName;
+        public static User CurrentUser {get; set;}
 
     }
 

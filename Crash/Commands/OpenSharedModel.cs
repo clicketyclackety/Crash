@@ -6,6 +6,8 @@ using Rhino.Input;
 using Rhino.Input.Custom;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using Crash.Utilities;
 
 namespace Crash.Commands
 {
@@ -26,8 +28,15 @@ namespace Crash.Commands
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            RequestManager.StartOrContinueLocalClient();
 
+            var name="";
+            Rhino.Input.RhinoGet.GetString("Your Name", true, ref name);
+            User user = new User(name);
+            User.CurrentUser = user;
+            var URL="";
+            Rhino.Input.RhinoGet.GetString("File URL", true, ref URL);
+
+            RequestManager.StartOrContinueLocalClient(URL);
 
             return Result.Success;
         }

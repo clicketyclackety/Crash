@@ -10,42 +10,44 @@ using System.Threading;
 
 namespace Crash.Commands
 {
-    /// <summary>
-    /// Open shared model command
-    /// </summary>
+
     public sealed class OpenSharedModel : Command
     {
-        /// <summary>
-        /// Empty constructor
-        /// </summary>
+
         public OpenSharedModel()
         {
             Instance = this;
         }
 
-        /// <summary>
-        /// The instance
-        /// </summary>
         public static OpenSharedModel Instance { get; private set; }
 
-        /// <summary>
-        /// The command name
-        /// </summary>
         public override string EnglishName => "OpenSharedModel";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            var name="";
-            Rhino.Input.RhinoGet.GetString("Your Name", true, ref name);
-            User user = new User(name);
-            User.CurrentUser = user;
-            
-            var URL="http://localhost:5000";
-            Rhino.Input.RhinoGet.GetString("Server URL", true, ref URL);
+            string name = Environment.UserName;
+            string url = "http://localhost:5000";
 
-            RequestManager.StartOrContinueLocalClient(new Uri(URL + "/Crash"));
+            if (!StartSharedModel._GetUsersName(ref name))
+                return Result.Nothing;
+
+            StartSharedModel._CreateCurrentUser(name);
+
+            if (!_GetServerURL(ref url))
+                return Result.Nothing;
+
+            RequestManager.StartOrContinueLocalClient(new Uri($"{url}/Crash"));
 
             return Result.Success;
+        }
+
+        private static bool _GetServerURL(ref string url)
+        {
+            Result getUrl = RhinoGet.GetString("Server URL", true, ref url);
+            
+            if (string.IsNullOrEmpty(url)) return false;
+
+            return getUrl == Result.Success;
         }
 
     }

@@ -16,7 +16,7 @@
   <p align="center">
     A multi-user collaborative environment for Rhino
     <br />
-    <a href="https://github.com/clicketyclackety/Crash">View Demo</a>
+    <a href="https://rhinocrash.notion.site/CRASH-6fdc9286ff33490487c6585b2f17c33d">User Guide</A>
     ·
     <a href="https://github.com/clicketyclackety/Crash/issues">Report Bug</a>
     ·

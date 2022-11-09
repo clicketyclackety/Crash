@@ -91,8 +91,6 @@ To Join a shared model:
 2. Enter your name when prompted.
 3. Enter the server URL from step 4 above.
 
-![start-share](https://github.com/clicketyclackety/Crash/blob/main/start-share.gif)
-
 You're now connected in a collaborative session. To commit your changes to the central model use the `Release` command.
 
 <!-- DEVELOPER GETTING STARTED -->

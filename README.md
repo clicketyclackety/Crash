@@ -84,6 +84,8 @@ To host a new shared model:
 3. Specify an open port on your machine to run the server
 4. Others can join the session using url `<your_ip_address>:<port>`
 
+![Alt Text](https://media.giphy.com/media/oNuY0wsiDV5XFmYuNw/giphy.gif)
+
 To Join a shared model:
 1. Type `OpenSharedModel` command in Rhino.
 2. Enter your name when prompted.
@@ -168,7 +170,9 @@ The following steps show a complete workflow of how the system works. For this e
     - [ ] Layers
     - [ ] Object attributes
     - [ ] Document settings
-- [ ] Authorization and access management
+- [ ] Authorization 
+    - [ ] Rhino Accounts integration
+    - [ ] Permissions and access management
 
 See the [open issues](https://github.com/clicketyclackety/Crash/issues) for a full list of proposed features (and known issues).
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

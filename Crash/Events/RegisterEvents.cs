@@ -23,6 +23,7 @@ namespace Crash.Events
 			RhinoDoc.SelectObjects += SelectItem.Event;
 			RhinoDoc.DeselectObjects += SelectItem.Event;
 			RhinoDoc.DeselectAllObjects += SelectAllItems.Event;
+			RhinoDoc.UndeleteRhinoObject += AddItem.Event;
 
 			// Crash
 			RequestManager.LocalClient.OnSelect += CrashSelect.OnSelect;

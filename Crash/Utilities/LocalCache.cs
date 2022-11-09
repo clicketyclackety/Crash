@@ -106,18 +106,29 @@ namespace Crash.Utilities
             SyncHost(rObj, speck);
         }
 
+        static string SpeckIdKey = "SPECKID";
+        
+        public static Guid? GetSpeckId(RhinoObject rObj)
+        {
+            if (rObj == null) return null;
+
+            if (rObj.UserDictionary.TryGetGuid(SpeckIdKey, out var key))
+                return key;
+            
+            return null;
+        }
+
         public static void SyncHost(RhinoObject rObj, Speck speck)
         {
             if (null == speck || rObj == null) return;
 
             // Data
-            string key = "SPECKID";
-            if (rObj.UserDictionary.TryGetGuid(key, out _))
+            if (rObj.UserDictionary.TryGetGuid(SpeckIdKey, out _))
             {
-                rObj.UserDictionary.Remove(key);
+                rObj.UserDictionary.Remove(SpeckIdKey);
             }
 
-            rObj.UserDictionary.Set(key, speck.Id);
+            rObj.UserDictionary.Set(SpeckIdKey, speck.Id);
 
             // Key/Key
             if (Instance._SpeckToRhino.ContainsKey(speck.Id))

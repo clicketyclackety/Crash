@@ -36,7 +36,7 @@
             } 
         },
         {
-            "name": "Run Rhino 7",
+            "name": "Run Rhino 7 (Mac)",
             "type": "rhino",
             "request": "launch",
             "preLaunchTask": "build-plugin",
@@ -46,6 +46,20 @@
             "console": "internalConsole",
             "env": {
                 "RHINO_PLUGIN_PATH": "${workspaceFolder}/Crash/bin/Debug/net48/Crash.rhp"
+            } 
+        },
+        {
+            "name": "Run Rhino 7 (Windows)",
+            "type": "clr",
+            "request": "launch",
+            "preLaunchTask": "build-plugin",
+            "program": "C:\\Program Files\\Rhino 7\\System\\Rhino.exe",
+            "args": [
+                "${workspaceFolder}\\Crash\\bin\\Debug\\net48\\Crash.rhp"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "env": {
             } 
         }
 

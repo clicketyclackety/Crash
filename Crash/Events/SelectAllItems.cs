@@ -22,7 +22,11 @@ namespace Crash.Events
                 if (robj.IsLocked)
                     continue;
                 else
-                    RequestManager.LocalClient?.Unselect(robj.Id);
+                {
+                    var speckId = LocalCache.GetSpeckId(robj);
+                    if (speckId != null)
+                        RequestManager.LocalClient?.Unselect(speckId.Value);
+                }
 
             }
         }

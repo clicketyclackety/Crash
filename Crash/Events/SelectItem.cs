@@ -19,13 +19,14 @@ namespace Crash.Events
             {
                 if (robj.IsLocked)
                     continue;
+                var speckId = LocalCache.GetSpeckId(robj);
+                if (speckId == null)
+                    continue;
 
                 if(e.Selected)
-                {
-                    RequestManager.LocalClient?.Select(robj.Id);
-                }
+                    RequestManager.LocalClient?.Select(speckId.Value);
                 else
-                    RequestManager.LocalClient?.Unselect(robj.Id);
+                    RequestManager.LocalClient?.Unselect(speckId.Value);
 
             }
         }

@@ -16,8 +16,9 @@ namespace Crash.Events
 
         internal static void Event(object sender, RhinoObjectEventArgs e)
         {
-            //TODO: if an item is removed, remove the item from the database
-            RequestManager.LocalClient?.Delete(e.ObjectId);
+            var id = LocalCache.GetSpeckId(e.TheObject);
+            if (id != null)
+                RequestManager.LocalClient?.Delete(id.Value);
         }
 
     }

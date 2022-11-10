@@ -1,4 +1,4 @@
-﻿using SpeckLib;
+using SpeckLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +33,15 @@ namespace Crash.Utilities
 
                 client.StartAsync();
 
-            }
+        }
+
+        public static void ForceEndLocalClient()
+        {
+            Events.EventManagement.DeRegisterEvents();
+
+            if (null == LocalClient) return;
+
+            RequestManager.LocalClient.StopAsync();
         }
 
         /// <summary>

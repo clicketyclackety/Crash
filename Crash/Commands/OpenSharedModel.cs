@@ -11,6 +11,7 @@ using System.Threading;
 namespace Crash.Commands
 {
 
+    [CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
     public sealed class OpenSharedModel : Command
     {
 

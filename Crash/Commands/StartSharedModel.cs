@@ -14,11 +14,14 @@ using System.Xml.Linq;
 
 namespace Crash.Commands
 {
+
     /// <summary>
     /// Command to start the shared model
     /// </summary>
+    [CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
     public sealed class StartSharedModel : Command
     {
+
         /// <summary>
         /// Empty constructor
         /// </summary>
@@ -32,8 +35,10 @@ namespace Crash.Commands
         /// </summary>
         public static StartSharedModel Instance { get; private set; }
 
+        /// <inheritdoc />
         public override string EnglishName => "StartSharedModel";
-        
+
+        /// <inheritdoc />
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
             if (RequestManager.LocalClient is object)

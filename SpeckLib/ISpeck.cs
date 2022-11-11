@@ -13,7 +13,7 @@ namespace SpeckLib
 
         public string Owner { get; }
 
-        public string Payload { get; }
+        public string? Payload { get; }
     }
 
 }

@@ -5,6 +5,7 @@ namespace SpeckLib
     /// <summary>
     /// SpeckLib.Speck to be used by Rhino Clients to initialize objects and send to server
     /// </summary>
+    [Obsolete("Use ISpeck!")]
     public sealed class Speck
     {
 

@@ -49,11 +49,6 @@ namespace Crash.UI
         }
 
         /// <summary>
-        /// The drawable items
-        /// </summary>
-        internal ConcurrentDictionary<Guid, Speck> Drawables { get; set; }
-
-        /// <summary>
         /// The interactive pipeline instance
         /// </summary>
         public InteractivePipe Instance;
@@ -63,7 +58,6 @@ namespace Crash.UI
         /// </summary>
         public InteractivePipe()
         {
-            Drawables = new ConcurrentDictionary<Guid, Speck>();
             Instance = this;
             bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
         }
@@ -86,11 +80,11 @@ namespace Crash.UI
         public void PostDrawObjects(object sender, DrawEventArgs e)
         {
             HashSet<string> owners = new HashSet<string>();
-            IEnumerable<Speck> specks = LocalCache.Instance.GetSpecks();
+            IEnumerable<LocalSpeck> specks = LocalCache.Instance.GetSpecks();
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
             {
-                Speck speck = enumer.Current;
+                LocalSpeck speck = enumer.Current;
                 var nameCol = new Utilities.User(speck.Owner).color;
                 DrawSpeck(e, speck, nameCol);
                 owners.Add(speck.Owner);
@@ -130,9 +124,9 @@ namespace Crash.UI
         /// Updates the BoundingBox of the Pipeline
         /// </summary>
         /// <param name="speck"></param>
-        private void UpdateBoundingBox(Speck speck)
+        private void UpdateBoundingBox(LocalSpeck speck)
         {
-            GeometryBase? geom = speck.GetGeom();
+            GeometryBase? geom = speck.Geometry;
             if (geom is object)
             {
                 BoundingBox speckBox = geom.GetBoundingBox(false);
@@ -150,9 +144,9 @@ namespace Crash.UI
         /// <param name="e">The EventArgs from the DisplayConduit</param>
         /// <param name="speck">The Speck</param>
         /// <param name="color">The colour for the speck, based on the user.</param>
-        private void DrawSpeck(DrawEventArgs e, Speck speck, Color color)
+        private void DrawSpeck(DrawEventArgs e, LocalSpeck speck, Color color)
         {
-            GeometryBase? geom = speck.GetGeom();
+            GeometryBase? geom = speck.Geometry;
             if (geom == null) return;
 
             if (cachedMaterial.Diffuse != color)

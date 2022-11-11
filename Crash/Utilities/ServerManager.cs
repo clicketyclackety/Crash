@@ -30,7 +30,6 @@ namespace Crash.Utilities
                 LocalServer = server;
 
                 server.Start(url, HostUtils.RunningOnOSX);
-
             }
         }
     }

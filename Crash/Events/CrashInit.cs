@@ -16,11 +16,11 @@ namespace Crash.Events
     {
         public static bool IsInit { get; set; }
 
-        internal static void OnInit(IEnumerable<Speck> specks)
+        internal static void OnInit(IEnumerable<ISpeck> specks)
         {
             IsInit = true;
             Rhino.RhinoApp.WriteLine("Loading specks ...");
-            LocalCache.Instance.BakeSpecks(specks);
+            LocalCache.Instance.BakeSpecks(specks.Select(speck => LocalSpeck.ReCreate(speck)));
             IsInit = false;
 
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();

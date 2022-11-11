@@ -20,7 +20,7 @@ namespace Crash.Events
             if (CrashInit.IsInit) return;
             if (LocalCache.SomeoneIsDone) return;
 
-            Speck speck = new Speck(e.ObjectId, User.CurrentUser.name, e.TheObject.Geometry.ToJSON(null));
+            LocalSpeck speck = LocalSpeck.Create(User.CurrentUser.name, e.TheObject.Geometry);
 
             LocalCache.SyncHost(e.TheObject, speck);
 

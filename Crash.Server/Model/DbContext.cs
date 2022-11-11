@@ -14,7 +14,7 @@ namespace Crash.Server.Model
         {
         }
 
-        public DbSet<Speck> Specks { get; set; }
+        public DbSet<SpeckLib.ServerSpeck> Specks { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

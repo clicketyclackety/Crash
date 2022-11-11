@@ -1,37 +1,43 @@
-# Introduction
+# Hello! 🦏🦏🦏
 
-### Hello!
-
->First off, thank you for considering contributing to Crash. It's people like you that make the world a better place!
+>First off, thank you for considering contributing to **CRASH!**. It's people like you that make the world a better place!
 
 ### Guidelines
 
 >Following these guidelines helps to communicate that you respect the time of the developers managing and developing this open source project. In return, they should reciprocate that respect in addressing your issue, assessing changes, and helping you finalize your pull requests.
 
-# Ground Rules
+## Ground Rules
 
 > Responsibilities
 > * Ensure that all code is made lovingly
-> * Create issues for any major changes and enhancements that you wish to make. Discuss things transparently and get community feedback.
+> * Create a discussion for any major changes and enhancements that you wish to make. Discuss things transparently and get community feedback.
 > * Keep feature versions as small as possible, preferably one new feature per version.
-> * Be welcoming to newcomers and encourage diverse new contributors from all backgrounds. See the [Python Community Code of Conduct](https://www.python.org/psf/codeofconduct/).
+> * Be welcoming to newcomers and encourage diverse new contributors from all backgrounds. I think Python's Code of Conduct sums it up nicely.
+>
+>   👉 [Python Code of Conduct](https://www.python.org/psf/codeofconduct/).
+
 
 
 # Your First Contribution
 
-> Unsure where to begin contributing to Crash? You can start by looking through [these](https://github.com/clicketyclackety/Crash/labels/Beginner%20issues) beginner and help-wanted issues:
+> Unsure where to begin contributing to Crash? There's a lot of ways you can help.
+>
+> 1. Read through the bugs in [issues](https://github.com/clicketyclackety/Crash/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) and help someone out
+> 2. Read through the discussions and join in the discourse
+> 3. Create new ideas and topics in the discourse
+> 4. Ask Questions in the Q&A! Questions are very helpful
+> 5. Create a Pull Request to fix a bug 🐛 or implement a new idea 💡
+>
+> You may feel like the only productive contribution is `code`. But that's not true! Any and all engagement helps the project, so give yourself a little pat on the back 😊!
+>
+> You can start by looking through [these](https://github.com/clicketyclackety/Crash/labels/Beginner%20issues) beginner and help-wanted issues:
 > Beginner issues - issues which should only require a few lines of code, and a test or two.
 > Help wanted issues - issues which should be a bit more involved than beginner issues.
 > Both issue lists are sorted by total number of comments. While not perfect, number of comments is a reasonable proxy for impact a given change will have.
 
-### New to open-source?
-Here are a couple of friendly tutorials you can include: http://makeapullrequest.com/ and http://www.firsttimersonly.com/
+## New to open-source?
 
-> Working on your first Pull Request? You can learn how from this *free* series, [How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github).
-
-# Getting started
->1. Create an issue for your new idea or bug
->2. Discuss this new idea or bug with the community
->3. If you like the change and think the project could use it:
-    * Be sure you have followed the code style for the project.
-    * Create a Pull Request!
+So are we! Here are a couple of friendly tutorials you can peruse
+👉 [Make a Pull Request](http://makeapullrequest.com)
+👉  [First Timers Only](http://www.firsttimersonly.com/)
+👉  [How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github).

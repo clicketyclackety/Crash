@@ -1,6 +1,7 @@
-﻿using Crash.Utilities;
+using Crash.Utilities;
 using Rhino;
 using Rhino.Display;
+using Rhino.DocObjects;
 using Rhino.Geometry;
 using SpeckLib;
 using System;
@@ -16,7 +17,7 @@ namespace Crash.UI
     /// <summary>
     /// Interactive pipeline for crash geometry display
     /// </summary>
-    public sealed class InteractivePipe
+    public sealed partial class InteractivePipe
     {
         private BoundingBox bbox;
 
@@ -145,142 +146,6 @@ namespace Crash.UI
                 bbox.Union(speckBox);
             }
 
-        }
-
-        /// Re-using materials is much faster
-        DisplayMaterial cachedMaterial = new DisplayMaterial(Color.Blue);
-        /// <summary>
-        /// Draws a Speck in the pipeline.
-        /// </summary>
-        /// <param name="e">The EventArgs from the DisplayConduit</param>
-        /// <param name="speck">The Speck</param>
-        /// <param name="color">The colour for the speck, based on the user.</param>
-        private void DrawSpeck(DrawEventArgs e, Speck speck, Color color)
-        {
-            GeometryBase? geom = speck.GetGeom();
-            if (geom == null) return;
-
-            // double transparency = 0.0;
-
-            if (cachedMaterial.Diffuse != color)
-            {
-                cachedMaterial = new DisplayMaterial(color);
-            }
-
-
-            bool draw = geom switch
-            {
-                Rhino.Geometry.Point point      => _DrawPoint(e, point),
-                
-                Curve cv                        => _DrawCurve(e, cv),
-
-                Brep brep                       => _DrawBrep(e, brep),
-                Mesh mesh                       => _DrawMesh(e, mesh),
-                Extrusion extrusion             => _DrawExtrusion(e, extrusion),
-                Surface surface                 => _DrawSurface(e, surface),
-
-                TextEntity text                 => _DrawTextEntity(e, text),
-                AnnotationBase anno             => _DrawAnnotation(e, anno),
-                TextDot dot                     => _DrawTextDot(e, dot),
-
-                _ => false
-            };
-
-        }
-
-        private bool _DrawSurface(DrawEventArgs e, Surface surface)
-        {
-            /* Of Note -> e.Display.DisplayPipelineAttributes.ShowSurfaceEdges */
-            Mesh mesh = Mesh.CreateFromSurface(surface);
-            return _DrawMesh(e, mesh);
-        }
-
-        private bool _DrawExtrusion(DrawEventArgs e, Extrusion extrusion)
-        {
-            if (e.Display.DisplayPipelineAttributes.ShadingEnabled)
-            {
-                Mesh extMesh = extrusion.GetMesh(MeshType.Render);
-                e.Display.DrawMeshShaded(extMesh, cachedMaterial);
-            }
-
-            e.Display.DrawExtrusionWires(extrusion, cachedMaterial.Diffuse);
-
-            return true;
-        }
-
-        private bool _DrawBrep(DrawEventArgs e, Brep brep)
-        {
-            Mesh mesh = Mesh.CreateFromBrep(brep, meshingParameters).FirstOrDefault();
-            return _DrawMesh(e, mesh);
-        }
-
-        private bool _DrawMesh(DrawEventArgs e, Mesh mesh)
-        {
-            var meshAttribs = e.Display.DisplayPipelineAttributes.MeshSpecificAttributes;
-
-            if (meshAttribs.ShowMeshVertices)
-                e.Display.DrawMeshVertices(mesh, cachedMaterial.Diffuse);
-
-            if (meshAttribs.ShowMeshWires)
-                e.Display.DrawMeshWires(mesh, cachedMaterial.Diffuse, meshAttribs.MeshWireThickness);
-
-            if (e.Display.DisplayPipelineAttributes.ShadingEnabled)
-                e.Display.DrawMeshShaded(mesh, cachedMaterial);
-
-            return true;
-        }
-
-        private bool _DrawCurve(DrawEventArgs e, Curve curve)
-        {
-            if (!e.Display.DisplayPipelineAttributes.ShowCurves)
-                return false;
-
-            e.Display.DrawCurve(curve, cachedMaterial.Diffuse, e.Display.DefaultCurveThickness);
-
-            return true;
-        }
-
-        private bool _DrawPoint(DrawEventArgs e, Rhino.Geometry.Point point)
-        {
-            if (!e.Display.DisplayPipelineAttributes.ShowPoints)
-                return false;
-
-            e.Display.DrawPoint(point.Location,
-                                e.Display.DisplayPipelineAttributes.PointStyle,
-                                e.Display.DisplayPipelineAttributes.PointRadius,
-                                cachedMaterial.Diffuse);
-
-            return true;
-        }
-
-        private bool _DrawAnnotation(DrawEventArgs e, AnnotationBase anno)
-        {
-            if (!e.Display.DisplayPipelineAttributes.ShowAnnotations)
-                return false;
-             
-            e.Display.DrawAnnotation(anno, cachedMaterial.Diffuse);
-
-            return true;
-        }
-
-        private bool _DrawTextDot(DrawEventArgs e, TextDot dot)
-        {
-            if (!e.Display.DisplayPipelineAttributes.ShowAnnotations)
-                return false;
-
-            e.Display.DrawDot(dot, Color.White, cachedMaterial.Diffuse, cachedMaterial.Diffuse);
-
-            return true;
-        }
-
-        private bool _DrawTextEntity(DrawEventArgs e, TextEntity text)
-        {
-            if (!e.Display.DisplayPipelineAttributes.ShowText)
-                return false;
-
-            e.Display.DrawText(text, cachedMaterial.Diffuse);
-
-            return true;
         }
 
     }

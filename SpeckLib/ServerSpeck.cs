@@ -42,7 +42,9 @@ namespace SpeckLib
                 Stamp = speck.Stamp,
                 Id = speck.Id,
                 Owner = speck.Owner,
-                Payload = speck.Payload
+                Payload = speck.Payload,
+                LockedBy = speck.Owner,
+                Temporary = true
             };
         }
 

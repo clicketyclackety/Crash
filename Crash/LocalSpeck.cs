@@ -1,4 +1,5 @@
-﻿using Rhino.Geometry;
+﻿using Rhino.FileIO;
+using Rhino.Geometry;
 using Rhino.Runtime;
 using SpeckLib;
 using System;
@@ -11,60 +12,53 @@ namespace Crash
 {
 
     /// <summary>
-    /// Local isntance of a received speck.
+    /// Local instance of a received speck.
     /// </summary>
-    public sealed class LocalSpeck : ISpeck
+    public sealed class LocalSpeck : Speck
     {
-        public DateTime Stamp { get; private set; }
 
-        public Guid Id { get; private set; }
-
-        public string Owner { get; private set; }
-
-        public string? Payload { get; private set; }
-
-        public GeometryBase Geometry { get; private set; }
+        public GeometryBase Geometry { get; set; }
 
         private LocalSpeck()
         {
-            Stamp = DateTime.UtcNow;
+
         }
 
-        public static LocalSpeck CreateEmpty()
+        public static LocalSpeck CreateNew(Guid id, string owner, GeometryBase geometry)
         {
-            return new LocalSpeck()
-            {
-                Id = Guid.NewGuid()
-            };
-        }
+            SerializationOptions options = new SerializationOptions();
 
-        public static LocalSpeck Create(Guid id, string? owner, string? payload)
-        {
-            GeometryBase? geom = CommonObject.FromJSON(payload) as GeometryBase;
-
-            return new LocalSpeck()
+            var speck = new LocalSpeck()
             {
                 Id = id,
-                Owner = owner,
-                Geometry = geom,
-            };
-        }
-
-        public static LocalSpeck Create(string owner, GeometryBase geometry)
-        {
-            return new LocalSpeck()
-            {
-                Id = Guid.NewGuid(),
-                Owner = owner,
                 Geometry = geometry,
-                Payload = geometry.ToJSON(null)
+                Payload = geometry?.ToJSON(options),
+                Owner = owner,
+                LockedBy = owner,
+                Stamp = DateTime.UtcNow,
+                Temporary = true
             };
+
+            return speck;
         }
 
-        public static LocalSpeck ReCreate(ISpeck speck)
+        public static LocalSpeck ReCreate(Speck speck)
         {
-            return Create(speck.Id, speck.Owner, speck.Payload);
+            GeometryBase geometry = CommonObject.FromJSON(speck.Payload) as GeometryBase;
+            var localSpeck = new LocalSpeck()
+            {
+                Id = speck.Id,
+                Geometry = geometry,
+                Owner = speck.Owner,
+                Payload = speck.Payload,
+                Temporary = speck.Temporary,
+                Stamp = speck.Stamp,
+                LockedBy = speck.LockedBy
+            };
+
+            return localSpeck;
         }
+
 
     }
 }

@@ -34,10 +34,10 @@ namespace Crash
         /// </summary>
         /// <param name="url">url</param>
         /// <param name="isMac">is mac</param>
-        public void Start(string url, bool isMac = false)
+        public bool Start(string url, bool isMac = false)
         {
             if (process != null)
-                return;
+                return false;
 
             var startInfo = new ProcessStartInfo();
             var currentPath = Path.GetDirectoryName(typeof(CrashServer).Assembly.Location);
@@ -53,10 +53,17 @@ namespace Crash
             else
                 serverExecutable = Path.Combine(currentPath, "Server", "win-x64", "Crash.Server.exe");
 
+            if (!File.Exists(serverExecutable))
+            {
+                return false;
+            }
+
             startInfo.FileName = serverExecutable;
             startInfo.Arguments = $"--urls \"{url}\"";
 
             process = Process.Start(startInfo);
+
+            return true;
         }
 
         /// <summary>

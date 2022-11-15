@@ -66,7 +66,7 @@ namespace Crash.Commands
             {
                 // TODO : Create these urls/ports as constants somewhere relevent
                 RequestManager.StartOrContinueLocalClient(new Uri($"http://127.0.0.1:{port}/Crash"));
-                RhinoApp.Write($"share url: rhino://package/search?q=Crash&host=0.0.0.0:{port}");
+                RhinoApp.WriteLine($"share url: rhino://crash/join?host=0.0.0.0:{port}");
             }
             catch(UriFormatException)
             {

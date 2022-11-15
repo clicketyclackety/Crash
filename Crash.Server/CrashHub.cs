@@ -8,13 +8,13 @@ namespace Crash.Server
     /// </summary>
     public interface ICrashClient
     {
-        Task Update(string user, Guid id, ISpeck speck);
-        Task Add(string user, ISpeck speck);
+        Task Update(string user, Guid id, Speck speck);
+        Task Add(string user, Speck speck);
         Task Delete(string user, Guid id);
         Task Done(string user);
         Task Select(string user, Guid id);
         Task Unselect(string user, Guid id);
-        Task Initialize(ISpeck[] specks);
+        Task Initialize(Speck[] specks);
     }
 
     /// <summary>
@@ -39,18 +39,19 @@ namespace Crash.Server
         /// <param name="user"></param>
         /// <param name="speck"></param>
         /// <returns></returns>
-        public async Task Add(string user, ISpeck speck)
+        public async Task Add(string user, Speck speck)
         {
             try
             {
-                _context.Specks.Add(ServerSpeck.From(speck));
+                _context.Specks.Add(speck);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex}");
             }
-            await Clients.Others.Add(user, ServerSpeck.From(speck));
+
+            await Clients.Others.Add(user, Speck.From(speck));
         }
 
         /// <summary>
@@ -60,7 +61,7 @@ namespace Crash.Server
         /// <param name="id"></param>
         /// <param name="speck"></param>
         /// <returns></returns>
-        public async Task Update(string user, Guid id, ISpeck speck)
+        public async Task Update(string user, Guid id, Speck speck)
         {
             try
             {
@@ -69,7 +70,7 @@ namespace Crash.Server
                 {
                     _context.Specks.Remove(removeSpeck);
                 }
-                _context.Specks.Add(ServerSpeck.From(speck));
+                _context.Specks.Add(Speck.From(speck));
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -111,7 +112,7 @@ namespace Crash.Server
         {
             try
             {
-                List<ServerSpeck> done = new List<ServerSpeck>();
+                List<Speck> done = new List<Speck>();
                 foreach (var speck in _context.Specks)
                 {
                     if (speck.LockedBy == user)

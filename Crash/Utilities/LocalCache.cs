@@ -194,7 +194,7 @@ namespace Crash.Utilities
         /// Remove a speck for the cache
         /// </summary>
         /// <param name="speck">the speck to remove</param>
-        internal void RemoveSpeck(LocalSpeck speck)
+        internal void RemoveSpeck(Speck speck)
         {
             if (null == speck) return;
 
@@ -249,7 +249,7 @@ namespace Crash.Utilities
         /// </summary>
         /// <param name="name">the name </param>
         /// <param name="speck">the speck</param>
-        internal static void OnAdd(string name, ISpeck speck)
+        internal static void OnAdd(string name, Speck speck)
         {
             if (null == speck) return;
 
@@ -267,7 +267,7 @@ namespace Crash.Utilities
         {
             if (Guid.Empty == speckId || string.IsNullOrEmpty(name)) return;
 
-            LocalSpeck speck = LocalSpeck.Create(speckId, name, null);
+            LocalSpeck speck = LocalSpeck.CreateNew(speckId, name, null);
             Instance.DeleteSpeck(speck);
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }

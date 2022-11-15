@@ -197,7 +197,7 @@ namespace Crash.UI
                     ;
                 }
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 
             }

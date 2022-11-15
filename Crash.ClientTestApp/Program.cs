@@ -36,7 +36,7 @@ namespace Crash.ClientTestApp
                 var k = Console.ReadKey();
                 if (k.KeyChar == 'c')
                 {
-                    client.Add(ServerSpeck.CreateEmpty())?.Wait();
+                    client.Add(Speck.CreateEmpty())?.Wait();
                 }
                 if (k.KeyChar == 'q')
                 {

@@ -17,7 +17,7 @@ namespace Crash.Events
     {
         public static bool IsInit { get; set; }
 
-        internal static void OnInit(IEnumerable<Speck> specks)
+        internal static void OnInit(IEnumerable<ISpeck> specks)
         {
             Rhino.RhinoApp.WriteLine("Loading specks ...");
 
@@ -28,7 +28,7 @@ namespace Crash.Events
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
-        private static void _HandleSpecks(IEnumerable<Speck> specks)
+        private static void _HandleSpecks(IEnumerable<ISpeck> specks)
         {
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
@@ -37,9 +37,9 @@ namespace Crash.Events
             }
         }
 
-        private static void _HandleSpeck(Speck speck)
+        private static void _HandleSpeck(ISpeck speck)
         {
-            LocalSpeck localSpeck = LocalSpeck.ReCreate(speck);
+            SpeckInstance localSpeck = new SpeckInstance(speck);
             if (!speck.Temporary)
             {
                 LocalCache.Instance.BakeSpeck(localSpeck);

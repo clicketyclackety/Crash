@@ -80,11 +80,11 @@ namespace Crash.UI
         public void PostDrawObjects(object sender, DrawEventArgs e)
         {
             HashSet<string> owners = new HashSet<string>();
-            IEnumerable<LocalSpeck> specks = LocalCache.Instance.GetSpecks();
+            IEnumerable<SpeckInstance> specks = LocalCache.Instance.GetSpecks();
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
             {
-                LocalSpeck speck = enumer.Current;
+                SpeckInstance speck = enumer.Current;
                 var nameCol = new Utilities.User(speck.Owner).color;
                 DrawSpeck(e, speck, nameCol);
                 owners.Add(speck.Owner);
@@ -124,7 +124,7 @@ namespace Crash.UI
         /// Updates the BoundingBox of the Pipeline
         /// </summary>
         /// <param name="speck"></param>
-        private void UpdateBoundingBox(LocalSpeck speck)
+        private void UpdateBoundingBox(SpeckInstance speck)
         {
             GeometryBase? geom = speck.Geometry;
             if (geom is object)
@@ -144,7 +144,7 @@ namespace Crash.UI
         /// <param name="e">The EventArgs from the DisplayConduit</param>
         /// <param name="speck">The Speck</param>
         /// <param name="color">The colour for the speck, based on the user.</param>
-        private void DrawSpeck(DrawEventArgs e, LocalSpeck speck, Color color)
+        private void DrawSpeck(DrawEventArgs e, SpeckInstance speck, Color color)
         {
             GeometryBase? geom = speck.Geometry;
             if (geom == null) return;

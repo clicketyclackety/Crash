@@ -51,7 +51,7 @@ namespace Crash.Server
                 Console.WriteLine($"Exception: {ex}");
             }
 
-            await Clients.Others.Add(user, Speck.From(speck));
+            await Clients.Others.Add(user, new Speck(speck));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Crash.Server
                 {
                     _context.Specks.Remove(removeSpeck);
                 }
-                _context.Specks.Add(Speck.From(speck));
+                _context.Specks.Add(new Speck(speck));
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)

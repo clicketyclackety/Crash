@@ -44,7 +44,7 @@ namespace Crash.Utilities
         public static async Task CollaboratorIsDone(string name)
         {
             string sanitisedName = name.ToLower();
-            IEnumerable<LocalSpeck> ToBake = LocalCache.Instance.GetSpecks().
+            IEnumerable<SpeckInstance> ToBake = LocalCache.Instance.GetSpecks().
                                         Where(s => s.Owner.ToLower() == sanitisedName);
 
             LocalCache.Instance.BakeSpecks(ToBake);

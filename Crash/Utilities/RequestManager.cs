@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Crash.Utilities
 {
+
     /// <summary>
     /// The request manager
     /// </summary>
@@ -32,7 +33,7 @@ namespace Crash.Utilities
                 Events.EventManagement.RegisterEvents();
 
                 client.StartAsync();
-
+            }
         }
 
         public static void ForceEndLocalClient()

@@ -3,11 +3,11 @@ using System;
 
 namespace SpeckLib
 {
+
     /// <summary>
-    /// Model.Speck to be stored in SqLite DB. To/From methods convert from SpeckLib.Speck to/from 
-    /// Crash.Server.Model.Speck
+    /// Model.Speck that is stored in SqLite DB.
     /// </summary>
-    public class Speck
+    public class Speck : ISpeck
     {
 
         public DateTime Stamp { get; set; }
@@ -22,6 +22,7 @@ namespace SpeckLib
 
         public string? Payload { get; set; }
 
+
         public Speck() { }
 
         public Speck(Guid id, string owner, string? payload)
@@ -32,27 +33,22 @@ namespace SpeckLib
             Stamp = DateTime.UtcNow;
         }
 
+        public Speck(ISpeck speck)
+        {
+            Stamp = speck.Stamp;
+            Id = speck.Id;
+            Owner = speck.Owner;
+            Payload = speck.Payload;
+            LockedBy = speck.Owner;
+            Temporary = true;
+        }
+
         public static Speck CreateEmpty()
         {
             return new Speck()
             {
                 Id = Guid.NewGuid()
             };
-        }
-
-        public static Speck From(Speck speck)
-        {
-           Speck newSpeck = new Speck()
-            {
-                Stamp = speck.Stamp,
-                Id = speck.Id,
-                Owner = speck.Owner,
-                Payload = speck.Payload,
-                LockedBy = speck.Owner,
-                Temporary = true
-            };
-
-            return newSpeck;
         }
 
     }

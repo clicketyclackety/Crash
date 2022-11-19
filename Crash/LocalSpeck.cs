@@ -14,51 +14,48 @@ namespace Crash
     /// <summary>
     /// Local instance of a received speck.
     /// </summary>
-    public sealed class LocalSpeck : Speck
+    public sealed class SpeckInstance : ISpeck
     {
+        ISpeck Speck { get; set; }
 
-        public GeometryBase Geometry { get; set; }
+        public GeometryBase Geometry { get; private set; }
 
-        private LocalSpeck()
+        public DateTime Stamp => Speck.Stamp;
+
+        public Guid Id => Speck.Id;
+
+        public string Owner => Speck.Owner;
+
+        public bool Temporary => Speck.Temporary;
+
+        public string? LockedBy => Speck.LockedBy;
+
+        public string? Payload => Speck.Payload;
+
+
+        private SpeckInstance()
         {
 
         }
 
-        public static LocalSpeck CreateNew(Guid id, string owner, GeometryBase geometry)
+        public SpeckInstance(ISpeck speck)
+        {
+            Speck = speck;
+            SerializationOptions options = new SerializationOptions();
+            GeometryBase geometry = CommonObject.FromJSON(speck.Payload) as GeometryBase;
+            Geometry = geometry;
+        }
+
+        public static SpeckInstance CreateNew(string owner, GeometryBase geometry)
         {
             SerializationOptions options = new SerializationOptions();
+            string payload = geometry?.ToJSON(options);
 
-            var speck = new LocalSpeck()
-            {
-                Id = id,
-                Geometry = geometry,
-                Payload = geometry?.ToJSON(options),
-                Owner = owner,
-                LockedBy = owner,
-                Stamp = DateTime.UtcNow,
-                Temporary = true
-            };
+            Speck speck = new Speck(Guid.NewGuid(), owner, payload);
+            SpeckInstance instance = new SpeckInstance(speck) { Geometry = geometry };
 
-            return speck;
+            return instance;
         }
-
-        public static LocalSpeck ReCreate(Speck speck)
-        {
-            GeometryBase geometry = CommonObject.FromJSON(speck.Payload) as GeometryBase;
-            var localSpeck = new LocalSpeck()
-            {
-                Id = speck.Id,
-                Geometry = geometry,
-                Owner = speck.Owner,
-                Payload = speck.Payload,
-                Temporary = speck.Temporary,
-                Stamp = speck.Stamp,
-                LockedBy = speck.LockedBy
-            };
-
-            return localSpeck;
-        }
-
 
     }
 }

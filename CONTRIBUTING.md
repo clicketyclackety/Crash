@@ -38,6 +38,9 @@
 ## New to open-source?
 
 So are we! Here are a couple of friendly tutorials you can peruse
+
 👉 [Make a Pull Request](http://makeapullrequest.com)
+
 👉  [First Timers Only](http://www.firsttimersonly.com/)
-👉  [How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github).
+
+👉  [How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github)

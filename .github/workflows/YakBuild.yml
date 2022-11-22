@@ -44,7 +44,7 @@ jobs:
       shell: bash
 
     - name: Install Powershell on Windows
-      if: ${{ matrix.os != 'windows-latest' }}
+      if: ${{ matrix.os == 'windows-latest' }}
       run: |
         # Install PowerShell
         dotnet tool install --global PowerShell
@@ -52,7 +52,7 @@ jobs:
 
     - name: Build Yak Package
       run: |
-        .\Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os ${{ matrix.os }}
+        Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os ${{ matrix.os }}
       shell: powershell
 
     - name: Upload Artifact

@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Client", "Crash.Clien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.ClientTestApp", "Crash.ClientTestApp\Crash.ClientTestApp.csproj", "{3D8DFE22-47A0-4B8B-BB14-79B560B1760E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F818AD48-6C55-4F5F-B06B-AF844D126C00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crash.Server.Tests", "Crash.Server.Tests\Crash.Server.Tests.csproj", "{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,9 +43,16 @@ Global
 		{3D8DFE22-47A0-4B8B-BB14-79B560B1760E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D8DFE22-47A0-4B8B-BB14-79B560B1760E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D8DFE22-47A0-4B8B-BB14-79B560B1760E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF} = {F818AD48-6C55-4F5F-B06B-AF844D126C00}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D9F64F3-0D9F-4D7F-9445-5215BF29D663}

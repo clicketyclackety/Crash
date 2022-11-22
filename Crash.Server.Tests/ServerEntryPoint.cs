@@ -138,8 +138,9 @@ namespace Crash.Server.Tests
 
         [TestMethod]
         [DynamicData(nameof(GetAllValidArgs), DynamicDataSourceType.Method)]
-        public void PathAndUrlArgs_Valid(string[] args)
+        public void PathAndUrlArgs_Valid(string? urlInput, string? url, string? pathInput, string? path)
         {
+            string[] args = new string[4] { urlInput, url, pathInput, path };
             var argHandler = new ArgumentHandler();
             argHandler.ParseArgs(args);
 
@@ -149,8 +150,9 @@ namespace Crash.Server.Tests
 
         [TestMethod]
         [DynamicData(nameof(GetAllInvalidArgs), DynamicDataSourceType.Method)]
-        public void PathAndUrlArgs_InValid(string[] args)
+        public void PathAndUrlArgs_InValid(string? urlInput, string? url, string? pathInput, string? path)
         {
+            string[] args = new string[4] { urlInput, url, pathInput, path };
             var argHandler = new ArgumentHandler();
             argHandler.ParseArgs(args);
 
@@ -159,14 +161,16 @@ namespace Crash.Server.Tests
         }
 
         [TestMethod]
-        public void EnsureDefaults_IsValid()
+        [DynamicData(nameof(GetAllInvalidArgs), DynamicDataSourceType.Method)]
+        public void EnsureDefaults_IsValid(string? urlInput, string? url, string? pathInput, string? path)
         {
+            string[] args = new string[4] { urlInput, url, pathInput, path };
             var argHandler = new ArgumentHandler();
+            argHandler.ParseArgs(args);
             argHandler.EnsureDefaults();
 
             Assert.IsFalse(string.IsNullOrEmpty(argHandler.DatabaseFileName));
             Assert.IsFalse(string.IsNullOrEmpty(argHandler.URL));
-
         }
 
     }

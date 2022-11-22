@@ -12,6 +12,7 @@ namespace Crash.Server
         const string dbName = "Database.db";
         const string appName = "Crash";
         const string dbDirectory = "App_Data";
+        const string defaultURL = "127.0.0.1:8080";
 
         public string URL { get; private set; }
 
@@ -57,7 +58,7 @@ namespace Crash.Server
         {
             if (string.IsNullOrEmpty(URL))
             {
-                // ... 
+                _setUrl(defaultURL);
             }
 
             if (string.IsNullOrEmpty(DatabaseFileName))
@@ -91,14 +92,20 @@ namespace Crash.Server
 
         private void _handleUrlArgs(string urlValue)
         {
+            _validateUrlInput(ref urlValue);
             if (!_validateUrlInput(ref urlValue))
             {
                 throw new ArgumentException("Given URL was Invalid.");
             }
             else
             {
-                URL = urlValue;
+                _setUrl(urlValue);
             }
+        }
+
+        private void _setUrl(string urlValue)
+        {
+            URL = urlValue;
         }
 
         private bool _validateUrlInput(ref string url)

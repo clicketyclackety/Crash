@@ -34,7 +34,7 @@ jobs:
 
     - name: Build Yak Package
       run: |
-        Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os ${{ matrix.os }}
+        .\Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os ${{ matrix.os }}
       shell: powershell
 
     - name: Upload Artifact

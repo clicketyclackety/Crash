@@ -76,9 +76,9 @@ namespace Crash.Server
                 {
                     action.Invoke(argValue);
                 }
-                catch (ArgumentException aEx)
+                catch (Exception ex)
                 {
-                    Console.WriteLine(aEx.Message);
+                    Console.WriteLine(ex.Message);
                 }
             }
             else
@@ -91,7 +91,7 @@ namespace Crash.Server
 
         private void _handleUrlArgs(string urlValue)
         {
-            if (!_validateUrl(ref urlValue))
+            if (!_validateUrlInput(ref urlValue))
             {
                 throw new ArgumentException("Given URL was Invalid.");
             }
@@ -101,16 +101,48 @@ namespace Crash.Server
             }
         }
 
-        private bool _validateUrl(ref string url)
+        private bool _validateUrlInput(ref string url)
         {
             UriBuilder uriBuild;
             try
             {
                 uriBuild = new UriBuilder(url);
+                if (uriBuild.Uri.HostNameType is UriHostNameType.IPv4 or UriHostNameType.IPv6)
+                {
+                    return _validateIPAddress(url);
+                }
+                else if (uriBuild.Uri.HostNameType is UriHostNameType.Dns)
+                {
+                    return _validateUrl(url);
+                }
+
+                throw new ArgumentException("Invalid URL. Was not detectable as either an IP or URL");
             }
             catch(UriFormatException)
             {
                 throw new ArgumentException("Invalid URL");
+            }
+        }
+
+        private bool _validateUrl(string url)
+        {
+            // No logic required for now.
+            return true;
+        }
+        
+        private bool _validateIPAddress(string url)
+        {
+            UriBuilder uriBuild = new UriBuilder(url);
+
+            if (!uriBuild.Uri.IsDefaultPort) return true;
+            if (url.Replace("/", "").EndsWith(uriBuild.Port.ToString())) return true;
+
+            string uriii = uriBuild.ToString();
+
+            // IP is IPv4/IPv6 - Website is DNS
+            if (uriBuild.Uri.HostNameType is UriHostNameType.IPv4 or UriHostNameType.IPv6)
+            {
+                throw new ArgumentException("Port is required for IP Address");
             }
 
             return true;
@@ -122,19 +154,26 @@ namespace Crash.Server
 
         private void _handleDatabasePath(string givenPath)
         {
-            if (!_validateDatabaseDirectory(givenPath)) return;
+            _validateDatabaseDirectory(givenPath);
             _ensureDatabaseDirectoryExists(givenPath);
             _setDatabaseFilePath(givenPath);
         }
 
-        private bool _validateDatabaseDirectory(string givenPath)
+        private void _validateDatabaseDirectory(string givenPath)
         {
-            if (!Uri.IsWellFormedUriString(givenPath, UriKind.RelativeOrAbsolute)) return false;
-            if (Path.GetInvalidPathChars().Where(c => givenPath.Contains(c)).Any()) return false;
-            string fileName = Path.GetFileName(givenPath);
-            if (!string.IsNullOrEmpty(fileName)) return false;
+            DirectoryInfo dInfo = new DirectoryInfo(givenPath);
+            string wellFormattedPath = dInfo.FullName;
+            
+            if (!string.IsNullOrEmpty(dInfo.Extension))
+            {
+                throw new Exception("Do not feed in a file Name!");
+            }
 
-            return true;
+            // if (!Uri.IsWellFormedUriString(dInfo.FullName, UriKind.RelativeOrAbsolute)) return false;
+            if (Path.GetInvalidPathChars().Where(c => wellFormattedPath.Contains(c)).Any())
+            {
+                throw new Exception("Invalid Characters in given path!");
+            }
         }
 
         private string _getDefaultDatabaseDirectory()

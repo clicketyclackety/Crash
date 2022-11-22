@@ -1,23 +1,97 @@
+using System.Collections.Generic;
+using System.Linq;
+using static System.Net.WebRequestMethods;
+
 namespace Crash.Server.Tests
 {
 
     [TestClass]
     public class ServerEntryPoint
     {
+        public static IEnumerable<object[]> GetValidURLArgs()
+        {
+             return new List<string[]>
+             {
+                new string[] { "--url", "https://thisisvalidaurl.com" },
+                new string[] { "--URL", "www.thisisavalidurl.com" },
+                new string[] { "--urL", "127.0.0.1:8080" },
+                new string[] { "--uRl", "127.0.0.1:80" },
+                new string[] { "--uRL", "127.0.0.1:5000" },
+                new string[] { "--urL", "127.0.0.1:5000/" },
+                new string[] { "--URL", "https://thisisvalidaurl.com" },
+                new string[] { "--URL", "https://thisisvalidaurl.com//" },
+             };
+        }
+
+        public static IEnumerable<object[]> GetInvalidURLArgs()
+        {
+            return new List<string[]>
+            {
+                new string[] { "url", "https://thisisavalidurl.com"} ,         // No dashes
+                new string[] { "--url", "https://thisisaninvalidurl..com"} ,   // Invalid URL
+                new string[] { null, "https://thisisavalidurl.com"} ,             // No preposition
+                new string[] { "-url", "https://thisisavalidurl.com"} ,        // One dash
+                new string[] { "--url", "127.0.0.1"} ,                         // Missing Port
+                new string[] { "--url", "127.0.0.1/"} ,                         // Missing Port with Slash
+                // new string[] { "--url", "127.0.0.1.3"} ,                       // Invalid IP // Detects as URL?
+                // new string[] { "--url", "999.888.777.666"} ,                   // Invalid IP // Detects as URL?
+                new string[] { "--url", "127.0.0.1:9999999"} ,                 // Invalid Port
+            };
+        }
+
+        public static IEnumerable<object[]> GetValidPathArgs()
+        {
+            return new List<string[]>
+            {
+                new string[] { "--path", @"C:\MyPrograms\File" },
+                new string[] { "--pAtH", @"C:\MyPrograms\File\" },
+                new string[] { "--PATH", @"C:\MyPrograms\File\" },
+                new string[] { "--PATH", @"C:\MyPrograms\File" },
+                new string[] { "--PATH", @"C:\MyPrograms\Dir 2" },
+                new string[] { "--PATH", @"C:/MyPrograms/Dir 2" },
+                new string[] { "--PATH", @"C://MyPrograms//File//" },
+                new string[] { "--PATH", "C:\\MyPrograms\\File\\" },
+                new string[] { "--PATH", "MyPrograms\\File\\" },
+                new string[] { "--PATH", "\\MyPrograms\\File\\" },
+            };
+        }
+
+        public static IEnumerable<object[]> GetInvalidPathArgs()
+        {
+            return new List<string[]>
+            {
+                new string[] { "path", @"C:\MyPrograms\Data\"} ,          // Missing double dash
+                new string[] { "-PATH", @"C:\MyPrograms\File"} ,       // One Dash
+                new string[] { "--PATH", @"C:\MyPrograms\File.db"} ,      // Includes file extension
+            };
+        }
+
+        private static IEnumerable<object[]> Zipper(IEnumerable<object[]> one, IEnumerable<object[]> two)
+        {
+            var oneEnumer = one.GetEnumerator();
+            var twoEnumer = two.GetEnumerator();
+
+            while (oneEnumer.MoveNext() & twoEnumer.MoveNext())
+            {
+                string[] oneArgs = oneEnumer.Current.Cast<string>().ToArray();
+                string[] twoArgs = twoEnumer.Current.Cast<string>().ToArray();
+
+                yield return new string[] { oneArgs[0], oneArgs[1], twoArgs[0], twoArgs[1] };
+            }
+        }
+
+        public static IEnumerable<object[]> GetAllValidArgs()
+            => Zipper(GetValidURLArgs(), GetValidPathArgs());
+
+        public static IEnumerable<object[]> GetAllInvalidArgs()
+            => Zipper(GetInvalidURLArgs(), GetInvalidPathArgs());
+
 
         [TestMethod]
-        [DataRow("--url https://thisisvalidaurl.com")]
-        [DataRow("--url www.thisisavalidurl.com")]
-        [DataRow("--url 127.0.0.1:8080")]
-        [DataRow("--url 127.0.0.1:80")]
-        [DataRow("--url 127.0.0.1:5000")]
-        [DataRow("--url 127.0.0.1:5000/")]
-        [DataRow("--URL https://thisisvalidaurl.com")]
-        [DataRow("--uRl https://thisisvalidaurl.com")]
-        [DataRow("--url https://thisisvalidaurl.com//")]
-        public void UrlArgs_Valid(string argsIn)
+        [DynamicData(nameof(GetValidURLArgs), DynamicDataSourceType.Method)]
+        public void UrlArgs_Valid(string? urlInput, string? url)
         {
-            string[] args = argsIn.Split(' ', 2);
+            string[] args = new string[2] { urlInput, url };
 
             var argHandler = new ArgumentHandler();
             argHandler.ParseArgs(args);
@@ -26,18 +100,10 @@ namespace Crash.Server.Tests
         }
 
         [TestMethod]
-        [DataRow("url https://thisisavalidurl.com")]        // No dashes
-        [DataRow("--url https://thisisaninvalidurl..com")]  // Invalid URL
-        [DataRow("https://thisisavalidurl.com")]            // No preposition
-        [DataRow("-url https://thisisavalidurl.com")]       // One dash
-        [DataRow("--url 127.0.0.1")]                        // Missing Port
-        [DataRow("--url 127.0.0.1/")]                        // Missing Port with Slash
-        // [DataRow("--url 127.0.0.1.3")]                      // Invalid IP // Detects as URL?
-        // [DataRow("--url 999.888.777.666")]                  // Invalid IP // Detects as URL?
-        [DataRow("--url 127.0.0.1:9999999")]                // Invalid Port
-        public void UrlArgs_Invalid(string argsIn)
+        [DynamicData(nameof(GetInvalidURLArgs), DynamicDataSourceType.Method)]
+        public void UrlArgs_Invalid(string? urlInput, string? url)
         {
-            string[] args = argsIn.Split(' ', 2);
+            string[] args = new string[2] { urlInput, url };
 
             var argHandler = new ArgumentHandler();
             argHandler.ParseArgs(args);
@@ -46,19 +112,10 @@ namespace Crash.Server.Tests
         }
 
         [TestMethod]
-        [DataRow(@"--path C:\MyPrograms\File")]
-        [DataRow(@"--pAtH C:\MyPrograms\File\")]
-        [DataRow(@"--PATH C:\MyPrograms\File\")]
-        [DataRow(@"--PATH C:\MyPrograms\File")]
-        [DataRow(@"--PATH C:\MyPrograms\Dir 2")]
-        [DataRow(@"--PATH C:/MyPrograms/Dir 2")]
-        [DataRow(@"--PATH C://MyPrograms//File//")]
-        [DataRow("--PATH C:\\MyPrograms\\File\\")]
-        [DataRow("--PATH MyPrograms\\File\\")]
-        [DataRow("--PATH \\MyPrograms\\File\\")]
-        public void PathArgs_Valid(string argsIn)
+        [DynamicData(nameof(GetValidPathArgs), DynamicDataSourceType.Method)]
+        public void PathArgs_Valid(string? pathInput, string? path)
         {
-            string[] args = argsIn.Split(' ', 2);
+            string[] args = new string[2] { pathInput, path };
 
             var argHandler = new ArgumentHandler();
             argHandler.ParseArgs(args);
@@ -68,12 +125,10 @@ namespace Crash.Server.Tests
         }
 
         [TestMethod]
-        [DataRow(@"path C:\MyPrograms\Data\")]          // Missing double dash
-        [DataRow(@"-PATH C:\MyPrograms\File")]       // One Dash
-        [DataRow(@"--PATH C:\MyPrograms\File.db")]      // Includes file extension
-        public void PathArgs_InValid(string argsIn)
+        [DynamicData(nameof(GetInvalidPathArgs), DynamicDataSourceType.Method)]
+        public void PathArgs_InValid(string? pathInput, string? path)
         {
-            string[] args = argsIn.Split(' ', 2);
+            string[] args = new string[2] { pathInput, path };
 
             var argHandler = new ArgumentHandler();
             argHandler.ParseArgs(args);
@@ -82,24 +137,35 @@ namespace Crash.Server.Tests
         }
 
         [TestMethod]
-        [DataRow(" ")]
-        [DataRow(" ")]
-        [DataRow(" ")]
-        [DataRow(" ")]
-        [DataRow(" ")]
-        public void PathAndUrlArgs_Valid(string argsIn)
+        [DynamicData(nameof(GetAllValidArgs), DynamicDataSourceType.Method)]
+        public void PathAndUrlArgs_Valid(string[] args)
         {
+            var argHandler = new ArgumentHandler();
+            argHandler.ParseArgs(args);
 
+            Assert.IsFalse(string.IsNullOrEmpty(argHandler.DatabaseFileName));
+            Assert.IsFalse(string.IsNullOrEmpty(argHandler.URL));
         }
 
         [TestMethod]
-        [DataRow(" ")]
-        [DataRow(" ")]
-        [DataRow(" ")]
-        [DataRow(" ")]
-        [DataRow(" ")]
-        public void PathAndUrlArgs_InValid(string argsIn)
+        [DynamicData(nameof(GetAllInvalidArgs), DynamicDataSourceType.Method)]
+        public void PathAndUrlArgs_InValid(string[] args)
         {
+            var argHandler = new ArgumentHandler();
+            argHandler.ParseArgs(args);
+
+            Assert.IsTrue(string.IsNullOrEmpty(argHandler.DatabaseFileName));
+            Assert.IsTrue(string.IsNullOrEmpty(argHandler.URL));
+        }
+
+        [TestMethod]
+        public void EnsureDefaults_IsValid()
+        {
+            var argHandler = new ArgumentHandler();
+            argHandler.EnsureDefaults();
+
+            Assert.IsFalse(string.IsNullOrEmpty(argHandler.DatabaseFileName));
+            Assert.IsFalse(string.IsNullOrEmpty(argHandler.URL));
 
         }
 

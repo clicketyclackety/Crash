@@ -1,10 +1,10 @@
 ---
 name: Yak Build
-on:
-  pull_request:
-    paths-ignore:
-      - '*.md'
-      - '*.gh*'
+on: push
+#  pull_request:
+#    paths-ignore:
+#      - '*.md'
+#      - '*.gh*'
   
   os_matrix:
     strategy:

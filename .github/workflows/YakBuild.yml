@@ -1,14 +1,16 @@
 ---
 name: Yak Build
-on: pull_request
-  
-  os_matrix:
+on:
+  pull_request:
+    paths-ignore:
+      - '*.md'
+      - '*.gh*'
+
+jobs:
+  build:  
     strategy:
       matrix:
         os: [macos-latest, windows-latest] #, ubuntu-latest] # Not supported yet
-
-jobs:
-  build:
     runs-on: ${{ matrix.os }}
 
     steps:

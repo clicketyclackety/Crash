@@ -24,9 +24,18 @@ param (
 
 $formattedVersion = $rhinoVersion.Replace('.','_')
 $crashVersion = "1.0.0"
+$formattedOS = "error"
+if ($os.ToLower().Contains(("win"))
+{
+    $formattedOS = "win"
+}
+else if ($os.ToLower().Contains(("mac"))
+{
+    $formattedOS = "mac"
+}
 
 $fileName = "Crash"
-$yakFile = "$outputDir\\crash-$crashVersion-rh$formattedVersion-$os.yak"
+$yakFile = "$outputDir\\crash-$crashVersion-rh$formattedVersion-$formattedOS.yak"
 
 if (Test-Path $yakFile)
 {

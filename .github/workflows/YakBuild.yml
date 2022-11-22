@@ -26,29 +26,9 @@ jobs:
 
     - run: dotnet build Crash.sln
 
-    - name: Install Powershell on Unix
-      if: ${{ matrix.os != 'windows-latest' }}
+    - name: Install Powershell
       run: |
-        # Update the list of packages
-        sudo apt-get update
-        # Install pre-requisite packages.
-        sudo apt-get install -y wget apt-transport-https software-properties-common
-        # Download the Microsoft repository GPG keys
-        wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
-        # Register the Microsoft repository GPG keys
-        sudo dpkg -i packages-microsoft-prod.deb
-        # Update the list of packages after we added packages.microsoft.com
-        sudo apt-get update
-        # Install PowerShell
-        sudo apt-get install -y powershell
-      shell: bash
-
-    - name: Install Powershell on Windows
-      if: ${{ matrix.os == 'windows-latest' }}
-      run: |
-        # Install PowerShell
         dotnet tool install --global PowerShell
-      shell: cmd
 
     - name: Build Yak Package
       run: |

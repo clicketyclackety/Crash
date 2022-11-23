@@ -31,7 +31,7 @@ jobs:
       run: |
         ls
         ls Scripts
-        .\Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os win
+        .\Scripts\YakCompiler.ps1 -Path $in -DestinationPath $out -Config Release -os win
       shell: powershell
 
     - name: Upload Windows Yak Package

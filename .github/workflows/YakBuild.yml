@@ -31,14 +31,11 @@ jobs:
       run: |
         ls
         ls Scripts
-
-        $cwd = Get-Location
-        $config = "Release"
-        $in = "$cwd\Crash\bin\$config\net48"
-        $out = $in
-
-        ls $in
         ls -R
+
+        $config = "Release"
+        $in = Resolve-Path("Crash\bin\$config\net48")
+        $out = $in
 
         .\Scripts\YakCompiler.ps1 -Path $in -DestinationPath $out -Config Release -os win
       shell: powershell
@@ -54,10 +51,10 @@ jobs:
       run: |
         ls
         ls Scripts
+        ls -R
 
-        $cwd = Get-Location
         $config = "Release"
-        $in = "$cwd\Crash\bin\$config\net48"
+        $in = Resolve-Path("Crash\bin\$config\net48")
         $out = $in
 
         .\Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os mac

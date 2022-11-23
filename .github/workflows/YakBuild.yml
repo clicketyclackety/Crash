@@ -29,10 +29,6 @@ jobs:
 
     - name: Build Yak Package for Windows
       run: |
-        ls
-        ls Scripts
-        ls -R
-
         $config = "Release"
         $in = Resolve-Path("Crash\bin\$config\net48")
         $out = $in
@@ -49,15 +45,11 @@ jobs:
 
     - name: Build Yak Package for Mac
       run: |
-        ls
-        ls Scripts
-        ls -R
-
         $config = "Release"
         $in = Resolve-Path("Crash\bin\$config\net48")
         $out = $in
 
-        .\Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os mac
+        .\Scripts\YakCompiler.ps1 -Path $in -DestinationPath $out -Config Release -os mac
       shell: powershell
 
     - name: Upload Mac Yak Package

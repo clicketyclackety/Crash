@@ -25,7 +25,7 @@ jobs:
           7.0
 
     - name: Build Crash on Windows
-      run: dotnet build Crash.sln
+      run: dotnet build Crash.sln --configuration Release
 
     - name: Build Yak Package for Windows
       run: |

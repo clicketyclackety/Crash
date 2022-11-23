@@ -7,19 +7,9 @@ on:
       - '*.gh*'
 
 jobs:
-  build:  
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest] #, ubuntu-latest] # Not supported yet
-    runs-on: ${{ matrix.os }}
-
+  build:
     steps:
-    - run: echo ${{matrix.os}}
-
     - uses: actions/checkout@v3
-
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1
 
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1
@@ -33,23 +23,28 @@ jobs:
           6.0
           7.0
 
-    - run: dotnet build Server/Crash.Server.csproj -f "6.0"
+    - name: Build Crash on Windows
+      run: dotnet build Crash.sln
 
-    - name: Build Crash
+    - name: Build Yak Package for Windows
       run: |
-        msbuild Crash/Crash.csproj
-
-    - name: Install Powershell
-      run: |
-        dotnet tool install --global PowerShell
-
-    - name: Build Yak Package
-      run: |
-        .\Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os ${{ matrix.os }}
+        .\Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os win
       shell: powershell
 
-    - name: Upload Artifact
+    - name: Upload Windows Yak Package
       uses: actions/upload-artifact@v3
       with:
-        name: my-artifact
+        name: crash-win-yak
+        path: Crash\bin\Release\net48\*.yak
+
+
+    - name: Build Yak Package for Mac
+      run: |
+        .\Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os mac
+      shell: powershell
+
+    - name: Upload Mac Yak Package
+      uses: actions/upload-artifact@v3
+      with:
+        name: crash-mac-yak
         path: Crash\bin\Release\net48\*.yak

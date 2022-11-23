@@ -25,22 +25,15 @@ param (
 $formattedVersion = $rhinoVersion.Replace('.','_')
 $crashVersion = "1.0.0"
 $formattedOS = "error"
-if ($os.ToLower().Contains(("win"))
-{
-    $formattedOS = "win"
-}
-else if ($os.ToLower().Contains(("mac"))
-{
-    $formattedOS = "mac"
-}
 
-$fileName = "Crash"
-$yakFile = "$outputDir\\crash-$crashVersion-rh$formattedVersion-$formattedOS.yak"
+$fileName = "$outputDir\crash-$crashVersion-rh$formattedVersion-$os"
+$zipFile = "$fileName.zip"
+$yakFile = "$fileName.yak"
 
-if (Test-Path $yakFile)
-{
-    Remove-Item $yakFile
-}
+Remove-Item "$outputDir\*.zip"
+Remove-Item "$outputDir\*.yak"
 
-Compress-Archive -Path "$inputDir\*.*" -DestinationPath $yakFile -CompressionLevel Optimal
-Compress-Archive -Path "$inputDir\Server" -DestinationPath $yakFile -CompressionLevel Optimal -Update
+Compress-Archive -Path "$inputDir\*.*" -DestinationPath $zipFile -CompressionLevel Optimal
+Compress-Archive -Path "$inputDir\Server" -DestinationPath $zipFile -CompressionLevel Optimal -Update
+
+Rename-Item $zipFile $yakFile

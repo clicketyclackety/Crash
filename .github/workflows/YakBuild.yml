@@ -29,6 +29,8 @@ jobs:
 
     - name: Build Yak Package for Windows
       run: |
+        ls
+        ls Scripts
         .\Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os win
       shell: powershell
 

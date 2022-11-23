@@ -4,7 +4,7 @@ param (
     [string]$inputDir,
 
     [Parameter(Mandatory=$false, HelpMessage="The output location")]
-    [Alias("DestinationPth")]
+    [Alias("DestinationPath")]
     [string]$outputDir = $inputDir,
 
     [Parameter(Mandatory=$false, HelpMessage="What Config was Project built for?")]

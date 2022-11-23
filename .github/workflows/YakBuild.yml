@@ -31,6 +31,12 @@ jobs:
       run: |
         ls
         ls Scripts
+
+        $cwd = Get-Location
+        $config = "Release"
+        $in = "$cwd\Crash\bin\$config\net48"
+        $out = $in
+
         .\Scripts\YakCompiler.ps1 -Path $in -DestinationPath $out -Config Release -os win
       shell: powershell
 
@@ -43,6 +49,14 @@ jobs:
 
     - name: Build Yak Package for Mac
       run: |
+        ls
+        ls Scripts
+
+        $cwd = Get-Location
+        $config = "Release"
+        $in = "$cwd\Crash\bin\$config\net48"
+        $out = $in
+
         .\Scripts\YakCompile.ps1 -Path $in -DestinationPath $out -Config Release -os mac
       shell: powershell
 

@@ -37,6 +37,9 @@ jobs:
         $in = "$cwd\Crash\bin\$config\net48"
         $out = $in
 
+        ls $in
+        ls -R
+
         .\Scripts\YakCompiler.ps1 -Path $in -DestinationPath $out -Config Release -os win
       shell: powershell
 

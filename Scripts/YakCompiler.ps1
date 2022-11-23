@@ -24,16 +24,20 @@ param (
 
 $formattedVersion = $rhinoVersion.Replace('.','_')
 $crashVersion = "1.0.0"
-$formattedOS = "error"
 
 $fileName = "$outputDir\crash-$crashVersion-rh$formattedVersion-$os"
 $zipFile = "$fileName.zip"
 $yakFile = "$fileName.yak"
 
-Remove-Item "$outputDir\*.zip"
-Remove-Item "$outputDir\*.yak"
+foreach($zip in Get-ChildItem "$outputDir\*.zip")
+{
+    Remove-Item $zip
+}
+foreach($yak in Get-ChildItem "$outputDir\*.yak")
+{
+    Remove-Item $yak
+}
 
 Compress-Archive -Path "$inputDir\*.*" -DestinationPath $zipFile -CompressionLevel Optimal
 Compress-Archive -Path "$inputDir\Server" -DestinationPath $zipFile -CompressionLevel Optimal -Update
-
 Rename-Item $zipFile $yakFile

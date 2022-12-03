@@ -37,6 +37,7 @@ namespace Crash.Commands
             if (!_GetServerURL(ref url))
                 return Result.Nothing;
 
+            // TODO : Ensure Requested Server is available, and notify if not
             RequestManager.StartOrContinueLocalClient(new Uri($"{url}/Crash"));
 
             return Result.Success;

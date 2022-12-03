@@ -12,14 +12,14 @@ namespace Crash.Server.Tests
         {
              return new List<string[]>
              {
-                new string[] { "--url", "https://thisisvalidaurl.com" },
-                new string[] { "--URL", "www.thisisavalidurl.com" },
-                new string[] { "--urL", "127.0.0.1:8080" },
-                new string[] { "--uRl", "127.0.0.1:80" },
-                new string[] { "--uRL", "127.0.0.1:5000" },
-                new string[] { "--urL", "127.0.0.1:5000/" },
-                new string[] { "--URL", "https://thisisvalidaurl.com" },
-                new string[] { "--URL", "https://thisisvalidaurl.com//" },
+                new string[] { "--urls", "https://thisisvalidaurl.com" },
+                new string[] { "--URLs", "www.thisisavalidurl.com" },
+                new string[] { "--urLs", "127.0.0.1:8080" },
+                new string[] { "--uRls", "127.0.0.1:80" },
+                new string[] { "--uRLs", "127.0.0.1:5000" },
+                new string[] { "--urLs", "127.0.0.1:5000/" },
+                new string[] { "--URLs", "https://thisisvalidaurl.com" },
+                new string[] { "--URLs", "https://thisisvalidaurl.com//" },
              };
         }
 
@@ -27,15 +27,15 @@ namespace Crash.Server.Tests
         {
             return new List<string[]>
             {
-                new string[] { "url", "https://thisisavalidurl.com"} ,         // No dashes
-                new string[] { "--url", "https://thisisaninvalidurl..com"} ,   // Invalid URL
+                new string[] { "urls", "https://thisisavalidurl.com"} ,         // No dashes
+                new string[] { "--urls", "https://thisisaninvalidurl..com"} ,   // Invalid URL
                 new string[] { null, "https://thisisavalidurl.com"} ,             // No preposition
-                new string[] { "-url", "https://thisisavalidurl.com"} ,        // One dash
-                new string[] { "--url", "127.0.0.1"} ,                         // Missing Port
-                new string[] { "--url", "127.0.0.1/"} ,                         // Missing Port with Slash
-                // new string[] { "--url", "127.0.0.1.3"} ,                       // Invalid IP // Detects as URL?
-                // new string[] { "--url", "999.888.777.666"} ,                   // Invalid IP // Detects as URL?
-                new string[] { "--url", "127.0.0.1:9999999"} ,                 // Invalid Port
+                new string[] { "-urls", "https://thisisavalidurl.com"} ,        // One dash
+                new string[] { "--urls", "127.0.0.1"} ,                         // Missing Port
+                new string[] { "--urls", "127.0.0.1/"} ,                         // Missing Port with Slash
+                // new string[] { "--urls", "127.0.0.1.3"} ,                       // Invalid IP // Detects as URL?
+                // new string[] { "--urls", "999.888.777.666"} ,                   // Invalid IP // Detects as URL?
+                new string[] { "--urls", "127.0.0.1:9999999"} ,                 // Invalid Port
             };
         }
 

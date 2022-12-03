@@ -16,5 +16,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Crash\Crash.csproj" />
   </ItemGroup>
-
+	
+  <PropertyGroup>
+	<VSTestLogger>trx%3bLogFileName=$(MSBuildProjectName).trx</VSTestLogger>
+	<VSTestResultsDirectory>$(MSBuildThisFileDirectory)/TestResults/$(TargetFramework)</VSTestResultsDirectory>
+  </PropertyGroup>
+	
 </Project>

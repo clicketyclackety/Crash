@@ -6,29 +6,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-var databasePath = "App_Data";
-var databaseFile = Path.Combine(databasePath, "Database.db");
-
-if (!Directory.Exists(databasePath))
-{
-    Directory.CreateDirectory(databasePath);
-}
+var argHandler = new ArgumentHandler();
+argHandler.ParseArgs(args);
+argHandler.EnsureDefaults();
 
 builder.Services.AddSignalR();
 
 builder.Services.AddDbContext<CrashContext>(options =>
-               options.UseSqlite($"Data Source={databaseFile.Replace("\\", "/")}"));
+               options.UseSqlite($"Data Source={argHandler.DatabaseFileName}"));
 
 var app = builder.Build();
 
-
 app.MapGet("/", () => "Hello World!");
-
 app.MapHub<CrashHub>("/Crash");
-
 app.MigrateDatabase<CrashContext>();
-
 app.Run();
-
 

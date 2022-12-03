@@ -4,12 +4,18 @@
     <TargetFramework>net48</TargetFramework>
     <Version>1.0</Version>
     <Title>Crash</Title>
-    <Description>Description of Crash</Description>
+    <Description> A multi-user collaborative environment for Rhino </Description>
     <TargetExt>.rhp</TargetExt>
   	<LangVersion>latest</LangVersion>
 	<Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+	<AssemblyAttribute Include="System.Runtime.InteropServices.GuidAttribute">
+		<_Parameter1>53CB2393-C71F-4079-9CEC-97464FF9D14E</_Parameter1>
+	</AssemblyAttribute>
+  </ItemGroup>
+	  
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\**\*" />
   </ItemGroup>

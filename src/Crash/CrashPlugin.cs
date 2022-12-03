@@ -9,7 +9,7 @@ namespace Crash
     ///<summary>
     /// The crash plugin for multi user rhino collaboration
     ///</summary>
-    public class CrashPlugin : Rhino.PlugIns.PlugIn
+    public sealed class CrashPlugin : Rhino.PlugIns.PlugIn
     {
         public CrashPlugin()
         {

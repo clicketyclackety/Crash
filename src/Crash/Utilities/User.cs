@@ -10,7 +10,7 @@ namespace Crash.Utilities
     /// <summary>
     /// User class
     /// </summary>
-    public class User
+    public sealed class User
     {
         /// <summary>
         /// Name of the user

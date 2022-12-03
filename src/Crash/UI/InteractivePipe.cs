@@ -80,12 +80,12 @@ namespace Crash.UI
         public void PostDrawObjects(object sender, DrawEventArgs e)
         {
             HashSet<string> owners = new HashSet<string>();
-            IEnumerable<SpeckInstance> specks = LocalCache.Instance.GetSpecks();
+            IEnumerable<SpeckInstance> specks = LocalCache.Instance.GetSpecks().OrderBy(s => s.Owner);
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
             {
                 SpeckInstance speck = enumer.Current;
-                var nameCol = new Utilities.User(speck.Owner).color;
+                var nameCol = new User(speck.Owner).color;
                 DrawSpeck(e, speck, nameCol);
                 owners.Add(speck.Owner);
                 UpdateBoundingBox(speck);

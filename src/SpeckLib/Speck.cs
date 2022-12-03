@@ -7,7 +7,7 @@ namespace SpeckLib
     /// <summary>
     /// Model.Speck that is stored in SqLite DB.
     /// </summary>
-    public class Speck : ISpeck
+    public sealed class Speck : ISpeck
     {
 
         public DateTime Stamp { get; set; }

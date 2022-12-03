@@ -29,7 +29,7 @@ jobs:
 
     - name: Test
       run: |
-        dotnet test src/tests/**/*.Tests.csproj
+        dotnet test Crash.sln
 
     - name: Test Report
       uses: dorny/test-reporter@v1

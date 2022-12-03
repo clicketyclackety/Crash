@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash", "Crash\Crash.csproj", "{FF5923AC-5721-4C5D-B92D-36FA02C68515}"
+	ProjectSection(ProjectDependencies) = postProject
+		{546E1EBF-7B4C-49C4-92F4-4325C248A473} = {546E1EBF-7B4C-49C4-92F4-4325C248A473}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpeckLib", "SpeckLib\SpeckLib.csproj", "{C8623934-01EB-48B2-B486-4355D5F80ADD}"
 EndProject
@@ -15,7 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.ClientTestApp", "Cras
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F818AD48-6C55-4F5F-B06B-AF844D126C00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crash.Server.Tests", "Crash.Server.Tests\Crash.Server.Tests.csproj", "{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server.Tests", "Crash.Server.Tests\Crash.Server.Tests.csproj", "{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

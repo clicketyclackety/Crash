@@ -24,7 +24,7 @@ namespace Crash.Server
         {
             argDict = new Dictionary<string, Action<string>>
             {
-                { "URL", _handleUrlArgs },
+                { "URLS", _handleUrlArgs },
                 { "PATH", _handleDatabasePath },
                 { "HELP", _handleHelpRequest }
             };
@@ -84,7 +84,7 @@ namespace Crash.Server
             }
             else
             {
-                Console.WriteLine("Invalid argument");
+                Console.WriteLine($"Invalid argument {argPreposition} and value {argValue}");
             }
         }
 

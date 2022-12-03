@@ -21,7 +21,6 @@ namespace Crash.Events
             if (LocalCache.SomeoneIsDone) return;
 
             SpeckInstance speck = SpeckInstance.CreateNew(User.CurrentUser.name, e.TheObject.Geometry);
-
             LocalCache.SyncHost(e.TheObject, speck);
 
             Speck serverSpeck = new Speck(speck);

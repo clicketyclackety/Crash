@@ -17,6 +17,7 @@ namespace Crash.Utilities
     public sealed class LocalCache
     {
         public static bool SomeoneIsDone { get; set; }
+        static string SpeckIdKey = "SPECKID";
 
         private ConcurrentDictionary<Guid, SpeckInstance> _cache { get; set; }
         
@@ -51,7 +52,6 @@ namespace Crash.Utilities
         {
             if (speck == null) return;
 
-            // Cache
             if (_cache.ContainsKey(speck.Id))
             {
                 _cache.TryRemove(speck.Id, out _);
@@ -60,6 +60,9 @@ namespace Crash.Utilities
             _cache.TryAdd(speck.Id, speck);
             if (string.IsNullOrEmpty(speck.Owner))
                 return;
+
+            // TODO : View should be redrawn on Update,
+            // but this would make things slow
         }
 
         /// <summary>
@@ -105,9 +108,7 @@ namespace Crash.Utilities
 
             SyncHost(rObj, speck);
         }
-
-        static string SpeckIdKey = "SPECKID";
-        
+                
         public static Guid? GetSpeckId(RhinoObject rObj)
         {
             if (rObj == null) return null;
@@ -159,13 +160,12 @@ namespace Crash.Utilities
         /// Delete a speck from rhino
         /// </summary>
         /// <param name="speck">the speck to delete</param>
-        void DeleteSpeck(SpeckInstance speck)
+        void DeleteSpeck(Guid speckId)
         {
-            RemoveSpeck(speck);
-            if (null == speck) return;
+            RemoveSpeck(speckId);
 
             var _doc = Rhino.RhinoDoc.ActiveDoc;
-            Guid hostId = GetHost(speck.Id);
+            Guid hostId = GetHost(speckId);
             RhinoObject rObj = _doc.Objects.Find(hostId);
             if (rObj is object)
             {
@@ -183,7 +183,7 @@ namespace Crash.Utilities
             var enumer = specks.GetEnumerator();
             while (enumer.MoveNext())
             {
-                DeleteSpeck(enumer.Current);
+                DeleteSpeck(enumer.Current.Id);
             }
         }
 
@@ -194,11 +194,9 @@ namespace Crash.Utilities
         /// Remove a speck for the cache
         /// </summary>
         /// <param name="speck">the speck to remove</param>
-        internal void RemoveSpeck(ISpeck speck)
+        internal void RemoveSpeck(Guid speckId)
         {
-            if (null == speck) return;
-
-            _cache.TryRemove(speck.Id, out _);
+            _cache.TryRemove(speckId, out _);
         }
 
         /// <summary>
@@ -212,7 +210,7 @@ namespace Crash.Utilities
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
             {
-                RemoveSpeck(enumer.Current);
+                RemoveSpeck(enumer.Current.Id);
             }
         }
 
@@ -267,8 +265,8 @@ namespace Crash.Utilities
         {
             if (Guid.Empty == speckId || string.IsNullOrEmpty(owner)) return;
 
-            SpeckInstance speck = new SpeckInstance(new Speck(speckId, owner, null));
-            Instance.DeleteSpeck(speck);
+            // SpeckInstance speck = new SpeckInstance(new Speck(speckId, owner, null));
+            Instance.DeleteSpeck(speckId);
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
 

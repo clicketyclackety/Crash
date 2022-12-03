@@ -43,14 +43,15 @@ namespace Crash.Server
         {
             try
             {
-                _context.Specks.Add(Model.Speck.From(speck));
+                _context.Specks.Add(speck);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex}");
             }
-            await Clients.Others.Add(user, speck);
+
+            await Clients.Others.Add(user, new Speck(speck));
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace Crash.Server
                 {
                     _context.Specks.Remove(removeSpeck);
                 }
-                _context.Specks.Add(Model.Speck.From(speck));
+                _context.Specks.Add(new Speck(speck));
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -111,7 +112,7 @@ namespace Crash.Server
         {
             try
             {
-                List<Model.Speck> done = new List<Model.Speck>();
+                List<Speck> done = new List<Speck>();
                 foreach (var speck in _context.Specks)
                 {
                     if (speck.LockedBy == user)
@@ -190,7 +191,7 @@ namespace Crash.Server
         {
             await base.OnConnectedAsync();
 
-            var specks = _context.Specks.Select(r => r.To()).ToArray();
+            var specks = _context.Specks.ToArray();
             await Clients.Caller.Initialize(specks);
         }
     }

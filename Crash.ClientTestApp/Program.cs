@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SpeckLib;
+using System;
 
 namespace Crash.ClientTestApp
 {
@@ -21,7 +22,7 @@ namespace Crash.ClientTestApp
             Console.WriteLine("\tc = Create Speck");
             Console.WriteLine("\tq = Quit");
 
-            var client = new CrashClient(userId, new Uri("http://localhost:5141/Crash"));
+            var client = new CrashClient(userId, new Uri("http://localhost:8080/Crash"));
 
             client.OnAdd += (user, speck) =>
             {
@@ -35,7 +36,7 @@ namespace Crash.ClientTestApp
                 var k = Console.ReadKey();
                 if (k.KeyChar == 'c')
                 {
-                    client.Add(new SpeckLib.Speck())?.Wait();
+                    client.Add(Speck.CreateEmpty())?.Wait();
                 }
                 if (k.KeyChar == 'q')
                 {

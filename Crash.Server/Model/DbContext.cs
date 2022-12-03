@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using SpeckLib;
 
 namespace Crash.Server.Model
 {
@@ -14,7 +12,7 @@ namespace Crash.Server.Model
         {
         }
 
-        public DbSet<Speck> Specks { get; set; }
+        public DbSet<SpeckLib.Speck> Specks { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

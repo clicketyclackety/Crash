@@ -1,4 +1,5 @@
-﻿using Rhino.Runtime;
+﻿using Rhino;
+using Rhino.Runtime;
 using SpeckLib;
 using System;
 using System.Collections.Generic;
@@ -29,8 +30,11 @@ namespace Crash.Utilities
                 CrashServer server = new CrashServer();
                 LocalServer = server;
 
-                server.Start(url, HostUtils.RunningOnOSX);
-
+                bool start = server.Start(url, HostUtils.RunningOnOSX);
+                if (!start)
+                {
+                    RhinoApp.WriteLine("Could not start Server!");
+                }
             }
         }
     }

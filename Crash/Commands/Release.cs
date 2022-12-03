@@ -1,4 +1,4 @@
-using Crash.Utilities;
+﻿using Crash.Utilities;
 using Rhino;
 using Rhino.Commands;
 using Rhino.Geometry;
@@ -32,6 +32,7 @@ namespace Crash.Commands
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
             // TODO : Wait for response for data integrity check
+            // TODO : check that concurrency book for how to await this in a non-awaitable scenario!
             RequestManager.LocalClient.Done();
 
             return Result.Success;

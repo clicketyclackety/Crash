@@ -18,13 +18,13 @@ namespace Crash.Utilities
     {
         public static bool SomeoneIsDone { get; set; }
 
-        private ConcurrentDictionary<Guid, Speck> _cache { get; set; }
+        private ConcurrentDictionary<Guid, SpeckInstance> _cache { get; set; }
         
         //                        <SpeckId, RhinoId>
         private ConcurrentDictionary<Guid, Guid> _SpeckToRhino { get; set; }
 
-        private List<Speck> ToBake = new List<Speck>();
-        private List<Speck> ToRemove = new List<Speck>();
+        private List<SpeckInstance> ToBake = new List<SpeckInstance>();
+        private List<SpeckInstance> ToRemove = new List<SpeckInstance>();
 
         /// <summary>
         /// The instance of the local cache
@@ -37,7 +37,7 @@ namespace Crash.Utilities
         public LocalCache()
         {
             RhinoApp.Idle += RhinoApp_Idle;
-            _cache = new ConcurrentDictionary<Guid, Speck>();
+            _cache = new ConcurrentDictionary<Guid, SpeckInstance>();
             _SpeckToRhino = new ConcurrentDictionary<Guid, Guid>();
         }
 
@@ -47,7 +47,7 @@ namespace Crash.Utilities
         /// </summary>
         /// <param name="speck">the specks</param>
         /// <returns>returns the update task</returns>
-        public async Task UpdateSpeck(Speck speck)
+        public async Task UpdateSpeck(SpeckInstance speck)
         {
             if (speck == null) return;
 
@@ -66,12 +66,12 @@ namespace Crash.Utilities
         /// Method to get specks
         /// </summary>
         /// <returns>returns a list of the specks</returns>
-        public IEnumerable<Speck> GetSpecks()
+        public IEnumerable<SpeckInstance> GetSpecks()
         {
             return _cache.Values;
         }
 
-        public static RhinoObject GetHost(Speck speck)
+        public static RhinoObject GetHost(SpeckInstance speck)
         {
             if (!Instance._SpeckToRhino.TryGetValue(speck.Id, out Guid hostId)) return null;
             return Rhino.RhinoDoc.ActiveDoc.Objects.Find(hostId);
@@ -90,12 +90,12 @@ namespace Crash.Utilities
         /// Bake the specks to rhino
         /// </summary>
         /// <param name="speck">the speck to bake</param>
-        internal void BakeSpeck(Speck speck)
+        internal void BakeSpeck(SpeckInstance speck)
         {
             if (speck == null) return;
 
             var _doc = Rhino.RhinoDoc.ActiveDoc;
-            GeometryBase geom = speck.GetGeom();
+            GeometryBase geom = speck.Geometry;
             if (null == geom) return;
 
             Guid id = _doc.Objects.Add(geom);
@@ -118,7 +118,7 @@ namespace Crash.Utilities
             return null;
         }
 
-        public static void SyncHost(RhinoObject rObj, Speck speck)
+        public static void SyncHost(RhinoObject rObj, ISpeck speck)
         {
             if (null == speck || rObj == null) return;
 
@@ -142,7 +142,7 @@ namespace Crash.Utilities
         /// Bake multiple specks to rhino
         /// </summary>
         /// <param name="specks">the enumerable specks to bake</param>
-        internal void BakeSpecks(IEnumerable<Speck> specks)
+        internal void BakeSpecks(IEnumerable<SpeckInstance> specks)
         {
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
@@ -159,7 +159,7 @@ namespace Crash.Utilities
         /// Delete a speck from rhino
         /// </summary>
         /// <param name="speck">the speck to delete</param>
-        void DeleteSpeck(Speck speck)
+        void DeleteSpeck(SpeckInstance speck)
         {
             RemoveSpeck(speck);
             if (null == speck) return;
@@ -176,7 +176,7 @@ namespace Crash.Utilities
         /// Delete multiple specks from rhino
         /// </summary>
         /// <param name="specks">the specks to delete</param>
-        void DeleteSpecks(IEnumerable<Speck> specks)
+        void DeleteSpecks(IEnumerable<SpeckInstance> specks)
         {
             if (null == specks) return;
 
@@ -194,7 +194,7 @@ namespace Crash.Utilities
         /// Remove a speck for the cache
         /// </summary>
         /// <param name="speck">the speck to remove</param>
-        internal void RemoveSpeck(Speck speck)
+        internal void RemoveSpeck(ISpeck speck)
         {
             if (null == speck) return;
 
@@ -205,7 +205,7 @@ namespace Crash.Utilities
         /// Remove multiple specks from the cache
         /// </summary>
         /// <param name="specks">the specks to remove</param>
-        internal void RemoveSpecks(IEnumerable<Speck> specks)
+        internal void RemoveSpecks(IEnumerable<ISpeck> specks)
         {
             if (null == specks) return;
 
@@ -249,24 +249,25 @@ namespace Crash.Utilities
         /// </summary>
         /// <param name="name">the name </param>
         /// <param name="speck">the speck</param>
-        internal static void OnAdd(string name, Speck speck)
+        internal static void OnAdd(string name, ISpeck speck)
         {
             if (null == speck) return;
 
-            Instance.UpdateSpeck(speck);
+            SpeckInstance lSpeck = new SpeckInstance(speck);
+            Instance.UpdateSpeck(lSpeck);
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
         
         /// <summary>
         /// On delete event. A user has deleted an element elsewhere.
         /// </summary>
-        /// <param name="name">the name</param>
+        /// <param name="owner">the name</param>
         /// <param name="speckId">speck id</param>
-        internal static void OnDelete(string name, Guid speckId)
+        internal static void OnDelete(string owner, Guid speckId)
         {
-            if (Guid.Empty == speckId || string.IsNullOrEmpty(name)) return;
+            if (Guid.Empty == speckId || string.IsNullOrEmpty(owner)) return;
 
-            Speck speck = new Speck(speckId) { Owner = name };
+            SpeckInstance speck = new SpeckInstance(new Speck(speckId, owner, null));
             Instance.DeleteSpeck(speck);
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
@@ -277,7 +278,7 @@ namespace Crash.Utilities
         /// <param name="name">the name</param>
         /// <param name="speckID">the speck id</param>
         /// <param name="speck">the speck</param>
-        internal static void OnUpdate(string name, Guid speckId, Speck speck)
+        internal static void OnUpdate(string name, Guid speckId, SpeckInstance speck)
         {
             if (null == speck ||
                 Guid.Empty == speckId ||
@@ -296,8 +297,9 @@ namespace Crash.Utilities
 
             SomeoneIsDone = true;
             string? sanitisedName = name?.ToLower();
-            IEnumerable<Speck> ToBake = LocalCache.Instance.GetSpecks().
-                                        Where(s => s.Owner?.ToLower() == sanitisedName).Where(s => s is object);
+            IEnumerable<SpeckInstance> ToBake = LocalCache.Instance.GetSpecks()
+                                        .Where(s => s.Owner?.ToLower() == sanitisedName)
+                                        .Where(s => s is object);
 
             LocalCache.Instance.BakeSpecks(ToBake);
             LocalCache.Instance.RemoveSpecks(ToBake);

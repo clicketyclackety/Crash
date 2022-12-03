@@ -65,7 +65,7 @@ namespace Crash.Commands
             ServerManager.StartOrContinueLocalServer($"http://0.0.0.0:{port}");
 
             // FIXME : This is a hack for now. The Server needs to return an "I'm ready", but until then ...
-            Thread.Sleep(2000);
+            Thread.Sleep(3000);
 
             try
             {

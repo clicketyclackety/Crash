@@ -17,7 +17,7 @@ namespace Crash.Server.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.10");
 
-            modelBuilder.Entity("Crash.Server.Model.Speck", b =>
+            modelBuilder.Entity("SpeckLib.Speck", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

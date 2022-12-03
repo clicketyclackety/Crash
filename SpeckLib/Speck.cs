@@ -1,54 +1,54 @@
-﻿using System;
+﻿using SpeckLib;
+using System;
 
 namespace SpeckLib
 {
+
     /// <summary>
-    /// SpeckLib.Speck to be used by Rhino Clients to initialize objects and send to server
+    /// Model.Speck that is stored in SqLite DB.
     /// </summary>
-    public sealed class Speck
+    public class Speck : ISpeck
     {
 
-        Guid _id;
-        DateTime _stamp;
-        string _owner;
+        public DateTime Stamp { get; set; }
 
-        public Guid Id
-        {
-            get => _id;
-            set => _id = value;
-        }
+        public Guid Id { get; set; }
 
-        public DateTime Stamp
-        {
-            get => _stamp;
-            set => _stamp = value;
-        }
+        public string Owner { get; set; }
 
-        public string Owner 
-        {
-            get => _owner;
-            set => _owner = value;
-        }
+        public bool Temporary { get; set; }
+
+        public string? LockedBy { get; set; }
 
         public string? Payload { get; set; }
 
-        public Speck()
-        {
-            _id = Guid.NewGuid();
-            _stamp = DateTime.UtcNow;
-        }
 
-        public Speck(Guid id)
-        {
-            _id = id;
-            _stamp = DateTime.UtcNow;
-        }
+        public Speck() { }
 
-        public Speck(string owner, string? payload = null)
-            : this()
+        public Speck(Guid id, string owner, string? payload)
         {
-            _owner = owner;
+            Id = id;
+            Owner = owner;
             Payload = payload;
+            Stamp = DateTime.UtcNow;
+        }
+
+        public Speck(ISpeck speck)
+        {
+            Stamp = speck.Stamp;
+            Id = speck.Id;
+            Owner = speck.Owner;
+            Payload = speck.Payload;
+            LockedBy = speck.Owner;
+            Temporary = true;
+        }
+
+        public static Speck CreateEmpty()
+        {
+            return new Speck()
+            {
+                Id = Guid.NewGuid()
+            };
         }
 
     }

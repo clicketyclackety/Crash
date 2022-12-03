@@ -1,6 +1,7 @@
-﻿using Crash.Utilities;
+using Crash.Utilities;
 using Rhino;
 using Rhino.Display;
+using Rhino.DocObjects;
 using Rhino.Geometry;
 using SpeckLib;
 using System;
@@ -8,19 +9,21 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices.WindowsRuntime;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Crash.UI
 {
     /// <summary>
     /// Interactive pipeline for crash geometry display
     /// </summary>
-    public sealed class InteractivePipe
+    public sealed partial class InteractivePipe
     {
         private BoundingBox bbox;
 
         private bool enabled { get; set; }
+
+        private MeshingParameters meshingParameters = new MeshingParameters(0.5);
 
         /// <summary>
         /// Pipeline enabled, disabling hides it
@@ -85,11 +88,14 @@ namespace Crash.UI
         /// <param name="e"></param>
         public void PostDrawObjects(object sender, DrawEventArgs e)
         {
+            if (e.Viewport.ParentView is RhinoPageView) return;
+
             HashSet<string> owners = new HashSet<string>();
             IEnumerable<Speck> specks = LocalCache.Instance.GetSpecks();
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
             {
+                if (e.Display.InterruptDrawing()) return;
                 Speck speck = enumer.Current;
                 var nameCol = new Utilities.User(speck.Owner).color;
                 DrawSpeck(e, speck, nameCol);
@@ -140,73 +146,6 @@ namespace Crash.UI
                 bbox.Union(speckBox);
             }
 
-        }
-
-        /// Re-using materials is much faster
-        DisplayMaterial cachedMaterial = new DisplayMaterial(Color.Blue);
-        /// <summary>
-        /// Draws a Speck in the pipeline.
-        /// </summary>
-        /// <param name="e">The EventArgs from the DisplayConduit</param>
-        /// <param name="speck">The Speck</param>
-        /// <param name="color">The colour for the speck, based on the user.</param>
-        private void DrawSpeck(DrawEventArgs e, Speck speck, Color color)
-        {
-            GeometryBase? geom = speck.GetGeom();
-            if (geom == null) return;
-
-            if (cachedMaterial.Diffuse != color)
-            {
-                cachedMaterial = new DisplayMaterial(color);
-            }
-
-            try
-            {
-                if (geom is Curve cv)
-                {
-                    e.Display.DrawCurve(cv, color, 2);
-                }
-                else if (geom is Brep brep)
-                {
-                    e.Display.DrawBrepShaded(brep, cachedMaterial);
-                }
-                else if (geom is Mesh mesh)
-                {
-                    e.Display.DrawMeshShaded(mesh, cachedMaterial);
-                }
-                else if (geom is Extrusion ext)
-                {
-                    e.Display.DrawExtrusionWires(ext, cachedMaterial.Diffuse);
-                }
-                else if (geom is TextEntity te)
-                {
-                    e.Display.DrawText(te, cachedMaterial.Diffuse);
-                }
-                else if (geom is TextDot td)
-                {
-                    e.Display.DrawDot(td, Color.White, cachedMaterial.Diffuse, cachedMaterial.Diffuse);
-                }
-                else if (geom is Surface srf)
-                {
-                    e.Display.DrawSurface(srf, cachedMaterial.Diffuse, 1);
-                }
-                else if (geom is Rhino.Geometry.Point pnt)
-                {
-                    e.Display.DrawPoint(pnt.Location, cachedMaterial.Diffuse);
-                }
-                else if (geom is AnnotationBase ab)
-                {
-                    e.Display.DrawAnnotation(ab, cachedMaterial.Diffuse);
-                }
-                else
-                {
-                    ;
-                }
-            }
-            catch(Exception ex)
-            {
-                
-            }
         }
 
     }

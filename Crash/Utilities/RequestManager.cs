@@ -1,4 +1,4 @@
-﻿using SpeckLib;
+using SpeckLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Crash.Utilities
 {
+
     /// <summary>
     /// The request manager
     /// </summary>
@@ -32,8 +33,16 @@ namespace Crash.Utilities
                 Events.EventManagement.RegisterEvents();
 
                 client.StartAsync();
-
             }
+        }
+
+        public static void ForceEndLocalClient()
+        {
+            Events.EventManagement.DeRegisterEvents();
+
+            if (null == LocalClient) return;
+
+            RequestManager.LocalClient.StopAsync();
         }
 
         /// <summary>

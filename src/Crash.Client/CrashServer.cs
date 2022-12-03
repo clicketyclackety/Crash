@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -11,9 +10,9 @@ using System.Threading.Tasks;
 namespace Crash
 {
     /// <summary>
-    /// Crash server class
+    /// Crash server class to handle the ServerProcess
     /// </summary>
-    public class CrashServer : IDisposable
+    public sealed class CrashServer : IDisposable
     {
         Process process;
 
@@ -94,7 +93,7 @@ namespace Crash
         /// Disposes of the object, stopping the server if it is running
         /// </summary>
         /// <param name="disposing">true if disposing, false if GC'd</param>
-        public virtual void Dispose(bool disposing)
+        public void Dispose(bool disposing)
         {
             // stop the server!
             Stop();

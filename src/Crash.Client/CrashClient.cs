@@ -8,7 +8,7 @@ namespace Crash
     /// <summary>
     /// Crash client class
     /// </summary>
-    public class CrashClient
+    public sealed class CrashClient
     {
         HubConnection _connection;
         string _user;
@@ -43,6 +43,15 @@ namespace Crash
         /// <param name="url">url</param>
         public CrashClient(string userName, Uri url)
         {
+            if (string.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentException("Username cannot be empty or null");
+            }
+            if (null == url)
+            {
+                throw new UriFormatException("URL Cannot be null");
+            }
+
             _user = userName;
             _connection = new HubConnectionBuilder()
                 .WithUrl(url)
@@ -58,16 +67,15 @@ namespace Crash
             _connection.On<Speck[]>("Initialize", (specks) => OnInitialize?.Invoke(specks));
             _connection.Closed += Connection_Closed;
             _connection.Reconnecting += Connection_Reconnecting;
-
         }
 
-        private Task Connection_Reconnecting(Exception arg)
+        private Task Connection_Reconnecting(Exception? arg)
         {
             Console.WriteLine(arg);
             return Task.CompletedTask;
         }
 
-        private Task Connection_Closed(Exception arg)
+        private Task Connection_Closed(Exception? arg)
         {
             Console.WriteLine(arg);
             return Task.CompletedTask;

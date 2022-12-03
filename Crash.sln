@@ -3,22 +3,24 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash", "Crash\Crash.csproj", "{FF5923AC-5721-4C5D-B92D-36FA02C68515}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash", "src\Crash\Crash.csproj", "{FF5923AC-5721-4C5D-B92D-36FA02C68515}"
 	ProjectSection(ProjectDependencies) = postProject
 		{546E1EBF-7B4C-49C4-92F4-4325C248A473} = {546E1EBF-7B4C-49C4-92F4-4325C248A473}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpeckLib", "SpeckLib\SpeckLib.csproj", "{C8623934-01EB-48B2-B486-4355D5F80ADD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpeckLib", "src\SpeckLib\SpeckLib.csproj", "{C8623934-01EB-48B2-B486-4355D5F80ADD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server", "Crash.Server\Crash.Server.csproj", "{546E1EBF-7B4C-49C4-92F4-4325C248A473}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server", "src\Crash.Server\Crash.Server.csproj", "{546E1EBF-7B4C-49C4-92F4-4325C248A473}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Client", "Crash.Client\Crash.Client.csproj", "{399DFBDE-D716-481C-BBEA-1FB224140EC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Client", "src\Crash.Client\Crash.Client.csproj", "{399DFBDE-D716-481C-BBEA-1FB224140EC4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.ClientTestApp", "Crash.ClientTestApp\Crash.ClientTestApp.csproj", "{3D8DFE22-47A0-4B8B-BB14-79B560B1760E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.ClientTestApp", "tests\Crash.ClientTestApp\Crash.ClientTestApp.csproj", "{3D8DFE22-47A0-4B8B-BB14-79B560B1760E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F818AD48-6C55-4F5F-B06B-AF844D126C00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server.Tests", "tests\Crash.Server.Tests\Crash.Server.Tests.csproj", "{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server.Tests", "Crash.Server.Tests\Crash.Server.Tests.csproj", "{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F8397E91-1EEA-4960-9685-7F76B23F642D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crash.Tests", "tests\Crash.Tests\Crash.Tests.csproj", "{F61E43D7-22DC-4B85-B514-C55F29C003B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,12 +52,18 @@ Global
 		{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F61E43D7-22DC-4B85-B514-C55F29C003B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F61E43D7-22DC-4B85-B514-C55F29C003B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F61E43D7-22DC-4B85-B514-C55F29C003B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F61E43D7-22DC-4B85-B514-C55F29C003B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF} = {F818AD48-6C55-4F5F-B06B-AF844D126C00}
+		{3D8DFE22-47A0-4B8B-BB14-79B560B1760E} = {F8397E91-1EEA-4960-9685-7F76B23F642D}
+		{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF} = {F8397E91-1EEA-4960-9685-7F76B23F642D}
+		{F61E43D7-22DC-4B85-B514-C55F29C003B3} = {F8397E91-1EEA-4960-9685-7F76B23F642D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D9F64F3-0D9F-4D7F-9445-5215BF29D663}

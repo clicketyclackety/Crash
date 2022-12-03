@@ -1,0 +1,59 @@
+---
+name: Yak Build
+on:
+  pull_request:
+    paths-ignore:
+      - '*.md'
+      - '*.gh*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+    
+    - name: Restore Packages
+      run: nuget restore Crash.sln
+
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          6.0
+          7.0
+
+    - name: Build Crash on Windows
+      run: dotnet build Crash.sln --configuration Release
+
+    - name: Build Yak Package for Windows
+      run: |
+        $config = "Release"
+        $in = Resolve-Path("Crash\bin\$config\net48")
+        $out = $in
+
+        .\Scripts\YakCompiler.ps1 -Path $in -DestinationPath $out -Config Release -os win
+      shell: powershell
+
+    - name: Upload Windows Yak Package
+      uses: actions/upload-artifact@v3
+      with:
+        name: crash-win-yak
+        path: Crash\bin\Release\net48\*.yak
+
+
+    - name: Build Yak Package for Mac
+      run: |
+        $config = "Release"
+        $in = Resolve-Path("Crash\bin\$config\net48")
+        $out = $in
+
+        .\Scripts\YakCompiler.ps1 -Path $in -DestinationPath $out -Config Release -os mac
+      shell: powershell
+
+    - name: Upload Mac Yak Package
+      uses: actions/upload-artifact@v3
+      with:
+        name: crash-mac-yak
+        path: Crash\bin\Release\net48\*.yak

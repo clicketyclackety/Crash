@@ -23,6 +23,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="App_Data\**" />
+	  <Content Remove="App_Data\**" />
+	  <EmbeddedResource Remove="App_Data\**" />
+	  <None Remove="App_Data\**" />
+	</ItemGroup>
+
+	<ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="6.0.10" />
 	  <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.2" />
@@ -31,10 +38,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SpeckLib\SpeckLib.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="App_Data\" />
   </ItemGroup>
 
 </Project>

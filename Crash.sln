@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crash.Tests", "tests\Crash.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crash.Client.Tests", "Crash.Client.Tests\Crash.Client.Tests.csproj", "{770CF273-241F-401E-BCB8-C82482398042}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerClient.Integration.Tests", "ServerClient.Integration.Tests\ServerClient.Integration.Tests.csproj", "{CDF0CC8F-EB9E-4362-916C-314617F9818C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{770CF273-241F-401E-BCB8-C82482398042}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{770CF273-241F-401E-BCB8-C82482398042}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{770CF273-241F-401E-BCB8-C82482398042}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDF0CC8F-EB9E-4362-916C-314617F9818C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDF0CC8F-EB9E-4362-916C-314617F9818C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDF0CC8F-EB9E-4362-916C-314617F9818C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDF0CC8F-EB9E-4362-916C-314617F9818C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,6 +77,7 @@ Global
 		{79757315-2EB1-4AF2-9B1D-CCA0477D6ABF} = {F8397E91-1EEA-4960-9685-7F76B23F642D}
 		{F61E43D7-22DC-4B85-B514-C55F29C003B3} = {F8397E91-1EEA-4960-9685-7F76B23F642D}
 		{770CF273-241F-401E-BCB8-C82482398042} = {F8397E91-1EEA-4960-9685-7F76B23F642D}
+		{CDF0CC8F-EB9E-4362-916C-314617F9818C} = {F8397E91-1EEA-4960-9685-7F76B23F642D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D9F64F3-0D9F-4D7F-9445-5215BF29D663}

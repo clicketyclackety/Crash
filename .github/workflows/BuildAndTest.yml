@@ -1,0 +1,40 @@
+---
+name: BuildAndTest
+on:
+  pull_request:
+    paths-ignore:
+      - '*.md'
+      - '*.gh*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+    
+    - name: Restore Packages
+      run: nuget restore Crash.sln
+
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          6.0
+          7.0
+
+    - name: Build Crash
+      run: dotnet build Crash.sln --configuration Release
+
+    - name: Test
+      run: |
+        dotnet test Crash.sln
+
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: CRASH Tests
+        path: tests/**/TestResults/*.trx    # Path to test results
+        reporter: dotnet-trx        # Format of test results

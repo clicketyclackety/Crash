@@ -2,7 +2,7 @@
   "profiles": {
     "Crash.Server": {
       "commandName": "Project",
-      "commandLineArgs": "--url https://localhost:8080 --path C:\\ProgramData\\Value.db",
+      "commandLineArgs": "--urls https://localhost:8080",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

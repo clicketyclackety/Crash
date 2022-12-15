@@ -51,7 +51,7 @@ namespace Crash.UI
         /// <summary>
         /// The interactive pipeline instance
         /// </summary>
-        public InteractivePipe Instance;
+        public static InteractivePipe Instance;
 
         /// <summary>
         /// Empty constructor

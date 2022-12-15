@@ -1,4 +1,5 @@
-﻿using Crash.Utilities;
+﻿using Crash.UI;
+using Crash.Utilities;
 using Eto.Forms;
 using SpeckLib;
 using System;

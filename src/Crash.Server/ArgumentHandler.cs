@@ -7,7 +7,7 @@ namespace Crash.Server
 {
     public class ArgumentHandler
     {
-        const char separator = '\n';
+
         const string pattern = @"--([\w]+ [\S]+)";
         const string dbName = "Database.db";
         const string appName = "Crash";
@@ -18,7 +18,7 @@ namespace Crash.Server
 
         public string DatabaseFileName { get; private set; }
 
-        private Dictionary<string, Action<string>> argDict;
+        private readonly Dictionary<string, Action<string>> argDict;
 
         public ArgumentHandler()
         {
@@ -47,7 +47,7 @@ namespace Crash.Server
                 string argPreposition = argSplit[0];
                 string argValue = string.Empty;
 
-                if (argSplit?.Count() > 0)
+                if (argSplit?.Length > 0)
                     argValue = argSplit[1];
 
                 _handleArgs(argPreposition, argValue);

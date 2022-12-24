@@ -15,29 +15,34 @@ param (
     [string]$os="win",
 
     [Parameter(Mandatory=$false, HelpMessage="Minimum required version of Rhino")]
-    [Alias("Version")]
-    [string]$rhinoVersion="7.21",
+    [Alias("Yak")]
+    [string]$yakExe="C:\Program Files\Rhino 7\System\Yak.exe",
 
     [Parameter(Mandatory=$false, HelpMessage="Push to yak server?")]
     [bool]$publish=$false
 )
 
-$formattedVersion = $rhinoVersion.Replace('.','_')
 $crashVersion = "1.0.0"
 
-$fileName = "$outputDir\crash-$crashVersion-rh$formattedVersion-$os"
-$zipFile = "$fileName.zip"
-$yakFile = "$fileName.yak"
-
-foreach($zip in Get-ChildItem "$outputDir\*.zip")
+foreach($yakFile in Get-ChildItem "$outputDir\*.yak")
 {
-    Remove-Item $zip
-}
-foreach($yak in Get-ChildItem "$outputDir\*.yak")
-{
-    Remove-Item $yak
+    Remove-Item $yakFile
 }
 
+$originalLocation = Get-Location
+Set-Location $inputDir
+
+& $yakExe build --platform $os
+
+if ($inputDir -ne $outputDir)
+{
+    Copy-Item -Path "$inputDir\*.yak" -DestinationPath $outputDir
+}
+
+<#
 Compress-Archive -Path "$inputDir\*.*" -DestinationPath $zipFile -CompressionLevel Optimal
 Compress-Archive -Path "$inputDir\Server" -DestinationPath $zipFile -CompressionLevel Optimal -Update
 Rename-Item $zipFile $yakFile
+#>
+
+Set-Location $originalLocation

@@ -11,6 +11,7 @@ using System.Security.Policy;
 using System.Threading;
 using static System.Net.WebRequestMethods;
 using System.Xml.Linq;
+using System.Threading.Tasks;
 
 namespace Crash.Commands
 {
@@ -45,6 +46,8 @@ namespace Crash.Commands
             {
                 RhinoApp.WriteLine("You are currently part of a Shared Model Session. " +
                     "Please restart Rhino to create or join a new session.");
+
+                return Result.Success;
             }
 
             string name = Environment.UserName;
@@ -70,7 +73,7 @@ namespace Crash.Commands
             try
             {
                 // TODO : Create these urls/ports as constants somewhere relevent
-                RequestManager.StartOrContinueLocalClient(new Uri($"http://127.0.0.1:{port}/Crash"));
+                Task.Run( () => RequestManager.StartOrContinueLocalClient(new Uri($"http://127.0.0.1:{port}/Crash")));
             }
             catch(UriFormatException)
             {

@@ -5,6 +5,7 @@
 	  <Platforms>AnyCPU;x64</Platforms>
 	  <LangVersion>latest</LangVersion>
 	  <Nullable>enable</Nullable>
+	  <Title>Crash.Client</Title>
   </PropertyGroup>
 
 	<ItemGroup>

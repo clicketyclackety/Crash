@@ -22,7 +22,7 @@ namespace Crash.Utilities
         /// Method to load the client
         /// </summary>
         /// <param name="uri">the uri of the client</param>
-        public static void StartOrContinueLocalClient(Uri uri)
+        public static async Task StartOrContinueLocalClient(Uri uri)
         {
             if (null == LocalClient)
             {
@@ -32,17 +32,14 @@ namespace Crash.Utilities
 
                 Events.EventManagement.RegisterEvents();
 
-                client.StartAsync();
+                await client.StartAsync();
             }
         }
 
         public static void ForceEndLocalClient()
         {
             Events.EventManagement.DeRegisterEvents();
-
-            if (null == LocalClient) return;
-
-            RequestManager.LocalClient.StopAsync();
+            Task.Run( () => RequestManager.LocalClient?.StopAsync() );
         }
 
         /// <summary>

@@ -14,6 +14,10 @@ using System.Xml.Linq;
 using System.Threading.Tasks;
 using System.IO;
 using Crash.UI;
+using Rhino.DocObjects;
+using System.Linq;
+using Crash.Commands;
+using Rhino.UI;
 
 namespace Crash.Commands
 {
@@ -26,6 +30,7 @@ namespace Crash.Commands
     {
         private static int lastPort = 5000;
         private const string defaultURL = "http://0.0.0.0:";
+        private bool includePreExistingGeometry = false;
 
         /// <summary>
         /// Empty constructor
@@ -65,6 +70,11 @@ namespace Crash.Commands
             if (!_GetPortFromUser(ref lastPort))
                 return Result.Nothing;
 
+            if (_PreExistingGeometryCheck(doc))
+            {
+                includePreExistingGeometry = _ContinueOrQuit().Value;
+            }
+
             // TODO : Add Port Validation
             // TODO : Add Port Suggestions to docs
 
@@ -87,6 +97,41 @@ namespace Crash.Commands
             return Result.Success;
         }
 
+        private void AddPreExistingGeometry()
+        {
+            var enumer = GetObjects(RhinoDoc.ActiveDoc).GetEnumerator();
+            while(enumer.MoveNext())
+            {
+                GeometryBase geom = enumer.Current.Geometry;
+                SpeckInstance speck = SpeckInstance.CreateNew(User.CurrentUser.name, geom);
+                LocalCache.Instance.UpdateSpeck(speck);
+            }
+        }
+
+        private bool? _ContinueOrQuit(bool defaultValue = false)
+            => CommandUtils.GetBoolean(ref defaultValue,
+                "Would you like to include preExisting Geometry?",
+                "dontInclude",
+                "include");
+
+        private IEnumerable<RhinoObject> GetObjects(RhinoDoc doc)
+        {
+            ObjectEnumeratorSettings settings = new ObjectEnumeratorSettings()
+            {
+                ActiveObjects = true,
+                DeletedObjects = true,
+                HiddenObjects = true,
+                IncludeGrips = false,
+                IncludeLights = false,
+                LockedObjects = true,
+                NormalObjects = true,
+            };
+            return doc.Objects.GetObjectList(settings);
+        }
+
+        private bool _PreExistingGeometryCheck(RhinoDoc doc)
+            => GetObjects(doc).Count() > 0;
+
         private void Server_OnFailure(object sender, EventArgs e)
         {
             CrashServer.OnFailure -= Server_OnFailure;
@@ -107,6 +152,9 @@ namespace Crash.Commands
             {
                 // TODO : Create these urls/ports as constants somewhere relevent
                 RequestManager.StartOrContinueLocalClient(new Uri($"http://127.0.0.1:{lastPort}/Crash"));
+
+                if (includePreExistingGeometry)
+                    AddPreExistingGeometry();
             }
             catch (UriFormatException)
             {

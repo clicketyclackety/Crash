@@ -1,3 +1,4 @@
+using Rhino;
 using SpeckLib;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Crash.Utilities
         /// <summary>
         /// local client instance
         /// </summary>
-        internal static Crash.CrashClient LocalClient;
+        internal static CrashClient LocalClient { get; set; }
 
         /// <summary>
         /// Method to load the client
@@ -24,22 +25,28 @@ namespace Crash.Utilities
         /// <param name="uri">the uri of the client</param>
         public static async Task StartOrContinueLocalClient(Uri uri)
         {
+            if (LocalClient is object)
+            {
+                await ForceEndLocalClient();
+            }
+
             if (null == LocalClient)
             {
                 // TODO : Add a URI
                 CrashClient client = new CrashClient(User.CurrentUser.name, uri);
                 RequestManager.LocalClient = client;
-
                 Events.EventManagement.RegisterEvents();
 
                 await client.StartAsync();
             }
+
+            // TODO : Check for successful connection
         }
 
-        public static void ForceEndLocalClient()
+        public static async Task ForceEndLocalClient()
         {
             Events.EventManagement.DeRegisterEvents();
-            Task.Run( () => RequestManager.LocalClient?.StopAsync() );
+            await LocalClient?.StopAsync();
             LocalClient = null;
         }
 

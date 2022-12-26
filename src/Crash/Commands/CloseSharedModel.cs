@@ -30,16 +30,15 @@ namespace Crash.Commands
         {
             bool? choice = _GetReleaseChoice();
             if (null == choice) return Result.Cancel;
-
-            EventManagement.DeRegisterEvents();
-
             if (choice.Value)
             {
                 RequestManager.LocalClient?.Done();
             }
 
-            RequestManager.ForceEndLocalClient();
+            EventManagement.DeRegisterEvents();
+
             ServerManager.ShutdownLocalServer();
+            RequestManager.ForceEndLocalClient();
 
             LocalCache.Clear();
             InteractivePipe.Instance.Enabled = false;

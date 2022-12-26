@@ -34,8 +34,9 @@ namespace Crash.Commands
                 bool? result = _NewModelOrExit(false);
                 if (!result.Value) return Result.Cancel;
 
-                RhinoApp.RunScript(CloseSharedModel.Instance.EnglishName, true);
-                RhinoApp.RunScript(OpenSharedModel.Instance.EnglishName, true);
+                if (RhinoApp.RunScript(CloseSharedModel.Instance.EnglishName, true))
+                    RhinoApp.RunScript(OpenSharedModel.Instance.EnglishName, true);
+
                 return Result.Success;
             }
 

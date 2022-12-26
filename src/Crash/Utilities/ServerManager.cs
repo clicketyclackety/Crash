@@ -1,42 +1,45 @@
-﻿using Rhino;
-using Rhino.Runtime;
-using SpeckLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Crash.Utilities
+﻿namespace Crash.Utilities
 {
     /// <summary>
     /// The server manager
     /// </summary>
     public static class ServerManager
     {
+
+        private static bool runningOnOSX = Rhino.Runtime.HostUtils.RunningOnOSX;
+
         /// <summary>
         /// local server instance
         /// </summary>
-        internal static Crash.CrashServer LocalServer;
+        internal static CrashServer? LocalServer;
 
         /// <summary>
         /// Method to load the server
         /// </summary>
         /// <param name="url">the uri of the server</param>
-        public static void StartOrContinueLocalServer(string url)
+        public static bool StartOrContinueLocalServer(string url)
         {
-            if (null == LocalServer)
-            {
-                CrashServer server = new CrashServer();
-                LocalServer = server;
+            string resultMessage = string.Empty;
+            bool result = false;
 
-                bool start = server.Start(url, HostUtils.RunningOnOSX);
-                if (!start)
-                {
-                    RhinoApp.WriteLine("Could not start Server!");
-                }
-            }
+            ShutdownLocalServer();
+
+            CrashServer server = new CrashServer();
+            LocalServer = server;
+
+            result = server.Start(url, runningOnOSX, out resultMessage);
+
+            Rhino.RhinoApp.WriteLine(resultMessage);
+
+            return result;
         }
+
+        public static void ShutdownLocalServer()
+        {
+            LocalServer?.Stop();
+            LocalServer = null;
+        }
+
     }
 
 }

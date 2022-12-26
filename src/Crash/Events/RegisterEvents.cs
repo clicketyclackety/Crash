@@ -48,8 +48,17 @@ namespace Crash.Events
 			RhinoDoc.DeselectObjects -= SelectItem.Event;
 			RhinoDoc.DeselectAllObjects -= SelectAllItems.Event;
 
-		}
+            // Crash
+            RequestManager.LocalClient.OnSelect -= CrashSelect.OnSelect;
+            RequestManager.LocalClient.OnUnselect -= CrashSelect.OnUnSelect;
 
-	}
+            RequestManager.LocalClient.OnInitialize -= CrashInit.OnInit;
+
+            RequestManager.LocalClient.OnAdd -= LocalCache.OnAdd;
+            RequestManager.LocalClient.OnDelete -= LocalCache.OnDelete;
+            RequestManager.LocalClient.OnDone -= LocalCache.CollaboratorIsDone;
+        }
+
+    }
 
 }

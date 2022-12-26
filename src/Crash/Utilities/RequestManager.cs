@@ -40,6 +40,7 @@ namespace Crash.Utilities
         {
             Events.EventManagement.DeRegisterEvents();
             Task.Run( () => RequestManager.LocalClient?.StopAsync() );
+            LocalClient = null;
         }
 
         /// <summary>

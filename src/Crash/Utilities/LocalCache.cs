@@ -42,6 +42,15 @@ namespace Crash.Utilities
             _SpeckToRhino = new ConcurrentDictionary<Guid, Guid>();
         }
 
+
+        internal static void Clear()
+        {
+            Instance?.ToBake?.Clear();
+            Instance?.ToRemove?.Clear();
+            Instance?._SpeckToRhino?.Clear();
+            Instance?._cache?.Clear();
+        }
+
         #region ConcurrentDictionary Methods
         /// <summary>
         /// Method to update a speck

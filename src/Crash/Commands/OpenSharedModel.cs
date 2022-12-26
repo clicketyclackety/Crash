@@ -22,10 +22,23 @@ namespace Crash.Commands
 
         public static OpenSharedModel Instance { get; private set; }
 
+        /// <inheritdoc />
         public override string EnglishName => "OpenSharedModel";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
+            if (RequestManager.LocalClient is object)
+            {
+                RhinoApp.WriteLine("You are currently part of a Shared Model Session.");
+
+                bool? result = _NewModelOrExit(false);
+                if (!result.Value) return Result.Cancel;
+
+                RhinoApp.RunScript(CloseSharedModel.Instance.EnglishName, true);
+                RhinoApp.RunScript(OpenSharedModel.Instance.EnglishName, true);
+                return Result.Success;
+            }
+
             string name = Environment.UserName;
             string url = "http://localhost:5000";
 
@@ -43,14 +56,14 @@ namespace Crash.Commands
             return Result.Success;
         }
 
-        private static bool _GetServerURL(ref string url)
-        {
-            Result getUrl = RhinoGet.GetString("Server URL", true, ref url);
-            
-            if (string.IsNullOrEmpty(url)) return false;
+        private bool? _NewModelOrExit(bool defaultValue)
+            => CommandUtils.GetBoolean(ref defaultValue,
+                "Would you like to close this model?",
+                "ExitCommand",
+                "CloseModel");
 
-            return getUrl == Result.Success;
-        }
+        private static bool _GetServerURL(ref string url)
+            => CommandUtils.GetValidString("Server URL", ref url);
 
     }
 

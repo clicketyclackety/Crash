@@ -80,6 +80,7 @@ namespace Crash.UI
         public void PostDrawObjects(object sender, DrawEventArgs e)
         {
             HashSet<string> owners = new HashSet<string>();
+            if (null == LocalCache.Instance) return;
             IEnumerable<SpeckInstance> specks = LocalCache.Instance.GetSpecks().OrderBy(s => s.Owner);
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())

@@ -4,6 +4,9 @@ using Rhino;
 using Rhino.Input;
 using Rhino.Commands;
 using System.Threading.Tasks;
+using Crash.UI;
+using Rhino.Input.Custom;
+using Crash.Events;
 
 namespace Crash.Commands
 {
@@ -11,6 +14,7 @@ namespace Crash.Commands
     [CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
     public sealed class CloseSharedModel : Command
     {
+        private bool defaultValue = false;
 
         public CloseSharedModel()
         {
@@ -19,37 +23,44 @@ namespace Crash.Commands
 
         public static CloseSharedModel Instance { get; private set; }
 
+        /// <inheritdoc />
         public override string EnglishName => "CloseSharedModel";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            bool choice = true;
-            if (!_GetReleaseChoice(ref choice)) return Result.Cancel;
+            bool? choice = _GetReleaseChoice();
+            if (null == choice) return Result.Cancel;
 
-            if (choice)
+            EventManagement.DeRegisterEvents();
+
+            if (choice.Value)
             {
-                var task = RequestManager.LocalClient.Done();
-                if (!task.Wait(500))
-                {
-                    RhinoApp.WriteLine("Could not Connect to server, data will not be saved.");
-                }
-                else
-                {
-                    RhinoApp.WriteLine("Model closed and saved successfully");
-                }
+                RequestManager.LocalClient?.Done();
             }
 
             RequestManager.ForceEndLocalClient();
+            ServerManager.ShutdownLocalServer();
+
+            LocalCache.Clear();
+            InteractivePipe.Instance.Enabled = false;
+            _EmptyModel(doc);
+
+            RhinoApp.WriteLine("Model closed and saved successfully");
+
+            doc.Views.Redraw();
 
             return Result.Success;
         }
 
-        private static bool _GetReleaseChoice(ref bool choice)
-        {
-            Result getUrl = RhinoGet.GetBool("Do you want to release URL", true,
-                                             "No Release", "Release", ref choice);
+        private bool? _GetReleaseChoice()
+            => CommandUtils.GetBoolean(ref defaultValue,
+                "Would you like to Release before exiting?",
+                "JustExit",
+                "ReleaseThenExit");
 
-            return getUrl == Result.Success;
+        private void _EmptyModel(Rhino.RhinoDoc doc)
+        {
+            doc.Objects.Clear();
         }
 
     }

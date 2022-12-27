@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Crash.Client\Crash.Client.csproj" />
-    <ProjectReference Include="..\src\Crash.Server\Crash.Server.csproj" />
+    <ProjectReference Include="..\..\src\Crash.Client\Crash.Client.csproj" />
+    <ProjectReference Include="..\..\src\Crash.Server\Crash.Server.csproj" />
   </ItemGroup>
 
 </Project>

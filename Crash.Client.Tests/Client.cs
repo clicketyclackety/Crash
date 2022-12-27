@@ -18,7 +18,9 @@
         [TestMethod]
         public async Task Select()
         {
-            CrashClient client = new CrashClient("Me", new Uri("http://localhost:8080/Crash"));
+
+            CrashClient client = new CrashClient("Me", new Uri("http://localhost:5000/Crash"));
+            await client.StartAsync();
             await client.Select(Guid.Empty);
         }
 

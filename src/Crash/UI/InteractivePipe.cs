@@ -24,20 +24,19 @@ namespace Crash.UI
             get => enabled;
             set
             {
-                if (enabled != value)
-                {
-                    enabled = value;
+                if (enabled == value) return;
 
-                    if (enabled)
-                    {
-                        DisplayPipeline.CalculateBoundingBox += CalculateBoundingBox;
-                        DisplayPipeline.PostDrawObjects += PostDrawObjects;
-                    }
-                    else
-                    {
-                        DisplayPipeline.CalculateBoundingBox -= CalculateBoundingBox;
-                        DisplayPipeline.PostDrawObjects -= PostDrawObjects;
-                    }
+                enabled = value;
+
+                if (enabled)
+                {
+                    DisplayPipeline.CalculateBoundingBox += CalculateBoundingBox;
+                    DisplayPipeline.PostDrawObjects += PostDrawObjects;
+                }
+                else
+                {
+                    DisplayPipeline.CalculateBoundingBox -= CalculateBoundingBox;
+                    DisplayPipeline.PostDrawObjects -= PostDrawObjects;
                 }
             }
         }

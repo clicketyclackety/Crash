@@ -68,6 +68,8 @@ namespace Crash.Commands
             // TODO : Ensure Requested Server is available, and notify if not
             ClientManager.StartOrContinueLocalClient(ClientManager.ClientUri);
 
+            InteractivePipe.Instance.Enabled = true;
+
             return Result.Success;
         }
 

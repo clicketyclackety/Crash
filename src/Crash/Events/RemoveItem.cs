@@ -1,12 +1,4 @@
-﻿using Crash.Utilities;
-using Rhino.DocObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Crash.Events
+﻿namespace Crash.Events
 {
     /// <summary>
     /// Remove item event handler
@@ -14,11 +6,11 @@ namespace Crash.Events
     internal static class RemoveItem
     {
 
-        internal static void Event(object sender, RhinoObjectEventArgs e)
+        internal static void Event(object sender, Rhino.DocObjects.RhinoObjectEventArgs e)
         {
             var id = LocalCache.GetSpeckId(e.TheObject);
             if (id != null)
-                RequestManager.LocalClient?.Delete(id.Value);
+                ClientManager.LocalClient?.Delete(id.Value);
         }
 
     }

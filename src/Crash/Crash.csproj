@@ -19,6 +19,10 @@
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\**\*" />
   </ItemGroup>
+	  
+  <ItemGroup>
+    <None Include="..\..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="RhinoCommon" Version="7.21.22208.13001" IncludeAssets="compile;build" />

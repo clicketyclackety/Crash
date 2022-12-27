@@ -1,16 +1,6 @@
-﻿using Crash.UI;
-using Crash.Utilities;
-using Eto.Forms;
-using SpeckLib;
-using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Crash.Events
+﻿namespace Crash.Events
 {
+
     /// <summary>
     /// Crash init event handler
     /// </summary>
@@ -20,13 +10,13 @@ namespace Crash.Events
 
         internal static void OnInit(IEnumerable<ISpeck> specks)
         {
-            Rhino.RhinoApp.WriteLine("Loading specks ...");
+            RhinoApp.WriteLine("Loading specks ...");
 
             IsInit = true;
             _HandleSpecks(specks);
             IsInit = false;
 
-            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
+            RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
         private static void _HandleSpecks(IEnumerable<ISpeck> specks)
@@ -47,7 +37,7 @@ namespace Crash.Events
             }
             else
             {
-                if (speck.LockedBy == User.CurrentUser.name)
+                if (speck.LockedBy == User.CurrentUser.Name)
                 {
                     LocalCache.Instance.BakeSpeck(localSpeck);
                 }

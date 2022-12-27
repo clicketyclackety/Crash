@@ -1,42 +1,51 @@
-﻿using Rhino;
-using Rhino.Runtime;
-using SpeckLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Crash.Utilities
+﻿namespace Crash.Utilities
 {
+
     /// <summary>
     /// The server manager
     /// </summary>
     public static class ServerManager
     {
+
+        public const string DefaultURL = "http://0.0.0.0";
+        public static int LastPort = 5000;
+
         /// <summary>
         /// local server instance
         /// </summary>
-        internal static Crash.CrashServer LocalServer;
+        internal static CrashServer? LocalServer;
 
         /// <summary>
         /// Method to load the server
         /// </summary>
         /// <param name="url">the uri of the server</param>
-        public static void StartOrContinueLocalServer(string url)
+        public static bool StartOrContinueLocalServer(string url)
         {
-            if (null == LocalServer)
-            {
-                CrashServer server = new CrashServer();
-                LocalServer = server;
+            CloseLocalServer();
 
-                bool start = server.Start(url, HostUtils.RunningOnOSX);
-                if (!start)
-                {
-                    RhinoApp.WriteLine("Could not start Server!");
-                }
-            }
+            CrashServer server = new CrashServer();
+            LocalServer = server;
+
+            bool result = server.Start(url, Rhino.Runtime.HostUtils.RunningOnOSX, out string resultMessage);
+
+            Rhino.RhinoApp.WriteLine(resultMessage);
+
+            return result;
         }
+
+        public static void CloseLocalServer()
+        {
+            LocalServer?.Stop();
+            LocalServer = null;
+        }
+
+        /// <summary>
+        /// Checks for an active Server
+        /// </summary>
+        /// <returns>True if active, false otherwise</returns>
+        public static bool CheckForActiveServer()
+            => LocalServer is object;
+
     }
 
 }

@@ -1,31 +1,25 @@
-﻿using Crash.Utilities;
-using Rhino.DocObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Crash.Events
+﻿namespace Crash.Events
 {
     /// <summary>
     /// Select all items event handler
     /// </summary>
     internal static class SelectAllItems
     {
-        internal static void Event(object sender, RhinoDeselectAllObjectsEventArgs e)
+        internal static void Event(object sender, Rhino.DocObjects.RhinoDeselectAllObjectsEventArgs e)
         {
-            ObjectEnumeratorSettings settings = new ObjectEnumeratorSettings();
-            settings.ActiveObjects = true;
-            foreach (RhinoObject robj in e.Document.Objects.GetObjectList(settings).ToList())
+            var settings = new Rhino.DocObjects.ObjectEnumeratorSettings()
             {
-                if (robj.IsLocked)
-                    continue;
-                else
+                ActiveObjects = true
+            };
+            
+            foreach (var rhinoObject in e.Document.Objects.GetObjectList(settings).ToList())
+            {
+                if (!rhinoObject.IsLocked)
                 {
-                    var speckId = LocalCache.GetSpeckId(robj);
-                    if (speckId != null)
-                        RequestManager.LocalClient?.Unselect(speckId.Value);
+                    var speckId = LocalCache.GetSpeckId(rhinoObject);
+                    if (null == speckId) continue;
+
+                    ClientManager.LocalClient?.Unselect(speckId.Value);
                 }
 
             }

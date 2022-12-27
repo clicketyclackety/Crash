@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Crash": {
+      "commandName": "Project",
+      "commandLineArgs": "/nosplash"
+    }
+  }
+}

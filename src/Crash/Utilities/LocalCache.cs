@@ -1,13 +1,7 @@
-﻿using Rhino;
-using Rhino.DocObjects;
+﻿using Rhino.DocObjects;
 using Rhino.Geometry;
-using SpeckLib;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Rhino;
+
 
 namespace Crash.Utilities
 {
@@ -40,6 +34,15 @@ namespace Crash.Utilities
             RhinoApp.Idle += RhinoApp_Idle;
             _cache = new ConcurrentDictionary<Guid, SpeckInstance>();
             _SpeckToRhino = new ConcurrentDictionary<Guid, Guid>();
+        }
+
+
+        internal static void Clear()
+        {
+            Instance?.ToBake?.Clear();
+            Instance?.ToRemove?.Clear();
+            Instance?._SpeckToRhino?.Clear();
+            Instance?._cache?.Clear();
         }
 
         #region ConcurrentDictionary Methods
@@ -108,7 +111,8 @@ namespace Crash.Utilities
 
             SyncHost(rObj, speck);
         }
-                
+
+        // TODO : Refactor to TryGetSpeckId pattern?
         public static Guid? GetSpeckId(RhinoObject rObj)
         {
             if (rObj == null) return null;

@@ -115,7 +115,7 @@ Clone the repo
    ```sh
    git clone https://github.com/clicketyclackety/Crash.git
    ```
-   
+
 ### Building
 
 #### Windows
@@ -134,6 +134,18 @@ Open Crash repository in VS Code run build tasks `⇧⌘B` in this order:
 From `Run and Debug` tab run `Run Rhino 8 WIP`
 
 Rhino will launch in debug mode.
+
+## Docker
+
+Navigate to the Crash directory root. Run build to create the image.
+```powershell
+docker build -t "crash.server" .
+```
+Use docker run to start the image
+```powershell
+docker run -d -p 8080:80 --name crashy01 "crash.server"
+```
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- WORKFLOW EXAMPLES -->

@@ -13,6 +13,9 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <ApplicationIcon>logo.ico</ApplicationIcon>
+    <UserSecretsId>4fb370be-a5a8-47da-b302-e271468d44a7</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Publish) == 'True'">
@@ -48,6 +51,7 @@
 	<ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="6.0.10" />
+	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
 	  <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.2" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.10" />
   </ItemGroup>

@@ -1,8 +1,4 @@
-﻿using Crash.Utilities;
-using Rhino;
-using Rhino.Commands;
-
-namespace Crash.Events
+﻿namespace Crash.Events
 {
 	/// <summary>
 	/// THe rhino event manager
@@ -25,17 +21,17 @@ namespace Crash.Events
 			RhinoDoc.DeselectAllObjects += SelectAllItems.Event;
 			RhinoDoc.UndeleteRhinoObject += AddItem.Event;
 
-            if (null == RequestManager.LocalClient) return;
+            if (null == ClientManager.LocalClient) return;
 
             // Crash
-            RequestManager.LocalClient.OnSelect += CrashSelect.OnSelect;
-            RequestManager.LocalClient.OnUnselect += CrashSelect.OnUnSelect;
+            ClientManager.LocalClient.OnSelect += CrashSelect.OnSelect;
+            ClientManager.LocalClient.OnUnselect += CrashSelect.OnUnSelect;
 
-			RequestManager.LocalClient.OnInitialize += CrashInit.OnInit;
+			ClientManager.LocalClient.OnInitialize += CrashInit.OnInit;
 
-			RequestManager.LocalClient.OnAdd += LocalCache.OnAdd;
-            RequestManager.LocalClient.OnDelete += LocalCache.OnDelete;
-			RequestManager.LocalClient.OnDone += LocalCache.CollaboratorIsDone;
+			ClientManager.LocalClient.OnAdd += LocalCache.OnAdd;
+            ClientManager.LocalClient.OnDelete += LocalCache.OnDelete;
+			ClientManager.LocalClient.OnDone += LocalCache.CollaboratorIsDone;
 
         }
 
@@ -50,17 +46,17 @@ namespace Crash.Events
 			RhinoDoc.DeselectObjects -= SelectItem.Event;
 			RhinoDoc.DeselectAllObjects -= SelectAllItems.Event;
 
-			if (null == RequestManager.LocalClient) return;
+			if (null == ClientManager.LocalClient) return;
 
             // Crash
-            RequestManager.LocalClient.OnSelect -= CrashSelect.OnSelect;
-            RequestManager.LocalClient.OnUnselect -= CrashSelect.OnUnSelect;
+            ClientManager.LocalClient.OnSelect -= CrashSelect.OnSelect;
+            ClientManager.LocalClient.OnUnselect -= CrashSelect.OnUnSelect;
 
-            RequestManager.LocalClient.OnInitialize -= CrashInit.OnInit;
+            ClientManager.LocalClient.OnInitialize -= CrashInit.OnInit;
 
-            RequestManager.LocalClient.OnAdd -= LocalCache.OnAdd;
-            RequestManager.LocalClient.OnDelete -= LocalCache.OnDelete;
-            RequestManager.LocalClient.OnDone -= LocalCache.CollaboratorIsDone;
+            ClientManager.LocalClient.OnAdd -= LocalCache.OnAdd;
+            ClientManager.LocalClient.OnDelete -= LocalCache.OnDelete;
+            ClientManager.LocalClient.OnDone -= LocalCache.CollaboratorIsDone;
         }
 
     }

@@ -1,15 +1,9 @@
-﻿using Crash.Utilities;
-using Rhino;
-using Rhino.Display;
+﻿using System.Drawing;
+
 using Rhino.Geometry;
-using SpeckLib;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Rhino.Display;
+using Rhino;
+
 
 namespace Crash.UI
 {
@@ -86,7 +80,7 @@ namespace Crash.UI
             while(enumer.MoveNext())
             {
                 SpeckInstance speck = enumer.Current;
-                var nameCol = new User(speck.Owner).color;
+                var nameCol = new User(speck.Owner).Color;
                 DrawSpeck(e, speck, nameCol);
                 owners.Add(speck.Owner);
                 UpdateBoundingBox(speck);
@@ -97,7 +91,7 @@ namespace Crash.UI
             while (userEnumer.MoveNext())
             {
                 string user = userEnumer.Current;
-                var nameCol = new User(user).color;
+                var nameCol = new User(user).Color;
                 DrawUser(e, user, nameCol,counter);
                 counter++;
             }

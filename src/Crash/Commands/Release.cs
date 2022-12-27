@@ -1,22 +1,19 @@
-﻿using Crash.Utilities;
-using Rhino;
-using Rhino.Commands;
-using Rhino.Geometry;
-using Rhino.Input;
-using Rhino.Input.Custom;
-using System;
-using System.Collections.Generic;
+﻿using Rhino.Commands;
+
 
 namespace Crash.Commands
 {
 
     /// <summary>
-    /// Command to Release 
+    /// Command to Release Specks
     /// </summary>
     [CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
     public sealed class ReleaseCommand : Command
     {
 
+        /// <summary>
+        /// Default Constructor
+        /// </summary>
         public ReleaseCommand()
         {
             Instance = this;
@@ -32,8 +29,7 @@ namespace Crash.Commands
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
             // TODO : Wait for response for data integrity check
-            var done = RequestManager.LocalClient.Done();
-            done.RunSynchronously();
+            ClientManager.LocalClient.Done();
 
             return Result.Success;
         }

@@ -1,12 +1,14 @@
 ﻿namespace Crash.Utilities
 {
+
     /// <summary>
     /// The server manager
     /// </summary>
     public static class ServerManager
     {
 
-        private static bool runningOnOSX = Rhino.Runtime.HostUtils.RunningOnOSX;
+        public const string DefaultURL = "http://0.0.0.0";
+        public static int LastPort = 5000;
 
         /// <summary>
         /// local server instance
@@ -19,26 +21,30 @@
         /// <param name="url">the uri of the server</param>
         public static bool StartOrContinueLocalServer(string url)
         {
-            string resultMessage = string.Empty;
-            bool result = false;
-
-            ShutdownLocalServer();
+            CloseLocalServer();
 
             CrashServer server = new CrashServer();
             LocalServer = server;
 
-            result = server.Start(url, runningOnOSX, out resultMessage);
+            bool result = server.Start(url, Rhino.Runtime.HostUtils.RunningOnOSX, out string resultMessage);
 
             Rhino.RhinoApp.WriteLine(resultMessage);
 
             return result;
         }
 
-        public static void ShutdownLocalServer()
+        public static void CloseLocalServer()
         {
             LocalServer?.Stop();
             LocalServer = null;
         }
+
+        /// <summary>
+        /// Checks for an active Server
+        /// </summary>
+        /// <returns>True if active, false otherwise</returns>
+        public static bool CheckForActiveServer()
+            => LocalServer is object;
 
     }
 

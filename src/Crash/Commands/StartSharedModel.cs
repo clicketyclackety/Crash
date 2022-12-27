@@ -1,23 +1,12 @@
-﻿using Rhino;
+﻿using System.IO;
+
+using Rhino.Input.Custom;
+using Rhino.DocObjects;
 using Rhino.Commands;
 using Rhino.Geometry;
 using Rhino.Input;
-using Rhino.Input.Custom;
-using System;
-using System.Collections.Generic;
-using Crash.Utilities;
-using System.Drawing;
-using System.Security.Policy;
-using System.Threading;
-using static System.Net.WebRequestMethods;
-using System.Xml.Linq;
-using System.Threading.Tasks;
-using System.IO;
-using Crash.UI;
-using Rhino.DocObjects;
-using System.Linq;
-using Crash.Commands;
-using Rhino.UI;
+using Rhino;
+
 
 namespace Crash.Commands
 {
@@ -28,8 +17,6 @@ namespace Crash.Commands
     [CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
     public sealed class StartSharedModel : Command
     {
-        private static int lastPort = 5000;
-        private const string defaultURL = "http://0.0.0.0:";
         private bool includePreExistingGeometry = false;
 
         /// <summary>
@@ -51,7 +38,7 @@ namespace Crash.Commands
         /// <inheritdoc />
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            if (RequestManager.LocalClient is object)
+            if (ClientManager.CheckForActiveClient() || ServerManager.CheckForActiveServer())
             {
                 string closeCommand = CloseSharedModel.Instance.EnglishName;
                 RhinoApp.WriteLine("You are currently part of a Shared Model Session. " +
@@ -60,29 +47,33 @@ namespace Crash.Commands
                 return Result.Success;
             }
 
-            string name = Environment.UserName;
+            string name = User.CurrentUserName;
 
             if (!_GetUsersName(ref name))
-                return Result.Nothing;
-
-            _CreateCurrentUser(name);
-
-            if (!_GetPortFromUser(ref lastPort))
-                return Result.Nothing;
-
-            if (_PreExistingGeometryCheck(doc))
             {
-                includePreExistingGeometry = _ContinueOrQuit().Value;
+                RhinoApp.WriteLine("Invalid name!");
+                return Result.Nothing;
             }
+            _CreateCurrentUser(name);
 
             // TODO : Add Port Validation
             // TODO : Add Port Suggestions to docs
+            if (!_GetPortFromUser(ref ServerManager.LastPort))
+            {
+                RhinoApp.WriteLine("Invalid Port!");
+                return Result.Nothing;
+            }
+
+            if (_PreExistingGeometryCheck(doc))
+            {
+                includePreExistingGeometry = _ContinueOrQuit() == true;
+            }
 
             // Start Server Host
             CrashServer.OnConnected += Server_OnConnected;
             CrashServer.OnFailure += Server_OnFailure;
 
-            while(!ServerManager.StartOrContinueLocalServer($"{defaultURL}:{lastPort}"))
+            while(!ServerManager.StartOrContinueLocalServer($"{ServerManager.DefaultURL}:{ServerManager.LastPort}"))
             {
                 bool? close = _GetForceCloseOptions();
                 if (close == null)
@@ -103,7 +94,7 @@ namespace Crash.Commands
             while(enumer.MoveNext())
             {
                 GeometryBase geom = enumer.Current.Geometry;
-                SpeckInstance speck = SpeckInstance.CreateNew(User.CurrentUser.name, geom);
+                SpeckInstance speck = SpeckInstance.CreateNew(User.CurrentUser.Name, geom);
                 LocalCache.Instance.UpdateSpeck(speck);
             }
         }
@@ -135,14 +126,15 @@ namespace Crash.Commands
         private void Server_OnFailure(object sender, EventArgs e)
         {
             CrashServer.OnFailure -= Server_OnFailure;
+
+            string message = "An Unknown Error occured";
+
             if (e is ErrorEventArgs errArgs)
             {
-                RhinoApp.WriteLine(errArgs.GetException().Message);
+                message = errArgs.GetException().Message;
             }
-            else
-            {
-                RhinoApp.WriteLine("An Unknown Error occured");
-            }
+
+            RhinoApp.WriteLine(message);
         }
 
         private void Server_OnConnected(object sender, EventArgs e)
@@ -150,8 +142,7 @@ namespace Crash.Commands
             CrashServer.OnConnected -= Server_OnConnected;
             try
             {
-                // TODO : Create these urls/ports as constants somewhere relevent
-                RequestManager.StartOrContinueLocalClient(new Uri($"http://127.0.0.1:{lastPort}/Crash"));
+                ClientManager.StartOrContinueLocalClient(ClientManager.ClientUri);
 
                 if (includePreExistingGeometry)
                     AddPreExistingGeometry();
@@ -166,7 +157,7 @@ namespace Crash.Commands
             }
         }
 
-        internal static bool? _GetForceCloseOptions()
+        private static bool? _GetForceCloseOptions()
         {
             bool defaultValue = false;
 
@@ -201,15 +192,14 @@ namespace Crash.Commands
 
         }
 
-
         // TODO : Ensure name is not already taken!
-        internal static bool _GetUsersName(ref string name)
+        private static bool _GetUsersName(ref string name)
             => CommandUtils.GetValidString("Your Name", ref name);
 
-        internal static bool _GetPortFromUser(ref int port)
+        private static bool _GetPortFromUser(ref int port)
             => CommandUtils.GetInteger("Server port", ref port);
 
-        internal static void _CreateCurrentUser(string name)
+        private static void _CreateCurrentUser(string name)
         {
             User user = new User(name);
             User.CurrentUser = user;

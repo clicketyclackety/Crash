@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Connections;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Linq;
+using System.IO;
+using System;
+
 
 namespace Crash
 {
@@ -39,8 +37,10 @@ namespace Crash
         /// <summary>
         /// Method to start the server
         /// </summary>
-        /// <param name="url">url</param>
-        /// <param name="isMac">is mac</param>
+        /// <param name="url">The URL for the Server</param>
+        /// <param name="isMac">Is the given OS Mac?</param>
+        /// <param name="errorMessage">The error, if nay</param>
+        /// <returns>True on success, false otherwise</returns>
         public bool Start(string url, bool isMac, out string errorMessage)
         {
             errorMessage = "Server Started Successfully";

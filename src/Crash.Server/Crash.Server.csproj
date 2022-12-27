@@ -12,6 +12,7 @@
     <PackageTags>Crash, Crash.Server</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Publish) == 'True'">
@@ -38,6 +39,10 @@
 	  <Content Remove="App_Data\**" />
 	  <EmbeddedResource Remove="App_Data\**" />
 	  <None Remove="App_Data\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="logo.ico" />
 	</ItemGroup>
 
 	<ItemGroup>

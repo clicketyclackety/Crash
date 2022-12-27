@@ -20,11 +20,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server.Tests", "tests
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F8397E91-1EEA-4960-9685-7F76B23F642D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crash.Tests", "tests\Crash.Tests\Crash.Tests.csproj", "{F61E43D7-22DC-4B85-B514-C55F29C003B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Tests", "tests\Crash.Tests\Crash.Tests.csproj", "{F61E43D7-22DC-4B85-B514-C55F29C003B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crash.Client.Tests", "Crash.Client.Tests\Crash.Client.Tests.csproj", "{770CF273-241F-401E-BCB8-C82482398042}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Client.Tests", "Crash.Client.Tests\Crash.Client.Tests.csproj", "{770CF273-241F-401E-BCB8-C82482398042}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerClient.Integration.Tests", "ServerClient.Integration.Tests\ServerClient.Integration.Tests.csproj", "{CDF0CC8F-EB9E-4362-916C-314617F9818C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerClient.Integration.Tests", "ServerClient.Integration.Tests\ServerClient.Integration.Tests.csproj", "{CDF0CC8F-EB9E-4362-916C-314617F9818C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{086123CF-2868-41BB-8F42-C0D636F36DA5}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

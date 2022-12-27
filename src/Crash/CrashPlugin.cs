@@ -1,21 +1,21 @@
-﻿using Crash.UI;
-using Crash.Utilities;
-using Rhino;
-using Rhino.PlugIns;
-using System;
+﻿using Rhino.PlugIns;
+
 
 namespace Crash
 {
+
     ///<summary>
     /// The crash plugin for multi user rhino collaboration
     ///</summary>
-    public sealed class CrashPlugin : Rhino.PlugIns.PlugIn
+    public sealed class CrashPlugin : PlugIn
     {
+
         public CrashPlugin()
         {
             Instance = this;
         }
 
+        /// <inheritdoc />
         protected override LoadReturnCode OnLoad(ref string errorMessage)
         {
             new InteractivePipe() { Enabled = true };
@@ -23,22 +23,21 @@ namespace Crash
             return base.OnLoad(ref errorMessage);
         }
 
+        /// <inheritdoc />
         protected override void OnShutdown()
         {
-            ServerManager.LocalServer?.Dispose();
-            ServerManager.LocalServer = null;
-            base.OnShutdown();
+            ServerManager.CloseLocalServer();
+            ClientManager.CloseLocalClient();
         }
 
+        /// <inheritdoc />
         public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
 
+        /// <inheritdoc />
         protected override string LocalPlugInName => "Crash";
 
         ///<summary>Gets the only instance of the CrashPlugin plug-in.</summary>
         public static CrashPlugin Instance { get; private set; }
 
-        // You can override methods here to change the plug-in behavior on
-        // loading and shut down, add options pages to the Rhino _Option command
-        // and maintain plug-in wide options in a document.
     }
 }

@@ -18,6 +18,7 @@ builder.Services.AddDbContext<CrashContext>(options =>
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
+app.Urls.Add(argHandler.URL);
 app.MapHub<CrashHub>("/Crash");
 app.MigrateDatabase<CrashContext>();
 app.Run();

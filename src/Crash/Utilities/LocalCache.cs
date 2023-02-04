@@ -255,6 +255,8 @@ namespace Crash.Utilities
         {
             if (null == speck) return;
 
+            Document.CrashDoc.ActiveDoc.Users.Add(speck.Owner);
+
             SpeckInstance lSpeck = new SpeckInstance(speck);
             Instance.UpdateSpeck(lSpeck);
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();

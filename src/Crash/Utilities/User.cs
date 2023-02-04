@@ -6,11 +6,19 @@ using System.Text;
 namespace Crash.Utilities
 {
 
+    public enum CameraState
+    {
+        None = 0,
+        Visible = 1,
+        Follow = 2,
+    }
+
     /// <summary>
     /// User class
     /// </summary>
     public sealed class User
     {
+        public bool Visible { get; set; } = true;
 
         /// <summary>
         /// Name of the user
@@ -21,6 +29,8 @@ namespace Crash.Utilities
         /// Color of the user
         /// </summary>
         public Color Color { get; set; }
+
+        public CameraState Camera { get; set; } = CameraState.None;
 
         /// <summary>
         /// User Constructor 
@@ -45,8 +55,10 @@ namespace Crash.Utilities
         /// <summary>
         /// Current user
         /// </summary>
+        [Obsolete("User UserTable")]
         public static User? CurrentUser { get; set; }
 
+        [Obsolete("User UserTable")]
         public static string CurrentUserName => CurrentUser is object ? CurrentUser.Name : Environment.UserName;
 
     }

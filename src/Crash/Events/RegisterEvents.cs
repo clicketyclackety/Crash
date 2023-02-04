@@ -20,6 +20,7 @@
 			RhinoDoc.DeselectObjects += SelectItem.Event;
 			RhinoDoc.DeselectAllObjects += SelectAllItems.Event;
 			RhinoDoc.UndeleteRhinoObject += AddItem.Event;
+            Rhino.Display.RhinoView.Modified += RhinoView_Modified;
 
             if (null == ClientManager.LocalClient) return;
 
@@ -35,10 +36,15 @@
 
         }
 
-		/// <summary>
-		/// De register events
-		/// </summary>
-		internal static void DeRegisterEvents()
+        private static void RhinoView_Modified(object sender, Rhino.Display.ViewEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// De register events
+        /// </summary>
+        internal static void DeRegisterEvents()
 		{
 			RhinoDoc.AddRhinoObject -= AddItem.Event;
 			RhinoDoc.DeleteRhinoObject -= RemoveItem.Event;

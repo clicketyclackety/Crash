@@ -17,6 +17,7 @@ namespace Crash.Commands
     [CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
     public sealed class StartSharedModel : Command
     {
+
         private bool includePreExistingGeometry = false;
 
         /// <summary>

@@ -9,13 +9,13 @@
         {
             if (CrashInit.IsInit) return;
             if (LocalCache.SomeoneIsDone) return;
-            if (null == User.CurrentUser)
+            if (null == Tables.UserTable.CurrentUser)
             {
                 Console.WriteLine("Current User is null");
                 return;
             }
 
-            SpeckInstance speck = SpeckInstance.CreateNew(User.CurrentUser.Name, e.TheObject.Geometry);
+            SpeckInstance speck = SpeckInstance.CreateNew(Tables.UserTable.CurrentUser.Name, e.TheObject.Geometry);
             LocalCache.SyncHost(e.TheObject, speck);
 
             Speck serverSpeck = new Speck(speck);

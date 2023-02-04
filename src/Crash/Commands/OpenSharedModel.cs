@@ -114,7 +114,8 @@ namespace Crash.Commands
         private void _CreateCurrentUser(string name)
         {
             User user = new User(name);
-            User.CurrentUser = user;
+            User.CurrentUser = user; // TODO : Remove
+            Tables.UserTable.CurrentUser = user;
         }
 
     }

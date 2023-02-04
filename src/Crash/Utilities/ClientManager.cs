@@ -1,3 +1,4 @@
+using Crash.Document;
 using System.Net.NetworkInformation;
 
 namespace Crash.Utilities
@@ -37,6 +38,8 @@ namespace Crash.Utilities
             LocalClient = client;
             Events.EventManagement.RegisterEvents();
 
+            CrashDoc.ActiveDoc = new CrashDoc();
+
             // TODO : Check for successful connection
             await client.StartAsync();
         }
@@ -52,6 +55,7 @@ namespace Crash.Utilities
                 await LocalClient.StopAsync();
 
             LocalClient = null;
+            CrashDoc.ActiveDoc?.Dispose();
         }
 
         /// <summary>

@@ -3,7 +3,8 @@
 using Rhino.Geometry;
 using Rhino.Display;
 using Rhino;
-
+using Crash.Document;
+using Crash.Utilities;
 
 namespace Crash.UI
 {
@@ -72,31 +73,36 @@ namespace Crash.UI
         /// <param name="e"></param>
         public void PostDrawObjects(object sender, DrawEventArgs e)
         {
-            HashSet<string> owners = new HashSet<string>();
             if (null == LocalCache.Instance) return;
+            if (null == CrashDoc.ActiveDoc) return;
+
             IEnumerable<SpeckInstance> specks = LocalCache.Instance.GetSpecks().OrderBy(s => s.Owner);
             var enumer = specks.GetEnumerator();
+
             while(enumer.MoveNext())
             {
                 SpeckInstance speck = enumer.Current;
-                var nameCol = new User(speck.Owner).Color;
-                DrawSpeck(e, speck, nameCol);
-                owners.Add(speck.Owner);
+
+                User user = CrashDoc.ActiveDoc.Users.Get(speck.Owner);
+                if (user?.Visible != true) continue;
+
+                DrawSpeck(e, speck, user.Color);
                 UpdateBoundingBox(speck);
             }
 
-            var userEnumer = owners.GetEnumerator();
+            var userEnumer = CrashDoc.ActiveDoc.Users.GetEnumerator();
             int counter = 0;
             while (userEnumer.MoveNext())
             {
-                string user = userEnumer.Current;
-                var nameCol = new User(user).Color;
-                DrawUser(e, user, nameCol,counter);
+                User user = userEnumer.Current;
+                if (!user.Visible) continue;
+
+                DrawUser(e, user, counter);
                 counter++;
             }
         }
 
-        private void DrawUser(DrawEventArgs e, string user, Color color, int counter)
+        private void DrawUser(DrawEventArgs e, User user, int counter)
         {
             try
             {
@@ -105,7 +111,7 @@ namespace Crash.UI
                 int yCoord = rect.Y+50;
                 yCoord += counter * 30;
                 Point2d point = new Point2d(xCoord, yCoord);
-                e.Display.Draw2dText(user, color, point, false, 20);
+                e.Display.Draw2dText(user.Name, user.Color, point, false, 20);
             }
             
             catch

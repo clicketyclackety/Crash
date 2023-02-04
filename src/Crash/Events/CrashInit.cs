@@ -43,6 +43,7 @@
                 }
                 else
                 {
+                    Document.CrashDoc.ActiveDoc.Users.Add(speck.Owner);
                     LocalCache.Instance.UpdateSpeck(localSpeck);
                 }
             }

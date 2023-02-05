@@ -37,28 +37,27 @@ namespace Crash.Events
             if (null == speck || string.IsNullOrEmpty(speck.Owner)) return;
 
             // Handle Camera Specks // Admittedly very badly.
-            if (speck.Payload?.Contains("{") == true)
+            if (speck.Payload?.Contains('{') == true)
             {
-                return;
-            }
-
-            SpeckInstance localSpeck = new SpeckInstance(speck);
-            if (!speck.Temporary)
-            {
-                CrashDoc.ActiveDoc?.CacheTable?.BakeSpeck(localSpeck);
-            }
-            else
-            {
-                if (speck.LockedBy.ToLower() == CrashDoc.ActiveDoc.Users?.CurrentUser?.Name.ToLower())
+                SpeckInstance localSpeck = new SpeckInstance(speck);
+                if (!speck.Temporary)
                 {
-                    CrashDoc.ActiveDoc.CacheTable?.BakeSpeck(localSpeck);
+                    CrashDoc.ActiveDoc?.CacheTable?.BakeSpeck(localSpeck);
                 }
                 else
                 {
-                    CrashDoc.ActiveDoc.Users.Add(speck.Owner);
-                    CrashDoc.ActiveDoc.CacheTable?.UpdateSpeck(localSpeck);
+                    if (speck.LockedBy.ToLower() == CrashDoc.ActiveDoc.Users?.CurrentUser?.Name.ToLower())
+                    {
+                        CrashDoc.ActiveDoc.CacheTable?.BakeSpeck(localSpeck);
+                    }
+                    else
+                    {
+                        CrashDoc.ActiveDoc.Users.Add(speck.Owner);
+                        CrashDoc.ActiveDoc.CacheTable?.UpdateSpeck(localSpeck);
+                    }
                 }
             }
+
         }
 
     }

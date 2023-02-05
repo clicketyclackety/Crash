@@ -51,7 +51,7 @@ namespace Crash.Utilities
             client.OnAdd += CrashDoc.ActiveDoc.CacheTable.OnAdd;
             client.OnDelete += CrashDoc.ActiveDoc.CacheTable.OnDelete;
             client.OnDone += CrashDoc.ActiveDoc.CacheTable.CollaboratorIsDone;
-            client.OnCameraChange += CrashDoc.ActiveDoc.CacheTable.OnCameraChange;
+            client.OnCameraChange += CrashDoc.ActiveDoc.Cameras.OnCameraChange;
 
             // TODO : Check for successful connection
             await client.StartAsync();
@@ -68,7 +68,7 @@ namespace Crash.Utilities
             client.OnAdd -= CrashDoc.ActiveDoc.CacheTable.OnAdd;
             client.OnDelete -= CrashDoc.ActiveDoc.CacheTable.OnDelete;
             client.OnDone -= CrashDoc.ActiveDoc.CacheTable.CollaboratorIsDone;
-            client.OnCameraChange -= CrashDoc.ActiveDoc.CacheTable.OnCameraChange;
+            client.OnCameraChange -= CrashDoc.ActiveDoc.Cameras.OnCameraChange;
 
             await client.StopAsync();
 

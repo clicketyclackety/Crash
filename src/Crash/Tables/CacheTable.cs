@@ -2,13 +2,14 @@
 using Rhino.Geometry;
 using Rhino;
 using Crash.Document;
+using System.Collections;
 
 namespace Crash.Tables
 {
     /// <summary>
     /// Local cache of the collaboration database
     /// </summary>
-    public sealed class CacheTable
+    public sealed class CacheTable : IEnumerable<SpeckInstance>
     {
         public bool SomeoneIsDone { get; set; }
         public bool IsInit { get; set; }
@@ -37,7 +38,7 @@ namespace Crash.Tables
             _cache = new ConcurrentDictionary<Guid, SpeckInstance>();
             _SpeckToRhino = new ConcurrentDictionary<Guid, Guid>();
         }
-
+            
         internal void Clear()
         {
             ToBake?.Clear();
@@ -47,6 +48,7 @@ namespace Crash.Tables
         }
 
         #region ConcurrentDictionary Methods
+
         /// <summary>
         /// Method to update a speck
         /// </summary>
@@ -320,6 +322,10 @@ namespace Crash.Tables
             CrashDoc.ActiveDoc?.Users.Remove(name);
             RhinoDoc.ActiveDoc.Views.Redraw();
         }
+
+        public IEnumerator<SpeckInstance> GetEnumerator() => _cache.Values.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         #endregion
 

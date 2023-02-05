@@ -4,9 +4,9 @@ using Rhino.Geometry;
 using Rhino.Display;
 using Rhino;
 using Crash.Document;
-using Crash.Utilities;
 using SpeckLib;
 using Eto.Forms;
+using Crash.Tables;
 
 namespace Crash.UI
 {
@@ -45,18 +45,13 @@ namespace Crash.UI
         }
 
         /// <summary>
-        /// The interactive pipeline instance
-        /// </summary>
-        public static InteractivePipe Instance;
-
-        /// <summary>
         /// Empty constructor
         /// </summary>
         public InteractivePipe()
         {
-            Instance = this;
             bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
             PipeCameraCache = new Dictionary<Color, Line[]>();
+            Enabled = true;
         }
 
         /// <summary>
@@ -77,6 +72,8 @@ namespace Crash.UI
         public void PostDrawObjects(object sender, DrawEventArgs e)
         {
             if (null == CrashDoc.ActiveDoc?.CacheTable) return;
+            if (null == CrashDoc.ActiveDoc?.Cameras) return;
+
             bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
 
             IEnumerable<SpeckInstance> specks = CrashDoc.ActiveDoc.CacheTable.GetSpecks().OrderBy(s => s.Owner);
@@ -93,8 +90,8 @@ namespace Crash.UI
                 UpdateBoundingBox(speck);
             }
 
-            Dictionary<string, Camera> ActiveCameras = CameraCache.GetActiveCameras();
-            foreach(var activeCamera in ActiveCameras)
+            Dictionary<string, Camera> ActiveCameras = CrashDoc.ActiveDoc.Cameras.GetActiveCameras();
+            foreach (var activeCamera in ActiveCameras)
             {
                 User? user = CrashDoc.ActiveDoc?.Users?.Get(activeCamera.Key);
                 if (user?.Camera != CameraState.Visible) continue;

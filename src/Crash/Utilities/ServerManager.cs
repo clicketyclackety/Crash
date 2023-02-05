@@ -24,10 +24,11 @@ namespace Crash.Utilities
             CloseLocalServer();
 
             if (null == CrashDoc.ActiveDoc) return false;
-            CrashServer? server = CrashDoc.ActiveDoc.LocalServer;
-            if (null == server) return false;
+            CrashDoc.ActiveDoc.LocalServer?.Stop();
+            CrashDoc.ActiveDoc.LocalServer = new CrashServer();
 
-            bool result = server.Start(url, Rhino.Runtime.HostUtils.RunningOnOSX, out string resultMessage);
+            bool result = CrashDoc.ActiveDoc.LocalServer.Start(url, Rhino.Runtime.HostUtils.RunningOnOSX, out string resultMessage);
+
 
             Rhino.RhinoApp.WriteLine(resultMessage);
 

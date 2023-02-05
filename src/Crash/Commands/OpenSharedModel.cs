@@ -48,11 +48,7 @@ namespace Crash.Commands
             }
 
             string name = Environment.UserName;
-            if (_GetUsersName(ref name))
-            {
-                _CreateCurrentUser(name);
-            }
-            else
+            if (!_GetUsersName(ref name))
             {
                 RhinoApp.WriteLine("Invalid Name Input");
                 return Result.Nothing;
@@ -70,10 +66,11 @@ namespace Crash.Commands
                 return Result.Nothing;
             }
 
-            // TODO : Ensure Requested Server is available, and notify if not
-            ClientManager.StartOrContinueLocalClient(ClientManager.ClientUri);
+            new CrashDoc(doc);
+            _CreateCurrentUser(name);
 
-            InteractivePipe.Instance.Enabled = true;
+            // TODO : Ensure Requested Server is available, and notify if not
+            Task.Run( () => ClientManager.StartOrContinueLocalClient(ClientManager.ClientUri));
 
             UsersForm.ToggleFormVisibility();
 
@@ -121,7 +118,7 @@ namespace Crash.Commands
         private void _CreateCurrentUser(string name)
         {
             User user = new User(name);
-            _rDoc.GetCrashDoc().Users.CurrentUser = user;
+            CrashDoc.ActiveDoc.Users.CurrentUser = user;
         }
 
     }

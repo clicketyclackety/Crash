@@ -44,7 +44,7 @@ namespace Crash.Tables
         {
             if (_users.TryGetValue(userName, out User user))
             {
-                OnUserAdded.Invoke(this, new UserEventArgs(user));
+                OnUserAdded?.Invoke(this, new UserEventArgs(user));
             }
 
             _users.Remove(userName);

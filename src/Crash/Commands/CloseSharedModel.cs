@@ -3,6 +3,7 @@ using Rhino;
 
 using Crash.Events;
 using Crash.Tables;
+using Crash.Document;
 
 namespace Crash.Commands
 {
@@ -32,20 +33,20 @@ namespace Crash.Commands
         /// <inheritdoc />
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
+            CrashClient? client = CrashDoc.ActiveDoc?.LocalClient;
+            if (null == client) return Result.Success;
+
             bool? choice = _GetReleaseChoice();
             if (null == choice)
                 return Result.Cancel;
 
             if (choice.Value)
-                ClientManager.LocalClient?.Done();
+                client.Done();
 
             EventManagement.DeRegisterEvents();
 
-            ServerManager.CloseLocalServer(); // TODO : Should this be closed?
-            ClientManager.CloseLocalClient();
+            CrashDoc.ActiveDoc.Dispose();
 
-            CacheTable.Clear();
-            InteractivePipe.Instance.Enabled = false;
             _EmptyModel(doc);
 
             RhinoApp.WriteLine("Model closed and saved successfully");

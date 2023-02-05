@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Crash.Document;
 using Crash.Events;
 using Crash.Properties;
+using Crash.Tables;
 using Eto.Drawing;
 using Eto.Forms;
 
@@ -37,7 +38,7 @@ namespace Crash.UI
     internal class UsersForm : Form
     {
         private GridView m_grid;
-        private readonly ObservableCollection<User> m_users;
+        private ObservableCollection<User> m_users { get; set; }
         internal static Crash.UI.UsersForm? ActiveForm { get; set; }
 
         internal static void ToggleFormVisibility()
@@ -63,7 +64,10 @@ namespace Crash.UI
 
         internal static void ReDrawForm()
         {
-            ActiveForm?.Invalidate(true);
+            if (null == ActiveForm) return;
+
+            ActiveForm.m_users = new ObservableCollection<User>(CrashDoc.ActiveDoc.Users);
+            ActiveForm.Invalidate(true);
         }
 
         /// <summary>
@@ -75,16 +79,25 @@ namespace Crash.UI
             UsersForm.ActiveForm = null;
         }
 
+        private void ReDrawEvent(object sender, EventArgs e) => ReDrawForm();
+
+        private void ReDrawEvent(ISpeck[] specks) => ReDrawForm();
+
         // TODO : Make UI Respond to New Users
         public UsersForm()
         {
-            if (CrashDoc.ActiveDoc?.LocalClient is object)
+            m_users = new ObservableCollection<User>(CrashDoc.ActiveDoc.Users);
+            RhinoDoc.ActiveDocumentChanged += ReDrawEvent;
+
+            if (CrashDoc.ActiveDoc is object)
             {
-                m_users = new ObservableCollection<User>(CrashDoc.ActiveDoc.Users);
-                CrashDoc.ActiveDoc.Users.OnUserAdded += (sender, userEventArgs) => ReDrawForm();
-                CrashDoc.ActiveDoc.Users.OnUserRemoved += (sender, userEventArgs) => ReDrawForm();
-                CrashDoc.ActiveDoc.LocalClient.OnInitialize += (specks) => ReDrawForm();
-                RhinoDoc.ActiveDocumentChanged += (sender, docEventArgs) => ReDrawForm();
+                CrashDoc.ActiveDoc.Users.OnUserAdded += ReDrawEvent;
+                CrashDoc.ActiveDoc.Users.OnUserRemoved += ReDrawEvent;
+
+                if (CrashDoc.ActiveDoc?.LocalClient is object)
+                {
+                    CrashDoc.ActiveDoc.LocalClient.OnInitialize += ReDrawEvent;
+                }
             }
 
             Maximizable = false;
@@ -229,7 +242,7 @@ namespace Crash.UI
                         }
                     }
 
-                    CameraCache.FollowCamera();
+                    CrashDoc.ActiveDoc?.Cameras?.FollowCamera();
                 }
 
                 user.Camera = state;

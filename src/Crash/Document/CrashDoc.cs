@@ -20,21 +20,21 @@ namespace Crash.Document
         /// </summary>
         public static CrashDoc ActiveDoc { get; private set; }
 
-        private static Dictionary<string, CrashDoc> activeDocuments;
+        // Path will likely never exist
+        // For multiple docs does it have to?
+        private static Dictionary<RhinoDoc, CrashDoc> activeDocuments;
 
         static CrashDoc()
         {
-            activeDocuments = new Dictionary<string, CrashDoc>();
+            activeDocuments = new Dictionary<RhinoDoc, CrashDoc>();
             RhinoDoc.ActiveDocumentChanged += documentChanged;
         }
 
         private static void documentChanged(object sender, DocumentEventArgs e)
         {
-            string path = e.Document.Path;
-            if (string.IsNullOrEmpty(path)) return;
-            if (activeDocuments.ContainsKey(path))
+            if (activeDocuments.ContainsKey(e.Document))
             {
-                ActiveDoc = activeDocuments[path];
+                ActiveDoc = activeDocuments[e.Document];
             }
             else
             {
@@ -49,6 +49,14 @@ namespace Crash.Document
         public readonly UserTable Users;
 
         public readonly CacheTable CacheTable;
+
+        public readonly CameraTable Cameras;
+
+        #endregion
+
+        #region UI
+
+        public readonly InteractivePipe Pipeline;
 
         #endregion
 
@@ -66,12 +74,16 @@ namespace Crash.Document
         {
             Users = new UserTable();
             CacheTable = new CacheTable();
+            Cameras = new CameraTable();
         }
 
         public CrashDoc(RhinoDoc doc) : this()
         {
-            activeDocuments.Add(doc.Path, this);
+            activeDocuments.Remove(doc);
+            activeDocuments.Add(doc, this);
             ActiveDoc = this;
+
+            Pipeline = new InteractivePipe();
         }
 
         internal static CrashDoc CreateHeadless()
@@ -84,15 +96,6 @@ namespace Crash.Document
 
         #region Methods
 
-        internal static CrashDoc? GetDocument(string path)
-        {
-            if (activeDocuments.TryGetValue(path, out CrashDoc doc))
-            {
-                return doc;
-            }
-
-            return null;
-        }
 
         #endregion
 
@@ -114,6 +117,10 @@ namespace Crash.Document
             {
                 ActiveDoc = null;
             }
+
+            LocalClient?.StopAsync();
+            LocalServer?.Stop();
+
         }
 
     }

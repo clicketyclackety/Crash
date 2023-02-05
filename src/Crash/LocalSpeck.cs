@@ -42,7 +42,7 @@ namespace Crash
         {
             Speck = speck;
             SerializationOptions options = new SerializationOptions();
-            GeometryBase geometry = CommonObject.FromJSON(speck.Payload) as GeometryBase;
+            GeometryBase? geometry = CommonObject.FromJSON(speck.Payload) as GeometryBase;
             Geometry = geometry;
         }
 

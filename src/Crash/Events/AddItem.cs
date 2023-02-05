@@ -23,7 +23,7 @@ namespace Crash.Events
             }
 
             SpeckInstance speck = SpeckInstance.CreateNew(userName, e.TheObject.Geometry);
-            CacheTable.SyncHost(e.TheObject, speck);
+            CrashDoc.ActiveDoc?.CacheTable?.SyncHost(e.TheObject, speck);
 
             Speck serverSpeck = new Speck(speck);
             CrashDoc.ActiveDoc?.LocalClient?.Add(serverSpeck);

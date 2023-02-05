@@ -1,4 +1,5 @@
-﻿using Crash.Tables;
+﻿using Crash.Document;
+using Crash.Tables;
 
 namespace Crash.UI
 {
@@ -27,7 +28,8 @@ namespace Crash.UI
 
         public static CameraSpeck CreateNew(Camera camera)
         {
-            ISpeck cameraSpeck = new Speck(Guid.NewGuid(), UserTable.CurrentUser?.Name, camera.ToJSON());
+            string userName = CrashDoc.ActiveDoc?.Users?.CurrentUser?.Name;
+            ISpeck cameraSpeck = new Speck(Guid.NewGuid(), userName, camera.ToJSON());
             return new CameraSpeck(cameraSpeck);
         }
 

@@ -1,13 +1,14 @@
-﻿using Rhino.Display;
+﻿using Crash.Tables;
+using Rhino.Display;
 using Rhino.Geometry;
 
 namespace Crash.Events
 {
 
-	/// <summary>
-	/// THe rhino event manager
-	/// </summary>
-	internal static class EventManagement
+    /// <summary>
+    /// THe rhino event manager
+    /// </summary>
+    internal static class EventManagement
 	{
 
 		/// <summary>
@@ -25,7 +26,7 @@ namespace Crash.Events
 			RhinoDoc.DeselectObjects += SelectItem.Event;
 			RhinoDoc.DeselectAllObjects += SelectAllItems.Event;
 			RhinoDoc.UndeleteRhinoObject += AddItem.Event;
-            RhinoView.Modified += CameraCache.RhinoView_Modified;
+            RhinoView.Modified += CameraTable.RhinoView_Modified;
 
 			RhinoApp.Idle += RhinoApp_Idle;
         }

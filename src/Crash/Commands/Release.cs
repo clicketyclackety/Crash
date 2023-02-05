@@ -1,4 +1,5 @@
-﻿using Rhino.Commands;
+﻿using Crash.Document;
+using Rhino.Commands;
 
 
 namespace Crash.Commands
@@ -29,7 +30,7 @@ namespace Crash.Commands
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
             // TODO : Wait for response for data integrity check
-            ClientManager.LocalClient.Done();
+            CrashDoc.ActiveDoc?.LocalClient?.Done();
 
             return Result.Success;
         }

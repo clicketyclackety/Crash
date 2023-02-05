@@ -6,11 +6,12 @@ using Rhino.Display;
 using Rhino.Geometry;
 using Crash.Events;
 using Crash.Document;
+using System.Collections;
 
-namespace Crash.Utilities
+namespace Crash.Tables
 {
 
-    internal sealed class CameraCache
+    public sealed class CameraTable : IEnumerable<Camera>
     {
         private const double MINIMUM_DISPLACEMENT = 1000; // What unit?
         private const double CHANGE_DELAY = 500; // in milliseconds
@@ -20,18 +21,18 @@ namespace Crash.Utilities
         private static Point3d lastLocation = Point3d.Unset;
         private static Point3d lastTarget = Point3d.Unset;
 
-        private static ConcurrentDictionary<string, Stack<Camera>> cameraLocations;
+        private ConcurrentDictionary<string, Stack<Camera>> cameraLocations;
 
-        static CameraCache()
+        public CameraTable()
         {
             cameraLocations = new ConcurrentDictionary<string, Stack<Camera>>();
         }
 
 
-        internal static void RhinoView_Modified(object sender, Rhino.Display.ViewEventArgs v)
+        internal static void RhinoView_Modified(object sender, ViewEventArgs v)
         {
-            if (null == Document.CrashDoc.ActiveDoc) return;
-            if (Document.CrashDoc.ActiveDoc.Users.Any(u => u.Camera == CameraState.Follow)) return;
+            if (null == CrashDoc.ActiveDoc?.LocalClient) return;
+            if (CrashDoc.ActiveDoc.Users.Any(u => u.Camera == CameraState.Follow)) return;
 
             RhinoView view = v.View;
             Point3d cameraLocation = view.ActiveViewport.CameraLocation;
@@ -49,13 +50,13 @@ namespace Crash.Utilities
                 CameraSpeck cameraSpeck = CameraSpeck.CreateNew(camera);
                 Speck serverSpeck = new Speck(cameraSpeck);
 
-                Task.Run( () => ClientManager.LocalClient?.CameraChange(serverSpeck));
+                Task.Run(() => CrashDoc.ActiveDoc.LocalClient.CameraChange(serverSpeck));
             }
         }
 
         internal void OnCameraChange(string userName, Speck cameraSpeck)
         {
-            User? user = Document.CrashDoc.ActiveDoc?.Users.Get(userName);
+            User? user = CrashDoc.ActiveDoc?.Users.Get(userName);
             if (null == user) return;
             Camera? newCamera = Camera.FromJSON(cameraSpeck.Payload);
             if (null == newCamera) return;
@@ -78,27 +79,29 @@ namespace Crash.Utilities
                 EventManagement.currentQueue.AddAction(FollowCamera);
             }
 
-            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
+            RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
         // What about queue?
-        internal static void FollowCamera()
+        internal void FollowCamera()
         {
             User toFollow = CrashDoc.ActiveDoc.Users.Where(u => u.Camera == CameraState.Follow).FirstOrDefault();
             if (null == toFollow) return;
             if (!cameraLocations.TryGetValue(toFollow?.Name, out Stack<Camera> cameras)) return;
             Camera camera = cameras.First();
 
-            var activeView = Rhino.RhinoDoc.ActiveDoc.Views.ActiveView;
-            activeView.ActiveViewport.SetCameraLocations(camera.Target,camera.Location);
+            var activeView = RhinoDoc.ActiveDoc.Views.ActiveView;
+            activeView.ActiveViewport.SetCameraLocations(camera.Target, camera.Location);
         }
 
-        internal static Dictionary<string, Camera> GetActiveCameras()
+        internal Dictionary<string, Camera> GetActiveCameras()
         {
             return cameraLocations.ToDictionary(cl => cl.Key, cl => cl.Value.Peek());
         }
 
+        public IEnumerator<Camera> GetEnumerator() => cameraLocations.Values.SelectMany(c => c).GetEnumerator();
 
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     }
 

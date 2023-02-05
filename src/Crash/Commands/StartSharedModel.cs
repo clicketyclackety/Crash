@@ -59,7 +59,6 @@ namespace Crash.Commands
                 RhinoApp.WriteLine("Invalid name!");
                 return Result.Nothing;
             }
-            _CreateCurrentUser(name);
 
             // TODO : Add Port Validation
             // TODO : Add Port Suggestions to docs
@@ -68,6 +67,10 @@ namespace Crash.Commands
                 RhinoApp.WriteLine("Invalid Port!");
                 return Result.Nothing;
             }
+
+            new CrashDoc(doc);
+
+            _CreateCurrentUser(name);
 
             if (_PreExistingGeometryCheck(doc))
             {
@@ -84,11 +87,12 @@ namespace Crash.Commands
                 if (close == null)
                     return Result.Cancel;
 
-                else if (close.Value)
+                else if (close == true)
+                {
                     CrashServer.ForceCloselocalServers();
+                    break;
+                }
             }
-
-            InteractivePipe.Instance.Enabled = true;
 
             UsersForm.ToggleFormVisibility();
 
@@ -97,7 +101,8 @@ namespace Crash.Commands
 
         private void AddPreExistingGeometry()
         {
-            string? user = CrashDoc.ActiveDoc?.Users?.CurrentUser?.Name;
+            CrashDoc cDoc = CrashDoc.ActiveDoc;
+            string? user = cDoc.Users?.CurrentUser?.Name;
             if (string.IsNullOrEmpty(user))
             {
                 RhinoApp.WriteLine("User is invalid!");
@@ -109,7 +114,7 @@ namespace Crash.Commands
             {
                 GeometryBase geom = enumer.Current.Geometry;
                 SpeckInstance speck = SpeckInstance.CreateNew(user, geom);
-                CacheTable.Instance.UpdateSpeck(speck);
+                cDoc.CacheTable?.UpdateSpeck(speck);
             }
         }
 

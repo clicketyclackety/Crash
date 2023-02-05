@@ -6,6 +6,7 @@ using Rhino.Geometry;
 
 namespace Crash.Events
 {
+
     /// <summary>
     /// Add item event handler
     /// </summary>
@@ -23,7 +24,11 @@ namespace Crash.Events
         internal static void Event(object sender, ViewEventArgs v)
         {
             if (null == Document.CrashDoc.ActiveDoc) return;
-            if (Tables.UserTable.CurrentUser.Camera == CameraState.Follow) return;
+            if (Tables.UserTable.CurrentUser.Camera != CameraState.Follow) return;
+
+            ;
+
+            return;
 
             RhinoView view = v.View;
             Point3d cameraLocation = view.ActiveViewport.CameraLocation;
@@ -37,12 +42,14 @@ namespace Crash.Events
             {
                 lastChange = currentChange;
 
-                Camera camera = new Camera(cameraLocation, cameraTarget, Tables.UserTable.CurrentUser);
+                Camera camera = new Camera(cameraLocation, cameraTarget);
                 CameraSpeck cameraSpeck = CameraSpeck.CreateNew(camera);
                 Speck serverSpeck = new Speck(cameraSpeck);
 
                 ClientManager.LocalClient?.Add(serverSpeck);
             }
         }
+
     }
+
 }

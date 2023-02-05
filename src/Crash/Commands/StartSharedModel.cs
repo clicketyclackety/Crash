@@ -6,7 +6,7 @@ using Rhino.Commands;
 using Rhino.Geometry;
 using Rhino.Input;
 using Rhino;
-
+using Crash.Tables;
 
 namespace Crash.Commands
 {
@@ -85,6 +85,8 @@ namespace Crash.Commands
             }
 
             InteractivePipe.Instance.Enabled = true;
+
+            UsersUIModeless.ToggleFormVisibility();
 
             return Result.Success;
         }
@@ -204,6 +206,7 @@ namespace Crash.Commands
         {
             User user = new User(name);
             User.CurrentUser = user;
+            UserTable.CurrentUser = user;
         }
 
     }

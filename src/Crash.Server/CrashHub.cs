@@ -171,6 +171,27 @@ namespace Crash.Server
         }
 
         /// <summary>
+        /// Add Speck to SqLite DB and notify other clients
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="speck"></param>
+        /// <returns></returns>
+        public async Task CameraChange(string user, Speck speck)
+        {
+            try
+            {
+                _context.Specks.Add(speck);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex}");
+            }
+
+            await Clients.Others.CameraChange(user, new Speck(speck)); // Why the new class?
+        }
+
+        /// <summary>
         /// On Connected send user specks from DB
         /// </summary>
         /// <returns></returns>

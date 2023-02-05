@@ -1,4 +1,7 @@
-﻿namespace Crash.Events
+﻿using Rhino.Display;
+using Rhino.Geometry;
+
+namespace Crash.Events
 {
 	/// <summary>
 	/// THe rhino event manager
@@ -20,7 +23,9 @@
 			RhinoDoc.DeselectObjects += SelectItem.Event;
 			RhinoDoc.DeselectAllObjects += SelectAllItems.Event;
 			RhinoDoc.UndeleteRhinoObject += AddItem.Event;
-            Rhino.Display.RhinoView.Modified += RhinoView_Modified;
+            RhinoView.Modified += CameraCache.RhinoView_Modified;
+
+            RhinoApp.Idle += RhinoApp_Idle;
 
             if (null == ClientManager.LocalClient) return;
 
@@ -33,12 +38,21 @@
 			ClientManager.LocalClient.OnAdd += LocalCache.OnAdd;
             ClientManager.LocalClient.OnDelete += LocalCache.OnDelete;
 			ClientManager.LocalClient.OnDone += LocalCache.CollaboratorIsDone;
+			ClientManager.LocalClient.OnCameraChange += CameraCache.OnCameraChange;
 
         }
 
-        private static void RhinoView_Modified(object sender, Rhino.Display.ViewEventArgs e)
+		static EventManagement()
+		{
+			currentQueue = new IdleQueue();
+        }
+
+		internal static IdleQueue currentQueue;
+
+		static int i = 0;
+        private static void RhinoApp_Idle(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+			currentQueue.RunQueue();
         }
 
         /// <summary>
@@ -66,5 +80,30 @@
         }
 
     }
+
+	internal sealed class IdleQueue
+	{
+		private ConcurrentQueue<Action> actions;
+
+		internal IdleQueue()
+		{
+			actions = new ConcurrentQueue<Action>();
+		}
+
+		internal bool RunQueue()
+		{
+			if (!actions.TryDequeue(out Action action)) return false;
+
+			action.Invoke();
+
+			return actions.Count == 0;
+		}
+
+		internal void AddAction(Action action)
+		{
+			actions.Enqueue(action);
+		}
+
+	}
 
 }

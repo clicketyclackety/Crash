@@ -30,7 +30,7 @@ namespace Crash.Utilities
         /// </summary>
         public Color Color { get; set; }
 
-        public CameraState Camera { get; set; } = CameraState.None;
+        public CameraState Camera { get; set; } = CameraState.Visible;
 
         /// <summary>
         /// User Constructor 
@@ -56,7 +56,11 @@ namespace Crash.Utilities
         /// Current user
         /// </summary>
         [Obsolete("User UserTable")]
-        public static User? CurrentUser { get; set; }
+        public static User? CurrentUser
+        {
+            get => Tables.UserTable.CurrentUser;
+            set => Tables.UserTable.CurrentUser = value;
+        }
 
         [Obsolete("User UserTable")]
         public static string CurrentUserName => CurrentUser is object ? CurrentUser.Name : Environment.UserName;

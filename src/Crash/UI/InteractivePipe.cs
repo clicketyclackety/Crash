@@ -5,6 +5,8 @@ using Rhino.Display;
 using Rhino;
 using Crash.Document;
 using Crash.Utilities;
+using SpeckLib;
+using Eto.Forms;
 
 namespace Crash.UI
 {
@@ -54,6 +56,7 @@ namespace Crash.UI
         {
             Instance = this;
             bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
+            PipeCameraCache = new Dictionary<Color, Line[]>();
         }
 
         /// <summary>
@@ -83,11 +86,20 @@ namespace Crash.UI
             {
                 SpeckInstance speck = enumer.Current;
 
-                User user = CrashDoc.ActiveDoc.Users.Get(speck.Owner);
+                User? user = CrashDoc.ActiveDoc?.Users?.Get(speck.Owner);
                 if (user?.Visible != true) continue;
 
                 DrawSpeck(e, speck, user.Color);
                 UpdateBoundingBox(speck);
+            }
+
+            Dictionary<string, Camera> ActiveCameras = CameraCache.GetActiveCameras();
+            foreach(var activeCamera in ActiveCameras)
+            {
+                User? user = CrashDoc.ActiveDoc?.Users?.Get(activeCamera.Key);
+                if (user?.Camera != CameraState.Visible) continue;
+
+                DrawCamera(e, activeCamera.Value, user.Color);
             }
 
             var userEnumer = CrashDoc.ActiveDoc.Users.GetEnumerator();
@@ -117,6 +129,46 @@ namespace Crash.UI
             catch
             {
                 return;
+            }
+        }
+
+        private Dictionary<Color, Line[]> PipeCameraCache;
+
+        const double width = 1000;
+        const double height = 500;
+        const int thickness = 4;
+        private void DrawCamera(DrawEventArgs e, Camera camera, Color userColor)
+        {
+            if (e.Display.InterruptDrawing()) return;
+
+            PipeCameraCache.Remove(userColor);
+            double ratio = 10;
+            double length = 5000 * ratio;
+
+            Vector3d viewAngle = camera.Target - camera.Location;
+
+            Line viewLine = new Line(camera.Location, viewAngle, length);
+
+            Plane cameraFrustrum = new Plane(viewLine.To, viewAngle);
+            Interval heightInterval = new Interval(-width * ratio / 2, width * ratio / 2);
+            Interval widthInterval = new Interval(-height * ratio / 2, height * ratio / 2);
+            Rectangle3d rectangle = new Rectangle3d(cameraFrustrum, widthInterval, heightInterval);
+
+            List<Line> lines = new List<Line>(8);
+            lines.AddRange(rectangle.ToPolyline().GetSegments());
+            lines.Add(new Line(camera.Location, rectangle.PointAt(0)));
+            lines.Add(new Line(camera.Location, rectangle.PointAt(1)));
+            lines.Add(new Line(camera.Location, rectangle.PointAt(2)));
+            lines.Add(new Line(camera.Location, rectangle.PointAt(3)));
+
+            Interval zInterval = new Interval(0, length);
+            BoundingBox cameraBox = new Box(cameraFrustrum, widthInterval, heightInterval, zInterval).BoundingBox;
+            bbox.Union(cameraBox);
+
+            foreach(Line line in lines)
+            {
+                // e.Display.DrawLines(lines, userColor, 3);
+                e.Display.DrawPatternedLine(line, userColor, 0x00001111, thickness);
             }
         }
 

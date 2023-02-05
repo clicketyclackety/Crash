@@ -12,7 +12,7 @@ namespace Crash.Server
         const string dbName = "Database.db";
         const string appName = "Crash";
         const string dbDirectory = "App_Data";
-        const string defaultURL = "127.0.0.1:8080";
+        const string defaultURL = "http://localhost:8080";
 
         public string URL { get; private set; }
 

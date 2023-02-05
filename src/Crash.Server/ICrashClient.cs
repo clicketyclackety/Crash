@@ -14,5 +14,6 @@ namespace Crash.Server
         Task Select(string user, Guid id);
         Task Unselect(string user, Guid id);
         Task Initialize(Speck[] specks);
+        Task CameraChange(string user, Speck speck);
     }
 }

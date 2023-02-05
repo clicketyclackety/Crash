@@ -30,6 +30,12 @@
 
         private static void _HandleSpeck(ISpeck speck)
         {
+            // Handle Camera Specks // Admittedly very badly.
+            if (!speck.Payload.Contains("{"))
+            {
+                return;
+            }
+
             SpeckInstance localSpeck = new SpeckInstance(speck);
             if (!speck.Temporary)
             {

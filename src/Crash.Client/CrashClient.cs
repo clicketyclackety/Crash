@@ -29,6 +29,7 @@ namespace Crash
         public event Action<string, Guid> OnSelect;
         public event Action<string, Guid> OnUnselect;
         public event Action<Speck[]> OnInitialize;
+        public event Action<string, Speck> OnCameraChange;
 
         /// <summary>
         /// Stop async task
@@ -65,6 +66,8 @@ namespace Crash
             _connection.On<string, Guid>("Select", (user, id) => OnSelect?.Invoke(user, id));
             _connection.On<string, Guid>("Unselect", (user, id) => OnUnselect?.Invoke(user, id));
             _connection.On<Speck[]>("Initialize", (specks) => OnInitialize?.Invoke(specks));
+            _connection.On<string, Speck>("CameraChange", (user, speck) => OnCameraChange?.Invoke(user, speck));
+
             _connection.Closed += Connection_Closed;
             _connection.Reconnecting += Connection_Reconnecting;
         }
@@ -139,6 +142,16 @@ namespace Crash
         public async Task Unselect(Guid id)
         {
             await _connection.InvokeAsync("Unselect", _user, id);
+        }
+
+        /// <summary>
+        /// CameraChange event
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task CameraChange(Speck speck)
+        {
+            await _connection.InvokeAsync("CameraChange", _user, speck);
         }
 
         /// <summary>

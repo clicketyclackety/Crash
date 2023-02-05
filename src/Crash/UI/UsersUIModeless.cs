@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Crash.Document;
+using Crash.Events;
 using Crash.Properties;
 using Eto.Drawing;
 using Eto.Forms;
@@ -37,6 +38,28 @@ namespace Crash.UI
     {
         private GridView m_grid;
         private readonly ObservableCollection<User> m_users;
+        internal static Crash.UI.UsersUIModeless? ActiveForm { get; set; }
+
+        internal static void ToggleFormVisibility()
+        {
+            var form = new UsersUIModeless { Owner = RhinoEtoApp.MainWindow };
+            form.Closed += OnFormClosed;
+            form.Show();
+        }
+
+        internal static void ReDrawForm()
+        {
+            ActiveForm?.Invalidate(true);
+        }
+
+        /// <summary>
+        /// FormClosed EventHandler
+        /// </summary>
+        private static void OnFormClosed(object sender, EventArgs e)
+        {
+            UsersUIModeless.ActiveForm?.Dispose();
+            UsersUIModeless.ActiveForm = null;
+        }
 
         // TODO : Make UI Respond to New Users
         public UsersUIModeless()
@@ -84,7 +107,7 @@ namespace Crash.UI
                 HeaderText = "",
                 Resizable = false,
                 Sortable = false,
-                Width = 40,
+                Width = 36,
             });
 
             // Visible
@@ -101,7 +124,22 @@ namespace Crash.UI
                 HeaderText = "",
                 Resizable = false,
                 Sortable = false,
-                Width = 40,
+                Width = 24,
+            });
+
+            DrawableCell cell = new DrawableCell();
+            cell.Paint += Cell_Paint;
+
+            // Colours
+            m_grid.Columns.Add(new GridColumn
+            {
+                DataCell = cell,
+                AutoSize = true,
+                Editable = false,
+                HeaderText = "",
+                Resizable = false,
+                Sortable = false,
+                Width = 24,
             });
 
             // User
@@ -139,6 +177,14 @@ namespace Crash.UI
 
         }
 
+        private void Cell_Paint(object sender, DrawableCellPaintEventArgs e)
+        {
+            if (e.Item is not User user) return;
+
+            // e.Graphics.DrawEllipse(user.Color.ToEto(), new RectangleF(2, 2, 16, 16),);
+            e.Graphics.FillEllipse(user.Color.ToEto(), new RectangleF(2, 2, 16, 16));
+        }
+
         private void M_grid_ColumnHeaderClick(object sender, GridColumnEventArgs e)
         {
             
@@ -164,12 +210,16 @@ namespace Crash.UI
                             userIter.Camera = CameraState.Visible;
                         }
                     }
+
+                    CameraCache.FollowCamera();
                 }
 
                 user.Camera = state;
             }
 
             m_grid.Invalidate(true);
+
+            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
         private CameraState CycleState(CameraState state)

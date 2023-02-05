@@ -1,10 +1,11 @@
-﻿using System.Collections;
+﻿using Crash.Utilities;
+using System.Collections;
 
 
 namespace Crash.Tables
 {
 
-    // TODO : Add User Added/Removed Events for UI to hook into
+    // Should this be async?
     public sealed class UserTable : IEnumerable<User>
     {
 
@@ -27,17 +28,25 @@ namespace Crash.Tables
                 return true;
             }
 
+            OnUserAdded.Invoke(this, new UserEventArgs(user));
+
             return false;
         }
 
         public bool Add(string userName)
         {
             User user = new User(userName);
+
             return Add(user);
         }
 
         public void Remove(string userName)
         {
+            if (_users.TryGetValue(userName, out User user))
+            {
+                OnUserAdded.Invoke(this, new UserEventArgs(user));
+            }
+
             _users.Remove(userName);
         }
 
@@ -50,6 +59,20 @@ namespace Crash.Tables
         public IEnumerator<User> GetEnumerator() => _users.Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public event EventHandler<UserEventArgs> OnUserAdded;
+        public event EventHandler<UserEventArgs> OnUserRemoved;
+
+    }
+
+    public sealed class UserEventArgs : EventArgs
+    {
+        public readonly User User;
+
+        public UserEventArgs(User user)
+        {
+            User = user;
+        }
 
     }
 

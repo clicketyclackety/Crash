@@ -86,7 +86,7 @@ namespace Crash.Commands
 
             InteractivePipe.Instance.Enabled = true;
 
-            UsersUIModeless.ToggleFormVisibility();
+            UsersForm.ToggleFormVisibility();
 
             return Result.Success;
         }

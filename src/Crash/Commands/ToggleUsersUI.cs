@@ -11,8 +11,10 @@ namespace Crash.Commands
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            UsersUIModeless.ToggleFormVisibility();
+            UsersForm.ToggleFormVisibility();
             return Result.Success;
         }
+
     }
+
 }

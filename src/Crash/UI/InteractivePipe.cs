@@ -78,6 +78,7 @@ namespace Crash.UI
         {
             if (null == LocalCache.Instance) return;
             if (null == CrashDoc.ActiveDoc) return;
+            bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
 
             IEnumerable<SpeckInstance> specks = LocalCache.Instance.GetSpecks().OrderBy(s => s.Owner);
             var enumer = specks.GetEnumerator();
@@ -100,35 +101,6 @@ namespace Crash.UI
                 if (user?.Camera != CameraState.Visible) continue;
 
                 DrawCamera(e, activeCamera.Value, user.Color);
-            }
-
-            var userEnumer = CrashDoc.ActiveDoc.Users.GetEnumerator();
-            int counter = 0;
-            while (userEnumer.MoveNext())
-            {
-                User user = userEnumer.Current;
-                if (!user.Visible) continue;
-
-                DrawUser(e, user, counter);
-                counter++;
-            }
-        }
-
-        private void DrawUser(DrawEventArgs e, User user, int counter)
-        {
-            try
-            {
-                Rectangle rect = RhinoDoc.ActiveDoc.Views.ActiveView.Bounds;
-                int xCoord = rect.X+50;
-                int yCoord = rect.Y+50;
-                yCoord += counter * 30;
-                Point2d point = new Point2d(xCoord, yCoord);
-                e.Display.Draw2dText(user.Name, user.Color, point, false, 20);
-            }
-            
-            catch
-            {
-                return;
             }
         }
 

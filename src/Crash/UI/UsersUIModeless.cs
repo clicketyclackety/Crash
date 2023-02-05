@@ -34,17 +34,31 @@ namespace Crash.UI
 
     }
 
-    internal class UsersUIModeless : Form
+    internal class UsersForm : Form
     {
         private GridView m_grid;
         private readonly ObservableCollection<User> m_users;
-        internal static Crash.UI.UsersUIModeless? ActiveForm { get; set; }
+        internal static Crash.UI.UsersForm? ActiveForm { get; set; }
 
         internal static void ToggleFormVisibility()
         {
-            var form = new UsersUIModeless { Owner = RhinoEtoApp.MainWindow };
-            form.Closed += OnFormClosed;
-            form.Show();
+            if (null == ActiveForm)
+            {
+                var form = new UsersForm { Owner = RhinoEtoApp.MainWindow };
+                form.Closed += OnFormClosed;
+                form.Show();
+
+                ActiveForm = form;
+            }
+            else
+            {
+                ActiveForm = null;
+            }
+        }
+
+        internal static void CloseActiveForm()
+        {
+            ActiveForm?.Dispose();
         }
 
         internal static void ReDrawForm()
@@ -57,16 +71,19 @@ namespace Crash.UI
         /// </summary>
         private static void OnFormClosed(object sender, EventArgs e)
         {
-            UsersUIModeless.ActiveForm?.Dispose();
-            UsersUIModeless.ActiveForm = null;
+            UsersForm.ActiveForm?.Dispose();
+            UsersForm.ActiveForm = null;
         }
 
         // TODO : Make UI Respond to New Users
-        public UsersUIModeless()
+        public UsersForm()
         {
-            if (CrashDoc.ActiveDoc is object)
+            if (CrashDoc.ActiveDoc is object && ClientManager.LocalClient is object)
             {
                 m_users = new ObservableCollection<User>(CrashDoc.ActiveDoc.Users);
+                CrashDoc.ActiveDoc.Users.OnUserAdded += (sender, userEventArgs) => ReDrawForm();
+                CrashDoc.ActiveDoc.Users.OnUserRemoved += (sender, userEventArgs) => ReDrawForm();
+                ClientManager.LocalClient.OnInitialize += (specks) => ReDrawForm();
             }
 
             Maximizable = false;

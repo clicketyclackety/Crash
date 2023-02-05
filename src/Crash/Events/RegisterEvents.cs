@@ -3,11 +3,13 @@ using Rhino.Geometry;
 
 namespace Crash.Events
 {
+
 	/// <summary>
 	/// THe rhino event manager
 	/// </summary>
 	internal static class EventManagement
 	{
+
 		/// <summary>
 		/// Register events
 		/// </summary>

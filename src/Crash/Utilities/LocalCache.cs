@@ -1,7 +1,7 @@
 ﻿using Rhino.DocObjects;
 using Rhino.Geometry;
 using Rhino;
-
+using Crash.Document;
 
 namespace Crash.Utilities
 {
@@ -255,11 +255,10 @@ namespace Crash.Utilities
         {
             if (null == speck) return;
 
-            Document.CrashDoc.ActiveDoc.Users.Add(speck.Owner);
+            Document.CrashDoc.ActiveDoc?.Users.Add(speck.Owner);
 
             SpeckInstance lSpeck = new SpeckInstance(speck);
             Instance.UpdateSpeck(lSpeck);
-            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
         
         /// <summary>
@@ -308,7 +307,9 @@ namespace Crash.Utilities
             LocalCache.Instance.BakeSpecks(ToBake);
             LocalCache.Instance.RemoveSpecks(ToBake);
             SomeoneIsDone = false;
-            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
+
+            CrashDoc.ActiveDoc?.Users.Remove(name);
+            RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
         #endregion

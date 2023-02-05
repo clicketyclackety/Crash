@@ -49,7 +49,7 @@ namespace Crash.Utilities
                 CameraSpeck cameraSpeck = CameraSpeck.CreateNew(camera);
                 Speck serverSpeck = new Speck(cameraSpeck);
 
-                ClientManager.LocalClient?.CameraChange(serverSpeck);
+                Task.Run( () => ClientManager.LocalClient?.CameraChange(serverSpeck));
             }
         }
 

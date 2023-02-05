@@ -7,6 +7,7 @@ using Rhino.Geometry;
 using Rhino.Input;
 using Rhino;
 using Crash.Tables;
+using Crash.Document;
 
 namespace Crash.Commands
 {
@@ -17,6 +18,7 @@ namespace Crash.Commands
     [CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
     public sealed class StartSharedModel : Command
     {
+        private RhinoDoc _rDoc;
 
         private bool includePreExistingGeometry = false;
 
@@ -39,6 +41,8 @@ namespace Crash.Commands
         /// <inheritdoc />
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
+            _rDoc = doc;
+
             if (ClientManager.CheckForActiveClient() || ServerManager.CheckForActiveServer())
             {
                 string closeCommand = CloseSharedModel.Instance.EnglishName;
@@ -48,7 +52,7 @@ namespace Crash.Commands
                 return Result.Success;
             }
 
-            string name = User.CurrentUserName;
+            string name = Environment.UserName;
 
             if (!_GetUsersName(ref name))
             {
@@ -93,12 +97,19 @@ namespace Crash.Commands
 
         private void AddPreExistingGeometry()
         {
+            string? user = CrashDoc.ActiveDoc?.Users?.CurrentUser?.Name;
+            if (string.IsNullOrEmpty(user))
+            {
+                RhinoApp.WriteLine("User is invalid!");
+                return;
+            }
+
             var enumer = GetObjects(RhinoDoc.ActiveDoc).GetEnumerator();
             while(enumer.MoveNext())
             {
                 GeometryBase geom = enumer.Current.Geometry;
-                SpeckInstance speck = SpeckInstance.CreateNew(User.CurrentUser.Name, geom);
-                LocalCache.Instance.UpdateSpeck(speck);
+                SpeckInstance speck = SpeckInstance.CreateNew(user, geom);
+                CacheTable.Instance.UpdateSpeck(speck);
             }
         }
 
@@ -160,7 +171,7 @@ namespace Crash.Commands
             }
         }
 
-        private static bool? _GetForceCloseOptions()
+        private bool? _GetForceCloseOptions()
         {
             bool defaultValue = false;
 
@@ -196,17 +207,16 @@ namespace Crash.Commands
         }
 
         // TODO : Ensure name is not already taken!
-        private static bool _GetUsersName(ref string name)
+        private bool _GetUsersName(ref string name)
             => CommandUtils.GetValidString("Your Name", ref name);
 
-        private static bool _GetPortFromUser(ref int port)
+        private bool _GetPortFromUser(ref int port)
             => CommandUtils.GetInteger("Server port", ref port);
 
-        private static void _CreateCurrentUser(string name)
+        private void _CreateCurrentUser(string name)
         {
             User user = new User(name);
-            User.CurrentUser = user;
-            UserTable.CurrentUser = user;
+            CrashDoc.ActiveDoc.Users.CurrentUser = user;
         }
 
     }

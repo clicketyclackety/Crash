@@ -1,4 +1,7 @@
-﻿namespace Crash.Events
+﻿using Crash.Document;
+using Crash.Tables;
+
+namespace Crash.Events
 {
     /// <summary>
     /// Remove item event handler
@@ -8,9 +11,11 @@
 
         internal static void Event(object sender, Rhino.DocObjects.RhinoObjectEventArgs e)
         {
-            var id = LocalCache.GetSpeckId(e.TheObject);
+            if (null == CrashDoc.ActiveDoc?.LocalClient) return;
+
+            var id = CacheTable.GetSpeckId(e.TheObject);
             if (id != null)
-                ClientManager.LocalClient?.Delete(id.Value);
+                CrashDoc.ActiveDoc.LocalClient.Delete(id.Value);
         }
 
     }

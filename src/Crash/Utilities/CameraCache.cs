@@ -53,7 +53,7 @@ namespace Crash.Utilities
             }
         }
 
-        internal static void OnCameraChange(string userName, Speck cameraSpeck)
+        internal void OnCameraChange(string userName, Speck cameraSpeck)
         {
             User? user = Document.CrashDoc.ActiveDoc?.Users.Get(userName);
             if (null == user) return;

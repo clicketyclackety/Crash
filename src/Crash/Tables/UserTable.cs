@@ -11,7 +11,7 @@ namespace Crash.Tables
 
         private readonly Dictionary<string, User> _users;
 
-        public static User CurrentUser;
+        public User CurrentUser;
 
         public UserTable()
         {

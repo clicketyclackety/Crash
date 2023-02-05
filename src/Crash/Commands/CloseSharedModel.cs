@@ -2,7 +2,7 @@
 using Rhino;
 
 using Crash.Events;
-
+using Crash.Tables;
 
 namespace Crash.Commands
 {
@@ -44,7 +44,7 @@ namespace Crash.Commands
             ServerManager.CloseLocalServer(); // TODO : Should this be closed?
             ClientManager.CloseLocalClient();
 
-            LocalCache.Clear();
+            CacheTable.Clear();
             InteractivePipe.Instance.Enabled = false;
             _EmptyModel(doc);
 

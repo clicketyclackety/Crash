@@ -1,6 +1,6 @@
 ﻿using Rhino.Commands;
 using Rhino;
-
+using Crash.Document;
 
 namespace Crash.Commands
 {
@@ -11,6 +11,8 @@ namespace Crash.Commands
     [CommandStyle(Style.DoNotRepeat | Style.NotUndoable | Style.ScriptRunner)]
     public sealed class OpenSharedModel : Command
     {
+
+        private RhinoDoc _rDoc;
 
         /// <summary>
         /// Default Constructor
@@ -29,6 +31,9 @@ namespace Crash.Commands
         /// <inheritdoc />
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
+            _rDoc = doc;
+
+            // Check Crash Doc
             if (ClientManager.CheckForActiveClient())
             {
                 RhinoApp.WriteLine("You are currently part of a Shared Model Session.");
@@ -42,7 +47,7 @@ namespace Crash.Commands
                 return Result.Success;
             }
 
-            string name = User.CurrentUserName;
+            string name = Environment.UserName;
             if (_GetUsersName(ref name))
             {
                 _CreateCurrentUser(name);
@@ -116,8 +121,7 @@ namespace Crash.Commands
         private void _CreateCurrentUser(string name)
         {
             User user = new User(name);
-            User.CurrentUser = user; // TODO : Remove
-            Tables.UserTable.CurrentUser = user;
+            _rDoc.GetCrashDoc().Users.CurrentUser = user;
         }
 
     }

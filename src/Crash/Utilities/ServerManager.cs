@@ -1,4 +1,6 @@
-﻿namespace Crash.Utilities
+﻿using Crash.Document;
+
+namespace Crash.Utilities
 {
 
     /// <summary>
@@ -7,13 +9,11 @@
     public static class ServerManager
     {
 
+        // TODO : Move these consts
         public const string DefaultURL = "http://0.0.0.0";
-        public static int LastPort = 5000;
 
-        /// <summary>
-        /// local server instance
-        /// </summary>
-        internal static CrashServer? LocalServer;
+        [Obsolete]
+        public static int LastPort = 5000;
 
         /// <summary>
         /// Method to load the server
@@ -23,8 +23,9 @@
         {
             CloseLocalServer();
 
-            CrashServer server = new CrashServer();
-            LocalServer = server;
+            if (null == CrashDoc.ActiveDoc) return false;
+            CrashServer? server = CrashDoc.ActiveDoc.LocalServer;
+            if (null == server) return false;
 
             bool result = server.Start(url, Rhino.Runtime.HostUtils.RunningOnOSX, out string resultMessage);
 
@@ -35,8 +36,11 @@
 
         public static void CloseLocalServer()
         {
-            LocalServer?.Stop();
-            LocalServer = null;
+            CrashServer? server = CrashDoc.ActiveDoc?.LocalServer;
+            if (null == server) return;
+
+            server?.Stop();
+            CrashDoc.ActiveDoc.LocalServer = null;
         }
 
         /// <summary>
@@ -44,7 +48,7 @@
         /// </summary>
         /// <returns>True if active, false otherwise</returns>
         public static bool CheckForActiveServer()
-            => LocalServer is object;
+            => CrashDoc.ActiveDoc?.LocalServer is object;
 
     }
 

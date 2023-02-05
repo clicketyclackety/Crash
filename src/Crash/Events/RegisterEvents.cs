@@ -27,27 +27,15 @@ namespace Crash.Events
 			RhinoDoc.UndeleteRhinoObject += AddItem.Event;
             RhinoView.Modified += CameraCache.RhinoView_Modified;
 
-            RhinoApp.Idle += RhinoApp_Idle;
-
-            if (null == ClientManager.LocalClient) return;
-
-            // Crash
-            ClientManager.LocalClient.OnSelect += CrashSelect.OnSelect;
-            ClientManager.LocalClient.OnUnselect += CrashSelect.OnUnSelect;
-
-			ClientManager.LocalClient.OnInitialize += CrashInit.OnInit;
-
-			ClientManager.LocalClient.OnAdd += LocalCache.OnAdd;
-            ClientManager.LocalClient.OnDelete += LocalCache.OnDelete;
-			ClientManager.LocalClient.OnDone += LocalCache.CollaboratorIsDone;
-			ClientManager.LocalClient.OnCameraChange += CameraCache.OnCameraChange;
-
+			RhinoApp.Idle += RhinoApp_Idle;
         }
 
 		static EventManagement()
 		{
 			currentQueue = new IdleQueue();
         }
+
+		 //TODO : Move this to a real class, static may be okay, but not ideal for Mac.
 
 		internal static IdleQueue currentQueue;
 
@@ -67,18 +55,6 @@ namespace Crash.Events
 			RhinoDoc.SelectObjects -= SelectItem.Event;
 			RhinoDoc.DeselectObjects -= SelectItem.Event;
 			RhinoDoc.DeselectAllObjects -= SelectAllItems.Event;
-
-			if (null == ClientManager.LocalClient) return;
-
-            // Crash
-            ClientManager.LocalClient.OnSelect -= CrashSelect.OnSelect;
-            ClientManager.LocalClient.OnUnselect -= CrashSelect.OnUnSelect;
-
-            ClientManager.LocalClient.OnInitialize -= CrashInit.OnInit;
-
-            ClientManager.LocalClient.OnAdd -= LocalCache.OnAdd;
-            ClientManager.LocalClient.OnDelete -= LocalCache.OnDelete;
-            ClientManager.LocalClient.OnDone -= LocalCache.CollaboratorIsDone;
         }
 
     }

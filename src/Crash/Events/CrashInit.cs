@@ -1,4 +1,6 @@
-﻿namespace Crash.Events
+﻿using Crash.Document;
+
+namespace Crash.Events
 {
 
     /// <summary>
@@ -6,15 +8,17 @@
     /// </summary>
     internal static class CrashInit
     {
-        public static bool IsInit { get; set; }
 
+        // TODO : This needs to be done on Idle
         internal static void OnInit(IEnumerable<ISpeck> specks)
         {
+            if (null == CrashDoc.ActiveDoc) return;
+
             RhinoApp.WriteLine("Loading specks ...");
 
-            IsInit = true;
+            CrashDoc.ActiveDoc.CacheTable.IsInit = true;
             _HandleSpecks(specks);
-            IsInit = false;
+            CrashDoc.ActiveDoc.CacheTable.IsInit = false;
 
             RhinoDoc.ActiveDoc.Views.Redraw();
         }
@@ -30,8 +34,10 @@
 
         private static void _HandleSpeck(ISpeck speck)
         {
+            if (null == speck || string.IsNullOrEmpty(speck.Owner)) return;
+
             // Handle Camera Specks // Admittedly very badly.
-            if (!speck.Payload.Contains("{"))
+            if (speck.Payload?.Contains("{") == true)
             {
                 return;
             }
@@ -39,18 +45,18 @@
             SpeckInstance localSpeck = new SpeckInstance(speck);
             if (!speck.Temporary)
             {
-                LocalCache.Instance.BakeSpeck(localSpeck);
+                CrashDoc.ActiveDoc?.CacheTable?.BakeSpeck(localSpeck);
             }
             else
             {
-                if (speck.LockedBy == User.CurrentUser.Name)
+                if (speck.LockedBy.ToLower() == CrashDoc.ActiveDoc.Users?.CurrentUser?.Name.ToLower())
                 {
-                    LocalCache.Instance.BakeSpeck(localSpeck);
+                    CrashDoc.ActiveDoc.CacheTable?.BakeSpeck(localSpeck);
                 }
                 else
                 {
-                    Document.CrashDoc.ActiveDoc.Users.Add(speck.Owner);
-                    LocalCache.Instance.UpdateSpeck(localSpeck);
+                    CrashDoc.ActiveDoc.Users.Add(speck.Owner);
+                    CrashDoc.ActiveDoc.CacheTable?.UpdateSpeck(localSpeck);
                 }
             }
         }

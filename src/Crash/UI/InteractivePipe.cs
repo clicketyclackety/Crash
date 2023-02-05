@@ -76,11 +76,10 @@ namespace Crash.UI
         /// <param name="e"></param>
         public void PostDrawObjects(object sender, DrawEventArgs e)
         {
-            if (null == LocalCache.Instance) return;
-            if (null == CrashDoc.ActiveDoc) return;
+            if (null == CrashDoc.ActiveDoc?.CacheTable) return;
             bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
 
-            IEnumerable<SpeckInstance> specks = LocalCache.Instance.GetSpecks().OrderBy(s => s.Owner);
+            IEnumerable<SpeckInstance> specks = CrashDoc.ActiveDoc.CacheTable.GetSpecks().OrderBy(s => s.Owner);
             var enumer = specks.GetEnumerator();
 
             while(enumer.MoveNext())

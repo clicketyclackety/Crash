@@ -49,7 +49,7 @@ namespace Crash
         public static SpeckInstance CreateNew(string owner, GeometryBase geometry)
         {
             SerializationOptions options = new SerializationOptions();
-            string payload = geometry?.ToJSON(options);
+            string? payload = geometry?.ToJSON(options);
 
             Speck speck = new Speck(Guid.NewGuid(), owner, payload);
             SpeckInstance instance = new SpeckInstance(speck) { Geometry = geometry };

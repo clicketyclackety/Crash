@@ -19,7 +19,9 @@ namespace Crash
         protected override LoadReturnCode OnLoad(ref string errorMessage)
         {
             new InteractivePipe() { Enabled = true };
-            LocalCache.Instance = new LocalCache();
+
+            Events.EventManagement.RegisterEvents();
+
             return base.OnLoad(ref errorMessage);
         }
 

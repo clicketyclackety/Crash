@@ -1,4 +1,5 @@
 using Crash.Document;
+using Crash.Events;
 using System.Net.NetworkInformation;
 
 namespace Crash.Utilities
@@ -19,6 +20,7 @@ namespace Crash.Utilities
         /// <summary>
         /// local client instance
         /// </summary>
+        [Obsolete("Obsolete!", true)]
         internal static CrashClient? LocalClient { get; set; }
 
         /// <summary>
@@ -27,18 +29,29 @@ namespace Crash.Utilities
         /// <param name="uri">the uri of the client</param>
         public static async Task StartOrContinueLocalClient(Uri uri)
         {
-            if (LocalClient is object) return;
+            if (null == CrashDoc.ActiveDoc) return;
+            if (CrashDoc.ActiveDoc.LocalClient is object) return;
 
-            if (null == User.CurrentUser)
+            string userName = CrashDoc.ActiveDoc?.Users?.CurrentUser?.Name;
+
+            if (string.IsNullOrEmpty(userName))
             {
                 throw new System.Exception("A User has not been assigned!");
             }
 
-            CrashClient client = new CrashClient(User.CurrentUser.Name, uri);
-            LocalClient = client;
-            Events.EventManagement.RegisterEvents();
+            CrashClient client = new CrashClient(userName, uri);
+            CrashDoc.ActiveDoc.LocalClient = client;
 
-            CrashDoc.ActiveDoc = new CrashDoc();
+            // Crash
+            client.OnSelect += CrashSelect.OnSelect;
+            client.OnUnselect += CrashSelect.OnUnSelect;
+
+            client.OnInitialize += CrashInit.OnInit;
+
+            client.OnAdd += CrashDoc.ActiveDoc.CacheTable.OnAdd;
+            client.OnDelete += CrashDoc.ActiveDoc.CacheTable.OnDelete;
+            client.OnDone += CrashDoc.ActiveDoc.CacheTable.CollaboratorIsDone;
+            client.OnCameraChange += CrashDoc.ActiveDoc.CacheTable.OnCameraChange;
 
             // TODO : Check for successful connection
             await client.StartAsync();
@@ -49,13 +62,18 @@ namespace Crash.Utilities
         /// </summary>
         public static async Task CloseLocalClient()
         {
-            Events.EventManagement.DeRegisterEvents();
+            var client = CrashDoc.ActiveDoc?.LocalClient;
+            if (null == client) return;
 
-            if (LocalClient is object)
-                await LocalClient.StopAsync();
+            client.OnAdd -= CrashDoc.ActiveDoc.CacheTable.OnAdd;
+            client.OnDelete -= CrashDoc.ActiveDoc.CacheTable.OnDelete;
+            client.OnDone -= CrashDoc.ActiveDoc.CacheTable.CollaboratorIsDone;
+            client.OnCameraChange -= CrashDoc.ActiveDoc.CacheTable.OnCameraChange;
 
-            LocalClient = null;
-            CrashDoc.ActiveDoc?.Dispose();
+            await client.StopAsync();
+
+            client = null;
+            CrashDoc.ActiveDoc.Dispose();
         }
 
         /// <summary>
@@ -63,7 +81,7 @@ namespace Crash.Utilities
         /// </summary>
         /// <returns>True if active, false otherwise</returns>
         public static bool CheckForActiveClient()
-            => LocalClient is object;
+            => CrashDoc.ActiveDoc?.LocalClient is object;
 
     }
 

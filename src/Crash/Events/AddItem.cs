@@ -1,4 +1,7 @@
-﻿namespace Crash.Events
+﻿using Crash.Document;
+using Crash.Tables;
+
+namespace Crash.Events
 {
     /// <summary>
     /// Add item event handler
@@ -7,19 +10,23 @@
     {
         internal static void Event(object sender, Rhino.DocObjects.RhinoObjectEventArgs e)
         {
-            if (CrashInit.IsInit) return;
-            if (LocalCache.SomeoneIsDone) return;
-            if (null == Tables.UserTable.CurrentUser)
+            if (null == CrashDoc.ActiveDoc?.CacheTable) return;
+
+            if (CrashDoc.ActiveDoc.CacheTable.IsInit) return;
+            if (CrashDoc.ActiveDoc.CacheTable.SomeoneIsDone) return;
+
+            string? userName = CrashDoc.ActiveDoc.Users?.CurrentUser?.Name;
+            if (string.IsNullOrEmpty(userName))
             {
                 Console.WriteLine("Current User is null");
                 return;
             }
 
-            SpeckInstance speck = SpeckInstance.CreateNew(Tables.UserTable.CurrentUser.Name, e.TheObject.Geometry);
-            LocalCache.SyncHost(e.TheObject, speck);
+            SpeckInstance speck = SpeckInstance.CreateNew(userName, e.TheObject.Geometry);
+            CacheTable.SyncHost(e.TheObject, speck);
 
             Speck serverSpeck = new Speck(speck);
-            ClientManager.LocalClient?.Add(serverSpeck);
+            CrashDoc.ActiveDoc?.LocalClient?.Add(serverSpeck);
         }
     }
 }

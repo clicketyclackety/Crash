@@ -18,6 +18,7 @@ namespace Crash.Utilities
     /// </summary>
     public sealed class User
     {
+
         public bool Visible { get; set; } = true;
 
         /// <summary>
@@ -51,19 +52,6 @@ namespace Crash.Utilities
                 Color = Color.FromArgb(hash[0], hash[1], hash[2]);
             }
         }
-
-        /// <summary>
-        /// Current user
-        /// </summary>
-        [Obsolete("User UserTable")]
-        public static User? CurrentUser
-        {
-            get => Tables.UserTable.CurrentUser;
-            set => Tables.UserTable.CurrentUser = value;
-        }
-
-        [Obsolete("User UserTable")]
-        public static string CurrentUserName => CurrentUser is object ? CurrentUser.Name : Environment.UserName;
 
     }
 

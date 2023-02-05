@@ -78,12 +78,13 @@ namespace Crash.UI
         // TODO : Make UI Respond to New Users
         public UsersForm()
         {
-            if (CrashDoc.ActiveDoc is object && ClientManager.LocalClient is object)
+            if (CrashDoc.ActiveDoc?.LocalClient is object)
             {
                 m_users = new ObservableCollection<User>(CrashDoc.ActiveDoc.Users);
                 CrashDoc.ActiveDoc.Users.OnUserAdded += (sender, userEventArgs) => ReDrawForm();
                 CrashDoc.ActiveDoc.Users.OnUserRemoved += (sender, userEventArgs) => ReDrawForm();
-                ClientManager.LocalClient.OnInitialize += (specks) => ReDrawForm();
+                CrashDoc.ActiveDoc.LocalClient.OnInitialize += (specks) => ReDrawForm();
+                RhinoDoc.ActiveDocumentChanged += (sender, docEventArgs) => ReDrawForm();
             }
 
             Maximizable = false;
@@ -194,7 +195,7 @@ namespace Crash.UI
 
         }
 
-        private void Cell_Paint(object sender, DrawableCellPaintEventArgs e)
+        private void Cell_Paint(object sender, CellPaintEventArgs e)
         {
             if (e.Item is not User user) return;
 

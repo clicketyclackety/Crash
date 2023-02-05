@@ -1,4 +1,7 @@
-﻿namespace Crash.Events
+﻿using Crash.Document;
+using Crash.Tables;
+
+namespace Crash.Events
 {
     /// <summary>
     /// Select all items event handler
@@ -7,6 +10,8 @@
     {
         internal static void Event(object sender, Rhino.DocObjects.RhinoDeselectAllObjectsEventArgs e)
         {
+            if (null == CrashDoc.ActiveDoc?.LocalClient) return;
+
             var settings = new Rhino.DocObjects.ObjectEnumeratorSettings()
             {
                 ActiveObjects = true
@@ -16,10 +21,10 @@
             {
                 if (!rhinoObject.IsLocked)
                 {
-                    var speckId = LocalCache.GetSpeckId(rhinoObject);
+                    var speckId = CacheTable.GetSpeckId(rhinoObject);
                     if (null == speckId) continue;
 
-                    ClientManager.LocalClient?.Unselect(speckId.Value);
+                    CrashDoc.ActiveDoc.LocalClient.Unselect(speckId.Value);
                 }
 
             }

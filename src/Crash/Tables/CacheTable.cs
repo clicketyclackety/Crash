@@ -3,18 +3,19 @@ using Rhino.Geometry;
 using Rhino;
 using Crash.Document;
 
-namespace Crash.Utilities
+namespace Crash.Tables
 {
     /// <summary>
     /// Local cache of the collaboration database
     /// </summary>
-    public sealed class LocalCache
+    public sealed class CacheTable
     {
-        public static bool SomeoneIsDone { get; set; }
-        static string SpeckIdKey = "SPECKID";
+        public bool SomeoneIsDone { get; set; }
+        public bool IsInit { get; set; }
+        private static string SpeckIdKey = "SPECKID";
 
         private ConcurrentDictionary<Guid, SpeckInstance> _cache { get; set; }
-        
+
         //                        <SpeckId, RhinoId>
         private ConcurrentDictionary<Guid, Guid> _SpeckToRhino { get; set; }
 
@@ -24,25 +25,25 @@ namespace Crash.Utilities
         /// <summary>
         /// The instance of the local cache
         /// </summary>
-        public static LocalCache Instance { get; set; }
+        [Obsolete("Obsolete", true)]
+        public static CacheTable Instance { get; set; }
 
         /// <summary>
         /// Local cache constructor subscribing to RhinoApp_Idle
         /// </summary>
-        public LocalCache()
+        public CacheTable()
         {
             RhinoApp.Idle += RhinoApp_Idle;
             _cache = new ConcurrentDictionary<Guid, SpeckInstance>();
             _SpeckToRhino = new ConcurrentDictionary<Guid, Guid>();
         }
 
-
-        internal static void Clear()
+        internal void Clear()
         {
-            Instance?.ToBake?.Clear();
-            Instance?.ToRemove?.Clear();
-            Instance?._SpeckToRhino?.Clear();
-            Instance?._cache?.Clear();
+            ToBake?.Clear();
+            ToRemove?.Clear();
+            _SpeckToRhino?.Clear();
+            _cache?.Clear();
         }
 
         #region ConcurrentDictionary Methods
@@ -77,15 +78,17 @@ namespace Crash.Utilities
             return _cache.Values;
         }
 
-        public static RhinoObject GetHost(SpeckInstance speck)
+        public RhinoObject GetHost(SpeckInstance speck)
         {
-            if (!Instance._SpeckToRhino.TryGetValue(speck.Id, out Guid hostId)) return null;
-            return Rhino.RhinoDoc.ActiveDoc.Objects.Find(hostId);
+            if (!_SpeckToRhino.TryGetValue(speck.Id, out Guid hostId)) return null;
+
+            // FIXME : Not a good idea for Mac
+            return RhinoDoc.ActiveDoc.Objects.Find(hostId);
         }
 
-        public static Guid GetHost(Guid speckId)
+        public Guid GetHost(Guid speckId)
         {
-            Instance._SpeckToRhino.TryGetValue(speckId, out Guid hostId);
+            _SpeckToRhino.TryGetValue(speckId, out Guid hostId);
             return hostId;
         }
 
@@ -100,7 +103,7 @@ namespace Crash.Utilities
         {
             if (speck == null) return;
 
-            var _doc = Rhino.RhinoDoc.ActiveDoc;
+            var _doc = RhinoDoc.ActiveDoc;
             GeometryBase geom = speck.Geometry;
             if (null == geom) return;
 
@@ -119,11 +122,11 @@ namespace Crash.Utilities
 
             if (rObj.UserDictionary.TryGetGuid(SpeckIdKey, out var key))
                 return key;
-            
+
             return null;
         }
 
-        public static void SyncHost(RhinoObject rObj, ISpeck speck)
+        public void SyncHost(RhinoObject rObj, ISpeck speck)
         {
             if (null == speck || rObj == null) return;
 
@@ -136,11 +139,11 @@ namespace Crash.Utilities
             rObj.UserDictionary.Set(SpeckIdKey, speck.Id);
 
             // Key/Key
-            if (Instance._SpeckToRhino.ContainsKey(speck.Id))
+            if (_SpeckToRhino.ContainsKey(speck.Id))
             {
-                Instance._SpeckToRhino.TryRemove(speck.Id, out _);
+                _SpeckToRhino.TryRemove(speck.Id, out _);
             }
-            Instance._SpeckToRhino.TryAdd(speck.Id, rObj.Id);
+            _SpeckToRhino.TryAdd(speck.Id, rObj.Id);
         }
 
         /// <summary>
@@ -150,25 +153,27 @@ namespace Crash.Utilities
         internal void BakeSpecks(IEnumerable<SpeckInstance> specks)
         {
             var enumer = specks.GetEnumerator();
-            while(enumer.MoveNext())
+            while (enumer.MoveNext())
             {
                 BakeSpeck(enumer.Current);
             }
-            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
+            RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
         #endregion
 
         #region delete specks
+
         /// <summary>
         /// Delete a speck from rhino
         /// </summary>
         /// <param name="speck">the speck to delete</param>
+        /// This needs to happen in Idle/
         void DeleteSpeck(Guid speckId)
         {
             RemoveSpeck(speckId);
 
-            var _doc = Rhino.RhinoDoc.ActiveDoc;
+            var _doc = RhinoDoc.ActiveDoc;
             Guid hostId = GetHost(speckId);
             RhinoObject rObj = _doc.Objects.Find(hostId);
             if (rObj is object)
@@ -212,7 +217,7 @@ namespace Crash.Utilities
             if (null == specks) return;
 
             var enumer = specks.GetEnumerator();
-            while(enumer.MoveNext())
+            while (enumer.MoveNext())
             {
                 RemoveSpeck(enumer.Current.Id);
             }
@@ -221,6 +226,8 @@ namespace Crash.Utilities
         #endregion
 
         #region events
+
+        // TODO : Move to Idle Queue
         /// <summary>
         /// The speck update events on idle
         /// </summary>
@@ -251,28 +258,28 @@ namespace Crash.Utilities
         /// </summary>
         /// <param name="name">the name </param>
         /// <param name="speck">the speck</param>
-        internal static void OnAdd(string name, ISpeck speck)
+        internal void OnAdd(string name, ISpeck speck)
         {
             if (null == speck) return;
 
-            Document.CrashDoc.ActiveDoc?.Users.Add(speck.Owner);
+            CrashDoc.ActiveDoc?.Users.Add(speck.Owner);
 
             SpeckInstance lSpeck = new SpeckInstance(speck);
-            Instance.UpdateSpeck(lSpeck);
+            UpdateSpeck(lSpeck);
         }
-        
+
         /// <summary>
         /// On delete event. A user has deleted an element elsewhere.
         /// </summary>
         /// <param name="owner">the name</param>
         /// <param name="speckId">speck id</param>
-        internal static void OnDelete(string owner, Guid speckId)
+        internal void OnDelete(string owner, Guid speckId)
         {
             if (Guid.Empty == speckId || string.IsNullOrEmpty(owner)) return;
 
             // SpeckInstance speck = new SpeckInstance(new Speck(speckId, owner, null));
-            Instance.DeleteSpeck(speckId);
-            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
+            DeleteSpeck(speckId);
+            RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
         /// <summary>
@@ -281,7 +288,7 @@ namespace Crash.Utilities
         /// <param name="name">the name</param>
         /// <param name="speckID">the speck id</param>
         /// <param name="speck">the speck</param>
-        internal static void OnUpdate(string name, Guid speckId, SpeckInstance speck)
+        internal void OnUpdate(string name, Guid speckId, SpeckInstance speck)
         {
             if (null == speck ||
                 Guid.Empty == speckId ||
@@ -294,18 +301,20 @@ namespace Crash.Utilities
         /// Collaboration is done event. A user has called the Release command.
         /// </summary>
         /// <param name="name">The name of the collaboration</param>
-        public static void CollaboratorIsDone(string name)
+        public void CollaboratorIsDone(string name)
         {
             if (string.IsNullOrEmpty(name)) return;
+            var cacheTable = CrashDoc.ActiveDoc?.CacheTable;
+            if (null == cacheTable) return;
 
             SomeoneIsDone = true;
             string? sanitisedName = name?.ToLower();
-            IEnumerable<SpeckInstance> ToBake = LocalCache.Instance.GetSpecks()
+            IEnumerable<SpeckInstance> ToBake = cacheTable.GetSpecks()
                                         .Where(s => s.Owner?.ToLower() == sanitisedName)
                                         .Where(s => s is object);
 
-            LocalCache.Instance.BakeSpecks(ToBake);
-            LocalCache.Instance.RemoveSpecks(ToBake);
+            cacheTable.BakeSpecks(ToBake);
+            cacheTable.RemoveSpecks(ToBake);
             SomeoneIsDone = false;
 
             CrashDoc.ActiveDoc?.Users.Remove(name);

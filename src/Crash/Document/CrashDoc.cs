@@ -78,13 +78,16 @@ namespace Crash.Document
             Cameras = new CameraTable();
         }
 
-        public CrashDoc(RhinoDoc doc) : this()
+        public static CrashDoc CreateAndRegisterDocument(RhinoDoc doc)
         {
-            activeDocuments.Remove(doc);
-            activeDocuments.Add(doc, this);
-            ActiveDoc = this;
+            CrashDoc cDoc = new CrashDoc();
+            cDoc.Queue = new IdleQueue();
 
-            Queue = new IdleQueue();
+            activeDocuments.Remove(doc);
+            activeDocuments.Add(doc, cDoc);
+            ActiveDoc = cDoc;
+
+            return cDoc;
         }
 
         internal static CrashDoc CreateHeadless()

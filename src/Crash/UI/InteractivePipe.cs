@@ -20,6 +20,8 @@ namespace Crash.UI
     // and store so much geometry.
     public class InteractivePipe
     {
+        // TODO : Does this ever get shrunk? It should do.
+        // TODO : Don't draw things not in the view port
         private BoundingBox bbox;
 
         private bool enabled { get; set; }
@@ -81,7 +83,7 @@ namespace Crash.UI
             if (null == CrashDoc.ActiveDoc?.CacheTable) return;
             if (null == CrashDoc.ActiveDoc?.Cameras) return;
 
-            bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
+            // bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
 
             IEnumerable<SpeckInstance> specks = CrashDoc.ActiveDoc.CacheTable.GetSpecks().OrderBy(s => s.Owner);
             var enumer = specks.GetEnumerator();

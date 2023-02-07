@@ -68,7 +68,7 @@ namespace Crash.Commands
                 return Result.Nothing;
             }
 
-            new CrashDoc(doc);
+            CrashDoc.CreateAndRegisterDocument(doc);
 
             _CreateCurrentUser(name);
 

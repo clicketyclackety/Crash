@@ -20,7 +20,7 @@ namespace Crash
         {
             new InteractivePipe() { Enabled = true };
 
-            Events.EventManagement.RegisterEvents();
+            Events.RhinoEventManagement.RegisterEvents();
 
             return base.OnLoad(ref errorMessage);
         }

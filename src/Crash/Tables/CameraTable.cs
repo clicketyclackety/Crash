@@ -77,7 +77,7 @@ namespace Crash.Tables
 
             if (user.Camera == CameraState.Follow)
             {
-                EventManagement.currentQueue.AddAction(FollowCamera);
+                RhinoEventManagement.currentQueue.AddAction(FollowCamera);
             }
 
             RhinoDoc.ActiveDoc.Views.Redraw();

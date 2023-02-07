@@ -56,13 +56,13 @@ namespace Crash.Events
                 SpeckInstance localSpeck = new SpeckInstance(speck);
                 if (!speck.Temporary)
                 {
-                    CrashDoc.ActiveDoc?.CacheTable?.BakeSpeck(localSpeck);
+                    CrashDoc.ActiveDoc?.CacheTable?.QueueSpeckBake(localSpeck);
                 }
                 else
                 {
                     if (speck.LockedBy?.ToLower() == CrashDoc.ActiveDoc.Users?.CurrentUser?.Name?.ToLower())
                     {
-                        CrashDoc.ActiveDoc.CacheTable?.BakeSpeck(localSpeck);
+                        CrashDoc.ActiveDoc.CacheTable?.QueueSpeckBake(localSpeck);
                     }
                     else
                     {

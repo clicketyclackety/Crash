@@ -3,6 +3,10 @@ using Rhino.Geometry;
 using Rhino;
 using Crash.Document;
 using System.Collections;
+using SpeckLib;
+using System.Collections.Generic;
+using Crash.Events;
+using Crash.Events.Args;
 
 namespace Crash.Tables
 {
@@ -20,29 +24,17 @@ namespace Crash.Tables
         //                        <SpeckId, RhinoId>
         private ConcurrentDictionary<Guid, Guid> _SpeckToRhino { get; set; }
 
-        private List<SpeckInstance> ToBake = new List<SpeckInstance>();
-        private List<SpeckInstance> ToRemove = new List<SpeckInstance>();
-
-        /// <summary>
-        /// The instance of the local cache
-        /// </summary>
-        [Obsolete("Obsolete", true)]
-        public static CacheTable Instance { get; set; }
-
         /// <summary>
         /// Local cache constructor subscribing to RhinoApp_Idle
         /// </summary>
         public CacheTable()
         {
-            RhinoApp.Idle += RhinoApp_Idle;
             _cache = new ConcurrentDictionary<Guid, SpeckInstance>();
             _SpeckToRhino = new ConcurrentDictionary<Guid, Guid>();
         }
             
         internal void Clear()
         {
-            ToBake?.Clear();
-            ToRemove?.Clear();
             _SpeckToRhino?.Clear();
             _cache?.Clear();
         }
@@ -66,9 +58,6 @@ namespace Crash.Tables
             _cache.TryAdd(speck.Id, speck);
             if (string.IsNullOrEmpty(speck.Owner))
                 return;
-
-            // TODO : View should be redrawn on Update,
-            // but this would make things slow
         }
 
         /// <summary>
@@ -94,30 +83,35 @@ namespace Crash.Tables
             return hostId;
         }
 
-        #endregion
+#endregion
 
-        #region bake specks
+        private void BakeSpeck(EventArgs args)
+        {
+            if (args is not BakeArgs bakeArgs) return;
+
+            GeometryBase? geom = bakeArgs.Geometry;
+            if (null == geom) return;
+
+            Guid id = bakeArgs.Doc.Objects.Add(geom);
+            if (Guid.Empty == id) return;
+
+            RhinoObject rObj = bakeArgs.Doc.Objects.Find(id);
+
+            SyncHost(rObj, bakeArgs.Speck);
+        }
+
         /// <summary>
         /// Bake the specks to rhino
         /// </summary>
         /// <param name="speck">the speck to bake</param>
-        internal void BakeSpeck(SpeckInstance speck)
+        internal void QueueSpeckBake(SpeckInstance speck)
         {
             if (speck == null) return;
 
-            var _doc = RhinoDoc.ActiveDoc;
-            GeometryBase geom = speck.Geometry;
-            if (null == geom) return;
-
-            Guid id = _doc.Objects.Add(geom);
-            if (Guid.Empty == id) return;
-
-            RhinoObject rObj = _doc.Objects.Find(id);
-
-            SyncHost(rObj, speck);
+            var args = new BakeArgs(RhinoDoc.ActiveDoc, speck);
+            CrashDoc.ActiveDoc.Queue.AddAction(new Events.IdleAction(BakeSpeck, args));
         }
 
-        // TODO : Refactor to TryGetSpeckId pattern?
         public static Guid? GetSpeckId(RhinoObject rObj)
         {
             if (rObj == null) return null;
@@ -152,17 +146,15 @@ namespace Crash.Tables
         /// Bake multiple specks to rhino
         /// </summary>
         /// <param name="specks">the enumerable specks to bake</param>
-        internal void BakeSpecks(IEnumerable<SpeckInstance> specks)
+        internal void QueueBakeSpecks(IEnumerable<SpeckInstance> specks)
         {
             var enumer = specks.GetEnumerator();
             while (enumer.MoveNext())
             {
-                BakeSpeck(enumer.Current);
+                QueueSpeckBake(enumer.Current);
             }
             RhinoDoc.ActiveDoc.Views.Redraw();
         }
-
-        #endregion
 
         #region delete specks
 
@@ -171,41 +163,48 @@ namespace Crash.Tables
         /// </summary>
         /// <param name="speck">the speck to delete</param>
         /// This needs to happen in Idle/
-        void DeleteSpeck(Guid speckId)
+        void QueueDeleteSpeck(Guid speckId)
         {
-            RemoveSpeck(speckId);
+            DeCacheSpeck(speckId);
 
-            var _doc = RhinoDoc.ActiveDoc;
-            Guid hostId = GetHost(speckId);
-            RhinoObject rObj = _doc.Objects.Find(hostId);
-            if (rObj is object)
-            {
-                _doc.Objects.Delete(rObj);
-            }
+            // TODO : Don't use ActiveDoc
+            DeleteArgs deleteArgs = new DeleteArgs(RhinoDoc.ActiveDoc, speckId);
+            IdleAction idleAction = new IdleAction(DeleteSpeck, deleteArgs);
+            CrashDoc.ActiveDoc.Queue.AddAction(idleAction);
         }
+
+        private void DeleteSpeck(EventArgs args)
+        {
+            if (args is not DeleteArgs delArgs) return;
+
+            Guid hostId = GetHost(delArgs.SpeckId);
+            delArgs.Doc.Objects.Delete(hostId, true);
+        }
+
         /// <summary>
         /// Delete multiple specks from rhino
         /// </summary>
         /// <param name="specks">the specks to delete</param>
-        void DeleteSpecks(IEnumerable<SpeckInstance> specks)
+        void QueueDeleteSpecks(IEnumerable<SpeckInstance> specks)
         {
             if (null == specks) return;
 
             var enumer = specks.GetEnumerator();
             while (enumer.MoveNext())
             {
-                DeleteSpeck(enumer.Current.Id);
+                QueueDeleteSpeck(enumer.Current.Id);
             }
         }
 
         #endregion
 
         #region Remove Specks
+
         /// <summary>
         /// Remove a speck for the cache
         /// </summary>
         /// <param name="speck">the speck to remove</param>
-        internal void RemoveSpeck(Guid speckId)
+        internal void DeCacheSpeck(Guid speckId)
         {
             _cache.TryRemove(speckId, out _);
         }
@@ -214,41 +213,14 @@ namespace Crash.Tables
         /// Remove multiple specks from the cache
         /// </summary>
         /// <param name="specks">the specks to remove</param>
-        internal void RemoveSpecks(IEnumerable<ISpeck> specks)
+        internal void DeCacheSpecks(IEnumerable<ISpeck> specks)
         {
             if (null == specks) return;
 
             var enumer = specks.GetEnumerator();
             while (enumer.MoveNext())
             {
-                RemoveSpeck(enumer.Current.Id);
-            }
-        }
-
-        #endregion
-
-        #region events
-
-        // TODO : Move to Idle Queue
-        /// <summary>
-        /// The speck update events on idle
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RhinoApp_Idle(object sender, EventArgs e)
-        {
-            if (null == ToBake || null == ToRemove) return;
-
-            if (ToBake.Count > 0)
-            {
-                BakeSpecks(ToBake);
-                ToBake.Clear();
-            }
-
-            if (ToRemove.Count > 0)
-            {
-                DeleteSpecks(ToRemove);
-                ToRemove.Clear();
+                DeCacheSpeck(enumer.Current.Id);
             }
         }
 
@@ -280,7 +252,7 @@ namespace Crash.Tables
             if (Guid.Empty == speckId || string.IsNullOrEmpty(owner)) return;
 
             // SpeckInstance speck = new SpeckInstance(new Speck(speckId, owner, null));
-            DeleteSpeck(speckId);
+            QueueDeleteSpeck(speckId);
             RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
@@ -315,8 +287,8 @@ namespace Crash.Tables
                                         .Where(s => s.Owner?.ToLower() == sanitisedName)
                                         .Where(s => s is object);
 
-            cacheTable.BakeSpecks(ToBake);
-            cacheTable.RemoveSpecks(ToBake);
+            cacheTable.QueueBakeSpecks(ToBake);
+            cacheTable.DeCacheSpecks(ToBake);
             SomeoneIsDone = false;
 
             CrashDoc.ActiveDoc?.Users.Remove(name);

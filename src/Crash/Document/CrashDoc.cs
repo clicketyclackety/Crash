@@ -22,6 +22,7 @@ namespace Crash.Document
 
         // Path will likely never exist
         // For multiple docs does it have to?
+        // TODO : Swap?
         private static Dictionary<RhinoDoc, CrashDoc> activeDocuments;
 
         static CrashDoc()
@@ -68,6 +69,12 @@ namespace Crash.Document
 
         #endregion
 
+        #region Queue
+
+        internal IdleQueue Queue { get; private set; }
+
+        #endregion
+
         #region constructors
 
         private CrashDoc()
@@ -84,6 +91,7 @@ namespace Crash.Document
             ActiveDoc = this;
 
             Pipeline = new InteractivePipe();
+            Queue = new IdleQueue();
         }
 
         internal static CrashDoc CreateHeadless()

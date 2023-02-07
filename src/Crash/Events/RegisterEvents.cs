@@ -8,7 +8,7 @@ namespace Crash.Events
     /// <summary>
     /// THe rhino event manager
     /// </summary>
-    internal static class EventManagement
+    internal static class RhinoEventManagement
 	{
 
 		/// <summary>
@@ -27,23 +27,11 @@ namespace Crash.Events
 			RhinoDoc.DeselectAllObjects += SelectAllItems.Event;
 			RhinoDoc.UndeleteRhinoObject += AddItem.Event;
             RhinoView.Modified += CameraTable.RhinoView_Modified;
-
-			RhinoApp.Idle += RhinoApp_Idle;
         }
 
-		static EventManagement()
+		static RhinoEventManagement()
 		{
-			currentQueue = new IdleQueue();
-        }
 
-		 //TODO : Move this to a real class, static may be okay, but not ideal for Mac.
-
-		internal static IdleQueue currentQueue;
-
-		static int i = 0;
-        private static void RhinoApp_Idle(object sender, EventArgs e)
-        {
-			currentQueue.RunQueue();
         }
 
         /// <summary>
@@ -59,30 +47,5 @@ namespace Crash.Events
         }
 
     }
-
-	internal sealed class IdleQueue
-	{
-		private ConcurrentQueue<Action> actions;
-
-		internal IdleQueue()
-		{
-			actions = new ConcurrentQueue<Action>();
-		}
-
-		internal bool RunQueue()
-		{
-			if (!actions.TryDequeue(out Action action)) return false;
-
-			action.Invoke();
-
-			return actions.Count == 0;
-		}
-
-		internal void AddAction(Action action)
-		{
-			actions.Enqueue(action);
-		}
-
-	}
 
 }

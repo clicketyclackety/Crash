@@ -118,9 +118,9 @@ namespace Crash.UI
             Line viewLine = new Line(camera.Location, viewAngle, length);
 
             Plane cameraFrustrum = new Plane(viewLine.To, viewAngle);
-            Interval heightInterval = new Interval(-width * ratio / 2, width * ratio / 2);
+            // Interval heightInterval = new Interval(-width * ratio / 2, width * ratio / 2);
             Interval widthInterval = new Interval(-height * ratio / 2, height * ratio / 2);
-            Rectangle3d rectangle = new Rectangle3d(cameraFrustrum, widthInterval, heightInterval);
+            Rectangle3d rectangle = new Rectangle3d(cameraFrustrum, widthInterval, widthInterval);
 
             List<Line> lines = new List<Line>(8);
             lines.AddRange(rectangle.ToPolyline().GetSegments());
@@ -130,7 +130,7 @@ namespace Crash.UI
             lines.Add(new Line(camera.Location, rectangle.PointAt(3)));
 
             Interval zInterval = new Interval(0, length);
-            BoundingBox cameraBox = new Box(cameraFrustrum, widthInterval, heightInterval, zInterval).BoundingBox;
+            BoundingBox cameraBox = new Box(cameraFrustrum, widthInterval, widthInterval, zInterval).BoundingBox;
             bbox.Union(cameraBox);
 
             foreach(Line line in lines)

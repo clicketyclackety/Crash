@@ -30,7 +30,6 @@ namespace Crash.Utilities
         public static async Task StartOrContinueLocalClient(Uri uri)
         {
             if (null == CrashDoc.ActiveDoc) return;
-            if (CrashDoc.ActiveDoc.LocalClient is object) return;
 
             string userName = CrashDoc.ActiveDoc?.Users?.CurrentUser?.Name;
 

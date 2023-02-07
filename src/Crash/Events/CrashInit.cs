@@ -17,8 +17,18 @@ namespace Crash.Events
             RhinoApp.WriteLine("Loading specks ...");
 
             CrashDoc.ActiveDoc.CacheTable.IsInit = true;
-            _HandleSpecks(specks);
-            CrashDoc.ActiveDoc.CacheTable.IsInit = false;
+            try
+            {
+                _HandleSpecks(specks);
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                CrashDoc.ActiveDoc.CacheTable.IsInit = false;
+            }
 
             RhinoDoc.ActiveDoc.Views.Redraw();
         }
@@ -28,7 +38,11 @@ namespace Crash.Events
             var enumer = specks.GetEnumerator();
             while(enumer.MoveNext())
             {
-                _HandleSpeck(enumer.Current);
+                try
+                {
+                    _HandleSpeck(enumer.Current);
+                }
+                catch { }
             }
         }
 
@@ -46,13 +60,13 @@ namespace Crash.Events
                 }
                 else
                 {
-                    if (speck.LockedBy.ToLower() == CrashDoc.ActiveDoc.Users?.CurrentUser?.Name.ToLower())
+                    if (speck.LockedBy?.ToLower() == CrashDoc.ActiveDoc.Users?.CurrentUser?.Name?.ToLower())
                     {
                         CrashDoc.ActiveDoc.CacheTable?.BakeSpeck(localSpeck);
                     }
                     else
                     {
-                        CrashDoc.ActiveDoc.Users.Add(speck.Owner);
+                        CrashDoc.ActiveDoc.Users?.Add(speck.Owner);
                         CrashDoc.ActiveDoc.CacheTable?.UpdateSpeck(localSpeck);
                     }
                 }

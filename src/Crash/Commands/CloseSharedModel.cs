@@ -43,8 +43,6 @@ namespace Crash.Commands
             if (choice.Value)
                 client.Done();
 
-            EventManagement.DeRegisterEvents();
-
             CrashDoc.ActiveDoc.Dispose();
 
             _EmptyModel(doc);

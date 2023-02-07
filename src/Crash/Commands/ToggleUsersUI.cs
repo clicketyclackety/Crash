@@ -4,6 +4,7 @@
 namespace Crash.Commands
 {
 
+    [CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
     public sealed class ToggleUsersUI : Command
     {
 

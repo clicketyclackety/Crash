@@ -14,10 +14,10 @@ namespace Crash.Tables
     public sealed class CameraTable : IEnumerable<Camera>
     {
         private const double MINIMUM_DISPLACEMENT = 1000; // What unit?
-        private const double CHANGE_DELAY = 500; // in milliseconds
+        private const double CHANGE_DELAY = 200; // in milliseconds
         private const double FOLLOW_DELAY = 1000; // in milliseconds
 
-        private static DateTime lastChange = DateTime.MinValue;
+        private static DateTime lastChange = DateTime.Now;
         private static Point3d lastLocation = Point3d.Unset;
         private static Point3d lastTarget = Point3d.Unset;
 
@@ -39,9 +39,10 @@ namespace Crash.Tables
             Point3d cameraTarget = view.ActiveViewport.CameraTarget;
             DateTime currentChange = DateTime.UtcNow;
 
+            if ((currentChange - lastChange).TotalMilliseconds < CHANGE_DELAY) return;
+
             // Limit the number of Specks we send
-            if ((currentChange - lastChange).TotalMilliseconds < CHANGE_DELAY ||
-                cameraLocation.DistanceTo(lastLocation) < MINIMUM_DISPLACEMENT ||
+            if (cameraLocation.DistanceTo(lastLocation) < MINIMUM_DISPLACEMENT ||
                 cameraTarget.DistanceTo(lastTarget) < MINIMUM_DISPLACEMENT)
             {
                 lastChange = currentChange;

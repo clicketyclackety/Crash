@@ -24,11 +24,11 @@ namespace Crash.Tables
 
             if (!_users.ContainsKey(user.Name))
             {
-                _users[user.Name] = user;
+                _users.Add(user.Name, user);
                 return true;
             }
 
-            OnUserAdded.Invoke(this, new UserEventArgs(user));
+            OnUserAdded?.Invoke(this, new UserEventArgs(user));
 
             return false;
         }

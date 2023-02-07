@@ -10,10 +10,15 @@ using Crash.Tables;
 
 namespace Crash.UI
 {
+
     /// <summary>
     /// Interactive pipeline for crash geometry display
     /// </summary>
-    public sealed class InteractivePipe
+    // TODO : Make this static, and turn it into a template that just
+    // grabs things from the CrashDoc
+    // There's no need to recreate the same class again and again
+    // and store so much geometry.
+    public class InteractivePipe
     {
         private BoundingBox bbox;
 
@@ -44,10 +49,12 @@ namespace Crash.UI
             }
         }
 
+        public static InteractivePipe Active;
+
         /// <summary>
         /// Empty constructor
         /// </summary>
-        public InteractivePipe()
+        internal InteractivePipe()
         {
             bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
             PipeCameraCache = new Dictionary<Color, Line[]>();
@@ -81,6 +88,8 @@ namespace Crash.UI
 
             while(enumer.MoveNext())
             {
+                if (e.Display.InterruptDrawing()) return;
+
                 SpeckInstance speck = enumer.Current;
 
                 User? user = CrashDoc.ActiveDoc?.Users?.Get(speck.Owner);
@@ -93,6 +102,8 @@ namespace Crash.UI
             Dictionary<string, Camera> ActiveCameras = CrashDoc.ActiveDoc.Cameras.GetActiveCameras();
             foreach (var activeCamera in ActiveCameras)
             {
+                if (e.Display.InterruptDrawing()) return;
+
                 User? user = CrashDoc.ActiveDoc?.Users?.Get(activeCamera.Key);
                 if (user?.Camera != CameraState.Visible) continue;
 
@@ -107,8 +118,6 @@ namespace Crash.UI
         const int thickness = 4;
         private void DrawCamera(DrawEventArgs e, Camera camera, Color userColor)
         {
-            if (e.Display.InterruptDrawing()) return;
-
             PipeCameraCache.Remove(userColor);
             double ratio = 10;
             double length = 5000 * ratio;

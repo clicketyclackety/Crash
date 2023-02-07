@@ -18,7 +18,7 @@ namespace Crash
         /// <inheritdoc />
         protected override LoadReturnCode OnLoad(ref string errorMessage)
         {
-            new InteractivePipe() { Enabled = true };
+            InteractivePipe.Active = new InteractivePipe() { Enabled = true };
 
             Events.RhinoEventManagement.RegisterEvents();
 

@@ -55,12 +55,6 @@ namespace Crash.Document
 
         #endregion
 
-        #region UI
-
-        public readonly InteractivePipe Pipeline;
-
-        #endregion
-
         #region Connectivity
 
         public CrashClient? LocalClient { get; internal set; }
@@ -90,7 +84,6 @@ namespace Crash.Document
             activeDocuments.Add(doc, this);
             ActiveDoc = this;
 
-            Pipeline = new InteractivePipe();
             Queue = new IdleQueue();
         }
 

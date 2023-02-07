@@ -20,6 +20,10 @@ namespace Crash.UI
     // and store so much geometry.
     public class InteractivePipe
     {
+
+        private const int FAR_AWAY = 150_000;
+        private const int VERY_FAR_AWAY = 250_000;
+
         // TODO : Does this ever get shrunk? It should do.
         // TODO : Don't draw things not in the view port
         private BoundingBox bbox;
@@ -183,6 +187,19 @@ namespace Crash.UI
             if (cachedMaterial.Diffuse != color)
             {
                 cachedMaterial = new DisplayMaterial(color);
+            }
+
+            BoundingBox bbox = speck.Geometry.GetBoundingBox(false);
+            double distanceTo = e.Viewport.CameraLocation.DistanceTo(bbox.Center);
+            
+            if (distanceTo > VERY_FAR_AWAY)
+            {
+                return;
+            }
+            if (distanceTo > FAR_AWAY)
+            {
+                e.Display.DrawBox(bbox, color, 1);
+                return;
             }
 
             try

@@ -11,7 +11,6 @@ namespace Crash.Events
         internal static void Event(object sender, Rhino.DocObjects.RhinoObjectEventArgs e)
         {
             if (null == CrashDoc.ActiveDoc?.CacheTable) return;
-
             if (CrashDoc.ActiveDoc.CacheTable.IsInit) return;
             if (CrashDoc.ActiveDoc.CacheTable.SomeoneIsDone) return;
 

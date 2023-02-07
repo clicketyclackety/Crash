@@ -38,7 +38,7 @@ namespace Crash.UI
     internal class UsersForm : Form
     {
         private GridView m_grid;
-        private ObservableCollection<User> m_users { get; set; }
+        private ObservableCollection<User>? m_users { get; set; }
         internal static Crash.UI.UsersForm? ActiveForm { get; set; }
 
         internal static void ToggleFormVisibility()
@@ -83,11 +83,12 @@ namespace Crash.UI
 
         private void ReDrawEvent(ISpeck[] specks) => ReDrawForm();
 
-        // TODO : Make UI Respond to New Users
         public UsersForm()
         {
             m_users = new ObservableCollection<User>(CrashDoc.ActiveDoc.Users);
             RhinoDoc.ActiveDocumentChanged += ReDrawEvent;
+            // https://discourse.mcneel.com/t/are-eto-modeless-forms-supported-on-rhino-8-mac/154337/2?u=csykes
+            RhinoDoc.ActiveDocumentChanged += RhinoDoc_ActiveDocumentChanged;
 
             if (CrashDoc.ActiveDoc is object)
             {
@@ -206,6 +207,20 @@ namespace Crash.UI
                 }
             };
 
+        }
+
+        private void RhinoDoc_ActiveDocumentChanged(object sender, DocumentEventArgs e)
+        {
+            if (CrashDoc.ActiveDoc.Users is object)
+            {
+                m_users = new ObservableCollection<User>(CrashDoc.ActiveDoc.Users);
+            }
+            else
+            {
+                m_users = null;
+            }
+
+            ReDrawForm();
         }
 
         private void Cell_Paint(object sender, CellPaintEventArgs e)

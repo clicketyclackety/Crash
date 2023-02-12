@@ -41,7 +41,7 @@ namespace Crash
         /// <param name="isMac">Is the given OS Mac?</param>
         /// <param name="errorMessage">The error, if nay</param>
         /// <returns>True on success, false otherwise</returns>
-        public bool Start(string url, bool isMac, out string errorMessage)
+        public bool Start(string url, out string errorMessage)
         {
             errorMessage = "Server Started Successfully";
 
@@ -53,7 +53,7 @@ namespace Crash
             
             try
             {   
-                string serverExecutable = getServerExecutablePath(isMac);
+                string serverExecutable = getServerExecutablePath();
                 createAndRegisterServerProcess(serverExecutable, url);
                 return true;
             }
@@ -88,30 +88,18 @@ namespace Crash
             return processes.All(p => null == p || p.HasExited);
         }
 
-        private string getServerExecutablePath(bool isMac)
+        private string getServerExecutablePath()
         {
             var currentPath = Path.GetDirectoryName(typeof(CrashServer).Assembly.Location);
-            string serverExecutable;
-            string os = getOS(isMac);
-            
-            serverExecutable = Path.Combine(currentPath, "Server", os, $"{ProcessName}.exe");
+            string[] serverExes = Directory.GetFiles(currentPath, $"{ProcessName}.exe", SearchOption.AllDirectories);
 
-            if (!File.Exists(serverExecutable))
+            if (null == serverExes || serverExes.Length == 0)
             {
                 throw new FileNotFoundException("Could not find Server Eexcutable!");
             }
 
+            string serverExecutable = serverExes.FirstOrDefault();
             return serverExecutable;
-        }
-
-        private string getOS(bool isMac)
-        {
-            if (!isMac) return "win-x64";
-
-            if (RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
-                return "osx-arm64";
-            
-            return "osx-x64";
         }
 
         // https://stackoverflow.com/questions/4291912/process-start-how-to-get-the-output

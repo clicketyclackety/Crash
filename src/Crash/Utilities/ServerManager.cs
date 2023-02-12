@@ -27,7 +27,7 @@ namespace Crash.Utilities
             CrashDoc.ActiveDoc.LocalServer?.Stop();
             CrashDoc.ActiveDoc.LocalServer = new CrashServer();
 
-            bool result = CrashDoc.ActiveDoc.LocalServer.Start(url, Rhino.Runtime.HostUtils.RunningOnOSX, out string resultMessage);
+            bool result = CrashDoc.ActiveDoc.LocalServer.Start(url, out string resultMessage);
 
 
             Rhino.RhinoApp.WriteLine(resultMessage);

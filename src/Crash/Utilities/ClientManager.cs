@@ -1,4 +1,4 @@
-using Crash.Document;
+﻿using Crash.Document;
 using Crash.Events;
 using System.Net.NetworkInformation;
 
@@ -8,7 +8,7 @@ namespace Crash.Utilities
     /// <summary>
     /// The request manager
     /// </summary>
-    public static class ClientManager
+    public sealed class ClientManager
     {
         public const string CrashPath = "Crash";
         public static string LastUrl = "http://localhost";
@@ -17,17 +17,13 @@ namespace Crash.Utilities
         public static int LastPort = 5000;
         public static Uri ClientUri => new Uri($"{UrlAndPort}/{CrashPath}");
 
-        /// <summary>
-        /// local client instance
-        /// </summary>
-        [Obsolete("Obsolete!", true)]
-        internal static CrashClient? LocalClient { get; set; }
+        private CrashDoc crashDoc;
 
         /// <summary>
         /// Method to load the client
         /// </summary>
         /// <param name="uri">the uri of the client</param>
-        public static async Task StartOrContinueLocalClient(Uri uri)
+        public async Task StartOrContinueLocalClient(Uri uri)
         {
             if (null == CrashDoc.ActiveDoc) return;
 
@@ -39,18 +35,17 @@ namespace Crash.Utilities
             }
 
             CrashClient client = new CrashClient(userName, uri);
-            CrashDoc.ActiveDoc.LocalClient = client;
+            crashDoc.LocalClient = client;
 
             // Crash
-            client.OnSelect += CrashSelect.OnSelect;
-            client.OnUnselect += CrashSelect.OnUnSelect;
+            client.OnSelect += CrashSelect.OnLock;
+            client.OnUnselect += CrashSelect.OnUnLock;
 
-            client.OnInitialize += CrashInit.OnInit;
-
-            client.OnAdd += CrashDoc.ActiveDoc.CacheTable.OnAdd;
-            client.OnDelete += CrashDoc.ActiveDoc.CacheTable.OnDelete;
-            client.OnDone += CrashDoc.ActiveDoc.CacheTable.CollaboratorIsDone;
-            client.OnCameraChange += CrashDoc.ActiveDoc.Cameras.OnCameraChange;
+            client.OnInitialize += Init;
+            client.OnAdd += crashDoc.CacheTable.OnAdd;
+            client.OnDelete += crashDoc.CacheTable.OnDelete;
+            client.OnDone += crashDoc.CacheTable.CollaboratorIsDone;
+            client.OnCameraChange += crashDoc.Cameras.OnCameraChange;
 
             // TODO : Check for successful connection
             await client.StartAsync();
@@ -59,20 +54,20 @@ namespace Crash.Utilities
         /// <summary>
         /// Closes the local Client
         /// </summary>
-        public static async Task CloseLocalClient()
+        public async Task CloseLocalClient()
         {
-            var client = CrashDoc.ActiveDoc?.LocalClient;
+            var client = crashDoc?.LocalClient;
             if (null == client) return;
 
-            client.OnAdd -= CrashDoc.ActiveDoc.CacheTable.OnAdd;
-            client.OnDelete -= CrashDoc.ActiveDoc.CacheTable.OnDelete;
-            client.OnDone -= CrashDoc.ActiveDoc.CacheTable.CollaboratorIsDone;
-            client.OnCameraChange -= CrashDoc.ActiveDoc.Cameras.OnCameraChange;
+            client.OnAdd -= crashDoc.CacheTable.OnAdd;
+            client.OnDelete -= crashDoc.CacheTable.OnDelete;
+            client.OnDone -= crashDoc.CacheTable.CollaboratorIsDone;
+            client.OnCameraChange -= crashDoc.Cameras.OnCameraChange;
 
             await client.StopAsync();
 
             client = null;
-            CrashDoc.ActiveDoc.Dispose();
+            crashDoc.Dispose();
         }
 
         /// <summary>
@@ -80,7 +75,95 @@ namespace Crash.Utilities
         /// </summary>
         /// <returns>True if active, false otherwise</returns>
         public static bool CheckForActiveClient()
-            => CrashDoc.ActiveDoc?.LocalClient is object;
+            => crashDoc?.LocalClient is object;
+
+        private void Init(IEnumerable<ISpeck> specks)
+        {
+            crashDoc.LocalClient.OnInitialize -= Init;
+
+            RhinoApp.WriteLine("Loading specks ...");
+
+            crashDoc.CacheTable.IsInit = true;
+            try
+            {
+                _HandleSpecks(specks);
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                crashDoc.CacheTable.IsInit = false;
+            }
+        }
+
+        internal void OnLock(string name, Guid speckId)
+        {
+            if (null == crashDoc?.CacheTable) return;
+
+            var _doc = crashDoc.HostRhinoDoc;
+            Guid rObjId = crashDoc.CacheTable.GetHost(speckId);
+            if (Guid.Empty == rObjId) return;
+
+            _doc.Objects.Lock(rObjId, true);
+            _doc.Views.Redraw();
+        }
+
+        internal void OnUnLock(string name, Guid speckId)
+        {
+            if (null == crashDoc?.CacheTable) return;
+
+            var _doc = crashDoc.HostRhinoDoc;
+            Guid rObjId = crashDoc.CacheTable.GetHost(speckId);
+            if (Guid.Empty == rObjId) return;
+
+            _doc.Objects.Unlock(rObjId, true);
+            _doc.Views.Redraw();
+        }
+
+        private void _HandleSpecks(IEnumerable<ISpeck> specks)
+        {
+            var enumer = specks.GetEnumerator();
+            while (enumer.MoveNext())
+            {
+                try
+                {
+                    _HandleSpeck(enumer.Current);
+                }
+                catch { }
+            }
+        }
+
+        private void _HandleSpeck(ISpeck speck)
+        {
+            if (null == speck || string.IsNullOrEmpty(speck.Owner)) return;
+
+            // Handle Camera Specks // Admittedly very badly.
+            if (speck.Payload?.Contains('{') == true)
+            {
+                SpeckInstance localSpeck = new SpeckInstance(speck);
+                if (!speck.Temporary)
+                {
+                    crashDoc?.CacheTable?.QueueSpeckBake(localSpeck);
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(speck.LockedBy) ||
+                        speck.LockedBy.ToLower() == CrashDoc.ActiveDoc.Users?.CurrentUser?.Name?.ToLower())
+                    {
+                        crashDoc.CacheTable?.QueueSpeckBake(localSpeck);
+                    }
+                    else
+                    {
+                        crashDoc.Users?.Add(speck.Owner);
+                        crashDoc.CacheTable?.UpdateSpeck(localSpeck);
+                    }
+                }
+            }
+
+        }
+
 
     }
 

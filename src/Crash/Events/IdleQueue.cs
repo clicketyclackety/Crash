@@ -1,30 +1,33 @@
-﻿namespace Crash.Events
+﻿using Crash.Document;
+
+namespace Crash.Events
 {
 
     public sealed class IdleQueue : IDisposable
 	{
 		private ConcurrentQueue<IdleAction> idleQueue;
 
-		internal IdleQueue()
+        private CrashDoc hostDoc;
+
+        internal IdleQueue(CrashDoc hostDoc)
 		{
+			this.hostDoc = hostDoc;
 			idleQueue = new ConcurrentQueue<IdleAction>();
             RhinoApp.Idle += CallIdle;
 		}
 
         private void CallIdle(object sender, EventArgs e)
         {
-			idleQueue.TryDequeue(out IdleAction action);
+			if (!idleQueue.TryDequeue(out IdleAction action)) return;
+			
 			action.Invoke();
+
+			// Only runs after a queue is finished
+            if (idleQueue.Count == 0)
+			{
+                hostDoc.Redraw();
+			}
         }
-
-        internal bool RunQueue()
-		{
-			if (!idleQueue.TryDequeue(out IdleAction action)) return false;
-
-			action.Invoke();
-
-			return idleQueue.Count == 0;
-		}
 
 		internal void AddAction(IdleAction action)
 		{

@@ -26,9 +26,8 @@ namespace Crash.UI
             this.Speck = speck;
         }
 
-        public static CameraSpeck CreateNew(Camera camera)
+        public static CameraSpeck CreateNew(Camera camera, string userName)
         {
-            string userName = CrashDoc.ActiveDoc?.Users?.CurrentUser?.Name;
             ISpeck cameraSpeck = new Speck(Guid.NewGuid(), userName, camera.ToJSON());
             return new CameraSpeck(cameraSpeck);
         }

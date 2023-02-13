@@ -21,8 +21,8 @@ namespace Crash.UI
     public class InteractivePipe
     {
 
-        private const int FAR_AWAY = 150_000;
-        private const int VERY_FAR_AWAY = 250_000;
+        private readonly int FAR_AWAY;
+        private readonly int VERY_FAR_AWAY;
 
         // TODO : Does this ever get shrunk? It should do.
         // TODO : Don't draw things not in the view port
@@ -65,6 +65,12 @@ namespace Crash.UI
             bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
             PipeCameraCache = new Dictionary<Color, Line[]>();
             Enabled = true;
+
+            double scale = RhinoMath.UnitScale(UnitSystem.Meters, RhinoDoc.ActiveDoc.ModelUnitSystem);
+            FAR_AWAY = (int) scale * 15_000;
+            double scale = RhinoMath.UnitScale(UnitSystem.Meters, crashDoc.HostRhinoDoc.ModelUnitSystem);
+            FAR_AWAY = (int)scale * 15_000;
+            VERY_FAR_AWAY = (int)scale * 75_000;
         }
 
         /// <summary>

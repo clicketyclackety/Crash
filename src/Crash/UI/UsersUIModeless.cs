@@ -90,6 +90,7 @@ namespace Crash.UI
             // https://discourse.mcneel.com/t/are-eto-modeless-forms-supported-on-rhino-8-mac/154337/2?u=csykes
             RhinoDoc.ActiveDocumentChanged += RhinoDoc_ActiveDocumentChanged;
 
+            // Intentional
             if (CrashDoc.ActiveDoc is object)
             {
                 CrashDoc.ActiveDoc.Users.OnUserAdded += ReDrawEvent;

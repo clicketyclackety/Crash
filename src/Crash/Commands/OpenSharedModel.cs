@@ -12,7 +12,7 @@ namespace Crash.Commands
     public sealed class OpenSharedModel : Command
     {
 
-        private RhinoDoc _rDoc;
+        private RhinoDoc rhinoDoc;
 
         /// <summary>
         /// Default Constructor
@@ -31,7 +31,7 @@ namespace Crash.Commands
         /// <inheritdoc />
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            _rDoc = doc;
+            rhinoDoc = doc;
 
             // Check Crash Doc
             if (ClientManager.CheckForActiveClient())
@@ -66,11 +66,12 @@ namespace Crash.Commands
                 return Result.Nothing;
             }
 
-            new CrashDoc(doc);
-            _CreateCurrentUser(name);
+            CrashDoc crashDoc = CrashDoc.CreateAndRegisterDocument(doc);
+            _CreateCurrentUser(crashDoc, name);
 
             // TODO : Ensure Requested Server is available, and notify if not
-            Task.Run( () => ClientManager.StartOrContinueLocalClient(ClientManager.ClientUri));
+            ClientManager clientManager = new ClientManager();
+            clientManager.StartOrContinueLocalClient(ClientManager.ClientUri).ConfigureAwait(false);
 
             UsersForm.ToggleFormVisibility();
 
@@ -115,10 +116,10 @@ namespace Crash.Commands
         private bool _GetServerURL(ref string url)
             => CommandUtils.GetValidString("Server URL", ref url);
 
-        private void _CreateCurrentUser(string name)
+        private void _CreateCurrentUser(CrashDoc crashDoc, string name)
         {
             User user = new User(name);
-            CrashDoc.ActiveDoc.Users.CurrentUser = user;
+            crashDoc.Users.CurrentUser = user;
         }
 
     }

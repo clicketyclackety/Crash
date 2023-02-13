@@ -13,11 +13,13 @@ namespace Crash.Tables
     /// <summary>
     /// Local cache of the collaboration database
     /// </summary>
-    public sealed class CacheTable : IEnumerable<SpeckInstance>
+    public sealed class ChangeTable : IEnumerable<SpeckInstance>
     {
         public bool SomeoneIsDone { get; set; }
         public bool IsInit { get; set; }
         private static string SpeckIdKey = "SPECKID";
+
+        private CrashDoc crashDoc;
 
         private ConcurrentDictionary<Guid, SpeckInstance> _cache { get; set; }
 
@@ -27,10 +29,11 @@ namespace Crash.Tables
         /// <summary>
         /// Local cache constructor subscribing to RhinoApp_Idle
         /// </summary>
-        public CacheTable()
+        public ChangeTable(CrashDoc hostDoc)
         {
             _cache = new ConcurrentDictionary<Guid, SpeckInstance>();
             _SpeckToRhino = new ConcurrentDictionary<Guid, Guid>();
+            this.crashDoc = hostDoc;
         }
             
         internal void Clear()
@@ -73,8 +76,7 @@ namespace Crash.Tables
         {
             if (!_SpeckToRhino.TryGetValue(speck.Id, out Guid hostId)) return null;
 
-            // FIXME : Not a good idea for Mac
-            return RhinoDoc.ActiveDoc.Objects.Find(hostId);
+            return crashDoc.HostRhinoDoc.Objects.Find(hostId);
         }
 
         public Guid GetHost(Guid speckId)
@@ -108,8 +110,8 @@ namespace Crash.Tables
         {
             if (speck == null) return;
 
-            var args = new BakeArgs(RhinoDoc.ActiveDoc, speck);
-            CrashDoc.ActiveDoc.Queue.AddAction(new Events.IdleAction(BakeSpeck, args));
+            var args = new BakeArgs(crashDoc.HostRhinoDoc, speck);
+            crashDoc.Queue.AddAction(new Events.IdleAction(BakeSpeck, args));
         }
 
         public static Guid? GetSpeckId(RhinoObject rObj)
@@ -153,7 +155,7 @@ namespace Crash.Tables
             {
                 QueueSpeckBake(enumer.Current);
             }
-            RhinoDoc.ActiveDoc.Views.Redraw();
+            crashDoc.Redraw();
         }
 
         #region delete specks
@@ -168,9 +170,9 @@ namespace Crash.Tables
             DeCacheSpeck(speckId);
 
             // TODO : Don't use ActiveDoc
-            DeleteArgs deleteArgs = new DeleteArgs(RhinoDoc.ActiveDoc, speckId);
+            DeleteArgs deleteArgs = new DeleteArgs(crashDoc.HostRhinoDoc, speckId);
             IdleAction idleAction = new IdleAction(DeleteSpeck, deleteArgs);
-            CrashDoc.ActiveDoc.Queue.AddAction(idleAction);
+            crashDoc.Queue.AddAction(idleAction);
         }
 
         private void DeleteSpeck(EventArgs args)
@@ -236,7 +238,7 @@ namespace Crash.Tables
         {
             if (null == speck) return;
 
-            CrashDoc.ActiveDoc?.Users.Add(speck.Owner);
+            crashDoc.Users.Add(speck.Owner);
 
             SpeckInstance lSpeck = new SpeckInstance(speck);
             UpdateSpeck(lSpeck);
@@ -253,7 +255,7 @@ namespace Crash.Tables
 
             // SpeckInstance speck = new SpeckInstance(new Speck(speckId, owner, null));
             QueueDeleteSpeck(speckId);
-            RhinoDoc.ActiveDoc.Views.Redraw();
+            crashDoc.Redraw();
         }
 
         /// <summary>
@@ -278,7 +280,7 @@ namespace Crash.Tables
         public void CollaboratorIsDone(string name)
         {
             if (string.IsNullOrEmpty(name)) return;
-            var cacheTable = CrashDoc.ActiveDoc?.CacheTable;
+            var cacheTable = crashDoc.CacheTable;
             if (null == cacheTable) return;
 
             SomeoneIsDone = true;
@@ -291,8 +293,8 @@ namespace Crash.Tables
             cacheTable.DeCacheSpecks(ToBake);
             SomeoneIsDone = false;
 
-            CrashDoc.ActiveDoc?.Users.Remove(name);
-            RhinoDoc.ActiveDoc.Views.Redraw();
+            crashDoc.Users.Remove(name);
+            crashDoc.Redraw();
         }
 
         public IEnumerator<SpeckInstance> GetEnumerator() => _cache.Values.GetEnumerator();

@@ -1,4 +1,5 @@
-﻿using Crash.Utilities;
+﻿using Crash.Document;
+using Crash.Utilities;
 using System.Collections;
 
 
@@ -11,11 +12,14 @@ namespace Crash.Tables
 
         private readonly Dictionary<string, User> _users;
 
-        public User CurrentUser;
+        private CrashDoc crashDoc;
 
-        public UserTable()
+        public User CurrentUser { get; set; }
+
+        public UserTable(CrashDoc hostDoc)
         {
             _users = new Dictionary<string, User>();
+            this.crashDoc = hostDoc;
         }
 
         public bool Add(User user)

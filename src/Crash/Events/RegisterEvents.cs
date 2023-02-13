@@ -1,6 +1,7 @@
-﻿using Crash.Tables;
+﻿using Crash.Document;
+using Crash.Tables;
 using Rhino.Display;
-using Rhino.Geometry;
+
 
 namespace Crash.Events
 {
@@ -14,18 +15,12 @@ namespace Crash.Events
 		/// <summary>
 		/// Register events
 		/// </summary>
-		internal static void RegisterEvents()
+		internal static void RegisterStaticEvents()
 		{
 			// Remove all events first just in case.
-			DeRegisterEvents();
+			DeRegisterStaticEvents();
 
 			// Rhino
-			RhinoDoc.AddRhinoObject += AddItem.Event;
-			RhinoDoc.DeleteRhinoObject += RemoveItem.Event;
-			RhinoDoc.SelectObjects += SelectItem.Event;
-			RhinoDoc.DeselectObjects += SelectItem.Event;
-			RhinoDoc.DeselectAllObjects += SelectAllItems.Event;
-			RhinoDoc.UndeleteRhinoObject += AddItem.Event;
             RhinoView.Modified += CameraTable.RhinoView_Modified;
         }
 
@@ -37,13 +32,9 @@ namespace Crash.Events
         /// <summary>
         /// De register events
         /// </summary>
-        internal static void DeRegisterEvents()
+        internal static void DeRegisterStaticEvents()
 		{
-			RhinoDoc.AddRhinoObject -= AddItem.Event;
-			RhinoDoc.DeleteRhinoObject -= RemoveItem.Event;
-			RhinoDoc.SelectObjects -= SelectItem.Event;
-			RhinoDoc.DeselectObjects -= SelectItem.Event;
-			RhinoDoc.DeselectAllObjects -= SelectAllItems.Event;
+			RhinoView.Modified -= CameraTable.RhinoView_Modified;
         }
 
     }

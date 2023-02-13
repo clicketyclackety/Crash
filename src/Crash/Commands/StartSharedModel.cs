@@ -18,7 +18,8 @@ namespace Crash.Commands
     [CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
     public sealed class StartSharedModel : Command
     {
-        private RhinoDoc _rDoc;
+        private RhinoDoc rhinoDoc;
+        private CrashDoc crashDoc;
 
         private bool includePreExistingGeometry = false;
 
@@ -41,9 +42,9 @@ namespace Crash.Commands
         /// <inheritdoc />
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            _rDoc = doc;
+            rhinoDoc = doc;
 
-            if (ClientManager.CheckForActiveClient() || ServerManager.CheckForActiveServer())
+            if (ClientManager.CheckForActiveClient() || ServerManager.CheckForActiveServer(CrashDoc.ActiveDoc))
             {
                 string closeCommand = CloseSharedModel.Instance.EnglishName;
                 RhinoApp.WriteLine("You are currently part of a Shared Model Session. " +
@@ -68,7 +69,7 @@ namespace Crash.Commands
                 return Result.Nothing;
             }
 
-            CrashDoc.CreateAndRegisterDocument(doc);
+            CrashDoc crashDoc = CrashDoc.CreateAndRegisterDocument(doc);
 
             _CreateCurrentUser(name);
 
@@ -78,8 +79,8 @@ namespace Crash.Commands
             }
 
             // Start Server Host
-            CrashServer.OnConnected += Server_OnConnected;
-            CrashServer.OnFailure += Server_OnFailure;
+            crashDoc.LocalServer.OnConnected += Server_OnConnected;
+            crashDoc.LocalServer.OnFailure += Server_OnFailure;
 
             while(!ServerManager.StartOrContinueLocalServer($"{ServerManager.DefaultURL}:{ServerManager.LastPort}"))
             {
@@ -159,9 +160,11 @@ namespace Crash.Commands
         private void Server_OnConnected(object sender, EventArgs e)
         {
             CrashServer.OnConnected -= Server_OnConnected;
+
+            ClientManager clientManager = new ClientManager();
             try
             {
-                ClientManager.StartOrContinueLocalClient(ClientManager.ClientUri);
+                clientManager.StartOrContinueLocalClient(ClientManager.ClientUri).ConfigureAwait(false);
 
                 if (includePreExistingGeometry)
                     AddPreExistingGeometry();
@@ -221,7 +224,7 @@ namespace Crash.Commands
         private void _CreateCurrentUser(string name)
         {
             User user = new User(name);
-            CrashDoc.ActiveDoc.Users.CurrentUser = user;
+            crashDoc.Users.CurrentUser = user;
         }
 
     }

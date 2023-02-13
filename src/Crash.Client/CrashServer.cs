@@ -228,8 +228,8 @@ namespace Crash
         #endregion  
 
 
-        public static event EventHandler? OnConnected;
-        public static event EventHandler? OnFailure;
+        public event EventHandler? OnConnected;
+        public event EventHandler? OnFailure;
 
     }
 }

@@ -9,38 +9,10 @@ using Crash.Document;
 using System.Collections;
 using Microsoft.VisualStudio.Threading;
 using System.Threading;
+using Crash.Common.Collections;
 
 namespace Crash.Tables
 {
-
-    public sealed class FixedSizedQueue<T> : IReadOnlyCollection<T>
-    {
-        private readonly Queue<T> _queue;
-
-        public readonly int Size;
-
-        public FixedSizedQueue(int size)
-        {
-            Size = size;
-            _queue = new Queue<T>();
-        }
-
-        public void Enqueue(T item)
-        {
-            if (_queue.Count >= Size)
-            {
-                _queue.Dequeue();
-            }
-
-            _queue.Enqueue(item);
-        }
-
-        public int Count => _queue.Count;
-
-        public IEnumerator<T> GetEnumerator() => _queue.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => _queue.GetEnumerator();
-    }
 
     public sealed class CameraTable : IEnumerable<Camera>
     {
@@ -173,7 +145,7 @@ namespace Crash.Tables
             cameraTargetRail = rails.Item2;
         }
 
-        internal Dictionary<string, Camera> GetActiveCameras()
+        public Dictionary<string, Camera> GetActiveCameras()
         {
             return cameraLocations.ToDictionary(cl => cl.Key, cl => cl.Value.FirstOrDefault());
         }

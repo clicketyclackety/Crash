@@ -68,7 +68,6 @@ namespace Crash.UI
 
             double scale = RhinoMath.UnitScale(UnitSystem.Meters, RhinoDoc.ActiveDoc.ModelUnitSystem);
             FAR_AWAY = (int) scale * 15_000;
-            double scale = RhinoMath.UnitScale(UnitSystem.Meters, crashDoc.HostRhinoDoc.ModelUnitSystem);
             FAR_AWAY = (int)scale * 15_000;
             VERY_FAR_AWAY = (int)scale * 75_000;
         }

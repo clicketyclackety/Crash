@@ -34,6 +34,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\CrashCommon\Crash.Common.csproj" />
     <ProjectReference Include="..\Crash.Client\Crash.Client.csproj" />
     <ProjectReference Include="..\SpeckLib\SpeckLib.csproj" />
   </ItemGroup>

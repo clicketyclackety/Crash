@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Crash.Common.View;
 using Crash.Geometry;
 
@@ -19,13 +20,13 @@ namespace Crash.Common.Serialization
 				throw new JsonException();
 			}
 
-			if (reader.Read() && reader.TryGetDouble(out double locationX) &&
-				reader.Read() && reader.TryGetDouble(out double locationY) &&
-				reader.Read() && reader.TryGetDouble(out double locationZ) &&
-
-				reader.Read() && reader.TryGetDouble(out double targetX) &&
+			if (reader.Read() && reader.TryGetDouble(out double targetX) &&
 				reader.Read() && reader.TryGetDouble(out double targetY) &&
 				reader.Read() && reader.TryGetDouble(out double targetZ) &&
+
+				reader.Read() && reader.TryGetDouble(out double locationX) &&
+				reader.Read() && reader.TryGetDouble(out double locationY) &&
+				reader.Read() && reader.TryGetDouble(out double locationZ) &&
 
 				reader.Read() && reader.TryGetInt64(out long ticks) &&
 

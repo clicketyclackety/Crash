@@ -46,8 +46,8 @@ namespace Crash.Common.Tests.Validity
 			}
 		}
 
-		[TestCaseSource(typeof(InvalidValues), nameof(InvalidValues.TestCases))]
-		public bool IsNotValid(params double[] mValues)
+		[TestCaseSource(typeof(InvalidTransformValues), nameof(InvalidValues.TestCases))]
+		public bool IsNotValid(double[] mValues)
 		{
 			CTransform transform = new CTransform(mValues);
 			return transform.IsValid();

@@ -94,9 +94,7 @@ namespace Crash.Geometry
 				!values.Any(v =>
 				{
 					return double.IsNaN(v) ||
-						double.IsInfinity(v) ||
-						double.IsNegativeInfinity(v) ||
-						double.IsPositiveInfinity(v);
+						   double.IsInfinity(v);
 				});
 
 		}

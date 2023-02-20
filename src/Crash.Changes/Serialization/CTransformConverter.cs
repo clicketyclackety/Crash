@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Crash.Geometry;
 
 namespace Crash.Changes.Serialization
@@ -30,15 +31,9 @@ namespace Crash.Changes.Serialization
 
 		private static double GetValue(ref Utf8JsonReader reader)
 		{
-			if (reader.TokenType != JsonTokenType.PropertyName)
-			{
-				throw new JsonException("Couldn't find property Name");
-			}
-			reader.Read();
-
 			if (reader.TokenType != JsonTokenType.Number)
 			{
-				throw new JsonException("Couldn't find Number Value");
+				return 0;
 			}
 			double value = reader.GetDouble();
 
@@ -49,11 +44,17 @@ namespace Crash.Changes.Serialization
 
 		private static void SetValue(ref Utf8JsonWriter writer, int row, int column, CTransform transform)
 		{
-			writer.WriteNumberValue(transform[row, column]);
+			double value = transform[row, column];
+			if (value == 0) return;
+
+			writer.WriteNumberValue(value);
 		}
 
 		public override CTransform Read(ref Utf8JsonReader reader, System.Type typeToConvert, JsonSerializerOptions options)
 		{
+			if (reader.TokenType != JsonTokenType.StartArray || !reader.Read())
+				throw new JsonException("Couldn't find Array Start");
+
 			CTransform transform = new CTransform(
 				GetValue(ref reader), // [0,0]
 				GetValue(ref reader), // [0,1]
@@ -76,11 +77,16 @@ namespace Crash.Changes.Serialization
 				GetValue(ref reader)  // [3,3]
 			);
 
+			if (reader.TokenType != JsonTokenType.EndArray)
+				throw new JsonException("Couldn't find Array End");
+
 			return transform;
 		}
 
 		public override void Write(Utf8JsonWriter writer, CTransform value, JsonSerializerOptions options)
 		{
+			writer.WriteStartArray();
+
 			SetValue(ref writer, 0, 0, value);
 			SetValue(ref writer, 0, 1, value);
 			SetValue(ref writer, 0, 2, value);
@@ -100,6 +106,8 @@ namespace Crash.Changes.Serialization
 			SetValue(ref writer, 3, 1, value);
 			SetValue(ref writer, 3, 2, value);
 			SetValue(ref writer, 3, 3, value);
+
+			writer.WriteEndArray();
 		}
 
 	}

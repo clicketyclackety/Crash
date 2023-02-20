@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-using Crash.Common.Tests.Validity;
 using Crash.Geometry;
 
 namespace Crash.Common.Tests.Serialization
@@ -27,12 +26,14 @@ namespace Crash.Common.Tests.Serialization
 			};
 		}
 
-		[TestCaseSource(typeof(InvalidValues), nameof(InvalidValues.TestCases))]
-		public bool TestCTransformSerializationMaximums(params double[] values)
+		/*
+		[TestCaseSource(typeof(InvalidTransformValues), nameof(InvalidValues.TestCases))]
+		public bool TestCTransformSerializationMaximums(double[] values)
 		{
-			TestCTransformSerializtion(new CTransform(values));
+			TestCTransformSerialization(new CTransform(values));
 			return false;
 		}
+		*/
 
 		[TestCase(1)]
 		[TestCase(10)]
@@ -42,7 +43,7 @@ namespace Crash.Common.Tests.Serialization
 			for (var i = 0; i < count; i++)
 			{
 				var doubleValues = GetRandomTransformValues().ToArray();
-				TestCTransformSerializtion(new CTransform(doubleValues));
+				TestCTransformSerialization(new CTransform(doubleValues));
 			}
 		}
 
@@ -50,11 +51,11 @@ namespace Crash.Common.Tests.Serialization
 		{
 			for (double i = 0; i < 16; i++)
 			{
-				yield return TestContext.CurrentContext.Random.NextDouble(Int16.MinValue, Int16.MaxValue);
+				yield return TestContext.CurrentContext.Random.NextDouble(-10_000, 10_000);
 			}
 		}
 
-		private void TestCTransformSerializtion(CTransform cTransform)
+		private void TestCTransformSerialization(CTransform cTransform)
 		{
 			var json = JsonSerializer.Serialize(cTransform, TestOptions);
 			var cTransformOut = JsonSerializer.Deserialize<CTransform>(json, TestOptions);

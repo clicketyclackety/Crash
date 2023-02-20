@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using Crash.Document;
+using Crash.Common.Document;
 using Crash.Events;
 using Crash.Properties;
 using Crash.Tables;
@@ -81,7 +81,7 @@ namespace Crash.UI
 
         private void ReDrawEvent(object sender, EventArgs e) => ReDrawForm();
 
-        private void ReDrawEvent(ISpeck[] specks) => ReDrawForm();
+        private void ReDrawEvent(IChange[] Changes) => ReDrawForm();
 
         public UsersForm()
         {

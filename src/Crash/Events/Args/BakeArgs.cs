@@ -1,4 +1,5 @@
-﻿using Rhino.Geometry;
+﻿using Crash.Common.Changes;
+using Rhino.Geometry;
 
 namespace Crash.Events.Args
 {
@@ -7,14 +8,14 @@ namespace Crash.Events.Args
     {
 
         internal readonly RhinoDoc Doc;
-        internal GeometryBase? Geometry => Speck?.Geometry;
-        internal readonly SpeckInstance Speck;
+        internal GeometryBase? Geometry => Change?.Geometry;
+        internal readonly GeometryChange Change;
 
 
-        public BakeArgs(RhinoDoc rdoc, SpeckInstance speck)
+        public BakeArgs(RhinoDoc rdoc, GeometryChange Change)
         {
             Doc = rdoc;
-            Speck = speck;
+            Change = Change;
         }
 
     }

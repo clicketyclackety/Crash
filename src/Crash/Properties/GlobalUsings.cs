@@ -6,7 +6,7 @@ global using System;
 
 global using Rhino;
 
-global using SpeckLib;
+global using Crash.Changes;
 
 global using Crash.Utilities;
 global using Crash.UI;

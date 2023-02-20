@@ -1,4 +1,6 @@
-﻿using Crash.Document;
+﻿using Crash.Client;
+using Crash.Common.Changes;
+using Crash.Common.Document;
 using Crash.Events;
 using System.Net.NetworkInformation;
 
@@ -77,16 +79,16 @@ namespace Crash.Utilities
         public static bool CheckForActiveClient()
             => crashDoc?.LocalClient is object;
 
-        private void Init(IEnumerable<ISpeck> specks)
+        private void Init(IEnumerable<Common.Changes.ICachedChange> Changes)
         {
             crashDoc.LocalClient.OnInitialize -= Init;
 
-            RhinoApp.WriteLine("Loading specks ...");
+            RhinoApp.WriteLine("Loading Changes ...");
 
             crashDoc.CacheTable.IsInit = true;
             try
             {
-                _HandleSpecks(specks);
+                _HandleChanges(Changes);
             }
             catch
             {
@@ -98,66 +100,66 @@ namespace Crash.Utilities
             }
         }
 
-        internal void OnLock(string name, Guid speckId)
+        internal void OnLock(string name, Guid ChangeId)
         {
             if (null == crashDoc?.CacheTable) return;
 
             var _doc = crashDoc.HostRhinoDoc;
-            Guid rObjId = crashDoc.CacheTable.GetHost(speckId);
+            Guid rObjId = crashDoc.CacheTable.GetHost(ChangeId);
             if (Guid.Empty == rObjId) return;
 
             _doc.Objects.Lock(rObjId, true);
             _doc.Views.Redraw();
         }
 
-        internal void OnUnLock(string name, Guid speckId)
+        internal void OnUnLock(string name, Guid ChangeId)
         {
             if (null == crashDoc?.CacheTable) return;
 
             var _doc = crashDoc.HostRhinoDoc;
-            Guid rObjId = crashDoc.CacheTable.GetHost(speckId);
+            Guid rObjId = crashDoc.CacheTable.GetHost(ChangeId);
             if (Guid.Empty == rObjId) return;
 
             _doc.Objects.Unlock(rObjId, true);
             _doc.Views.Redraw();
         }
 
-        private void _HandleSpecks(IEnumerable<ISpeck> specks)
+        private void _HandleChanges(IEnumerable<Common.Changes.ICachedChange> Changes)
         {
-            var enumer = specks.GetEnumerator();
+            var enumer = Changes.GetEnumerator();
             while (enumer.MoveNext())
             {
                 try
                 {
-                    _HandleSpeck(enumer.Current);
+                    _HandleChange(enumer.Current);
                 }
                 catch { }
             }
         }
 
-        private void _HandleSpeck(ISpeck speck)
+        private void _HandleChange(Common.Changes.ICachedChange Change)
         {
-            if (null == speck || string.IsNullOrEmpty(speck.Owner)) return;
+            if (null == Change || string.IsNullOrEmpty(Change.Owner)) return;
 
-            // Handle Camera Specks // Admittedly very badly.
-            if (speck.Payload?.Contains('{') == true)
+            // Handle Camera Changes // Admittedly very badly.
+            if (Change.Payload?.Contains('{') == true)
             {
-                SpeckInstance localSpeck = new SpeckInstance(speck);
-                if (!speck.Temporary)
+                GeometryChange localChange = new ChangeInstance(Change);
+                if (!Change.Temporary)
                 {
-                    crashDoc?.CacheTable?.QueueSpeckBake(localSpeck);
+                    crashDoc?.CacheTable?.QueueChangeBake(localChange);
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(speck.LockedBy) ||
-                        speck.LockedBy.ToLower() == CrashDoc.ActiveDoc.Users?.CurrentUser?.Name?.ToLower())
+                    if (string.IsNullOrEmpty(Change.LockedBy) ||
+                        Change.LockedBy.ToLower() == CrashDoc.ActiveDoc.Users?.CurrentUser?.Name?.ToLower())
                     {
-                        crashDoc.CacheTable?.QueueSpeckBake(localSpeck);
+                        crashDoc.CacheTable?.QueueChangeBake(localChange);
                     }
                     else
                     {
-                        crashDoc.Users?.Add(speck.Owner);
-                        crashDoc.CacheTable?.UpdateSpeck(localSpeck);
+                        crashDoc.Users?.Add(Change.Owner);
+                        crashDoc.CacheTable?.UpdateChange(localChange);
                     }
                 }
             }

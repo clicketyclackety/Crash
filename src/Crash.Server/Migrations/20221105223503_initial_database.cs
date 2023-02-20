@@ -10,7 +10,7 @@ namespace Crash.Server.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Specks",
+                name: "Changes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -22,14 +22,14 @@ namespace Crash.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Specks", x => x.Id);
+                    table.PrimaryKey("PK_Changes", x => x.Id);
                 });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Specks");
+                name: "Changes");
         }
     }
 }

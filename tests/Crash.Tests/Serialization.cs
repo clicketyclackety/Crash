@@ -4,9 +4,9 @@ using System.Linq;
 using System;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Crash.UI;
 using Rhino.Geometry;
-using Crash.Utilities;
+using Crash.Common.Document;
+using Crash.Common.Changes;
 
 namespace Crash.Tests
 {

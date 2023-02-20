@@ -1,4 +1,5 @@
-﻿using Crash.Document;
+﻿using Crash.Client;
+using Crash.Common.Document;
 
 namespace Crash.Utilities
 {

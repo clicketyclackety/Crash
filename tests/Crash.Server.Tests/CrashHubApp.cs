@@ -1,12 +1,13 @@
-﻿using Crash.Server;
+﻿using Crash.Client;
+using Crash.Server;
 using Crash.Server.Model;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using SpeckLib;
+using Crash.Changes;
 
-namespace Crash.Tests
+namespace Crash.Server.Tests
 {
 
     public sealed class CrashHubApp : WebApplicationFactory<Program>
@@ -15,7 +16,7 @@ namespace Crash.Tests
         {
             var root = new InMemoryDatabaseRoot();
 
-            string[] args = new string[]
+            var args = new string[]
             {
                 "--urls ", "http://0.0.0.0:54625",
             };
@@ -45,7 +46,7 @@ namespace Crash.Tests
         public async Task StartServer()
         {
             var application = new CrashHubApp();
-            HttpClient serverClient = application.CreateClient();
+            var serverClient = application.CreateClient();
 
             var resp = await serverClient.GetAsync(url);
             resp.EnsureSuccessStatusCode();
@@ -55,18 +56,18 @@ namespace Crash.Tests
         public async Task GetAdd_Test()
         {
             var application = new CrashHubApp();
-            HttpClient server = application.CreateClient();
+            var server = application.CreateClient();
             await server.GetAsync(url);
 
-            Uri uri = new Uri(url);
-            CrashClient crashClient = new CrashClient(Environment.UserName, uri);
+            var uri = new Uri(url);
+            var crashClient = new CrashClient(Environment.UserName, uri);
 
             ;
             await crashClient.StartAsync();
 
 
-            Speck speck = new Speck(Guid.NewGuid(), Environment.UserName, "Example Payload");
-            crashClient.Add(speck);
+            var Change = new Change(Guid.NewGuid(), Environment.UserName, "Example Payload");
+            crashClient.Add(Change);
 
             ;
 
@@ -75,16 +76,16 @@ namespace Crash.Tests
         [TestMethod]
         public async Task Integration_Test()
         {
-            CrashServer server = new CrashServer();
-            Assert.IsTrue(server.Start(url, out string errorMessage));
+            var server = new CrashServer();
+            Assert.IsTrue(server.Start(url, out var errorMessage));
             Assert.IsTrue(errorMessage.Contains("Success"));
 
-            CrashClient client = new CrashClient(Environment.UserName, new Uri(url));
+            var client = new CrashClient(Environment.UserName, new Uri(url));
             await client.StartAsync();
 
-            Speck speck = new Speck(Guid.NewGuid(), Environment.UserName, "Example Payload");
+            var Change = new Change(Guid.NewGuid(), Environment.UserName, "Example Payload");
             ;
-            await client.Add(speck);
+            await client.Add(Change);
         }
 
     }

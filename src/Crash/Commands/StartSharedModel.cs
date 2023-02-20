@@ -7,7 +7,9 @@ using Rhino.Geometry;
 using Rhino.Input;
 using Rhino;
 using Crash.Tables;
-using Crash.Document;
+using Crash.Common.Changes;
+using Crash.Client;
+using Crash.Common.Document;
 
 namespace Crash.Commands
 {
@@ -114,8 +116,8 @@ namespace Crash.Commands
             while(enumer.MoveNext())
             {
                 GeometryBase geom = enumer.Current.Geometry;
-                SpeckInstance speck = SpeckInstance.CreateNew(user, geom);
-                cDoc.CacheTable?.UpdateSpeck(speck);
+                GeometryChange Change = GeometryChange.CreateNew(user, geom);
+                cDoc.CacheTable?.UpdateChange(Change);
             }
         }
 

@@ -1,0 +1,70 @@
+﻿using System.Text.Json.Serialization;
+using Crash.Changes.Serialization;
+
+namespace Crash.Geometry
+{
+
+	/// <summary>
+	/// A Transformation Matrix.
+	/// </summary>
+	[JsonConverter(typeof(CTransformConverter))]
+	public struct CTransform
+	{
+
+		private double[][] Transforms;
+
+		public static CTransform Unset => new CTransform() { Transforms = GetUniformMatrix(double.NaN) };
+
+		/// <summary>
+		/// Defaults to 0 for all values.
+		/// </summary>
+		public CTransform()
+		{
+			Transforms = GetUniformMatrix(0);
+		}
+
+		public CTransform(double m00 = 0, double m01 = 0, double m02 = 0, double m03 = 0,
+						 double m10 = 0, double m11 = 0, double m12 = 0, double m13 = 0,
+						 double m20 = 0, double m21 = 0, double m22 = 0, double m23 = 0,
+						 double m30 = 0, double m31 = 0, double m32 = 0, double m33 = 0)
+			: this()
+		{
+			Transforms[0][0] = m00;
+			Transforms[0][1] = m01;
+			Transforms[0][2] = m02;
+			Transforms[0][3] = m03;
+			Transforms[1][0] = m10;
+			Transforms[1][1] = m11;
+			Transforms[1][2] = m12;
+			Transforms[1][3] = m13;
+			Transforms[2][0] = m20;
+			Transforms[2][1] = m21;
+			Transforms[2][2] = m22;
+			Transforms[2][3] = m23;
+			Transforms[3][0] = m30;
+			Transforms[3][1] = m31;
+			Transforms[3][2] = m32;
+			Transforms[3][3] = m33;
+		}
+
+		private static double[][] GetUniformMatrix(double value)
+		{
+			var matrix = new double[][]
+			{
+					new double[4] { value, value, value, value },
+					new double[4] { value, value, value, value },
+					new double[4] { value, value, value, value },
+					new double[4] { value, value, value, value },
+			};
+			return matrix;
+		}
+
+		public double this[int row, int column]
+		{
+			get => Transforms[row][column];
+			set => Transforms[row][column] = value;
+		}
+
+	}
+
+}

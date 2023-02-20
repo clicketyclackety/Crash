@@ -1,6 +1,6 @@
 ﻿using Rhino.Commands;
 using Rhino;
-using Crash.Document;
+using Crash.Common.Document;
 
 namespace Crash.Commands
 {

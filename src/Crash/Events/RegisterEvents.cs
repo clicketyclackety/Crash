@@ -1,5 +1,5 @@
-﻿using Crash.Document;
-using Crash.Tables;
+﻿using Crash.Common.Tables;
+using Crash.Document;
 using Rhino.Display;
 
 
@@ -35,6 +35,11 @@ namespace Crash.Events
         internal static void DeRegisterStaticEvents()
 		{
 			RhinoView.Modified -= CameraTable.RhinoView_Modified;
+        }
+
+        internal static void RegisterDocumentEvents(CrashDoc crashDoc)
+        {
+
         }
 
     }

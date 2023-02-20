@@ -45,7 +45,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<AdditionalFiles Include="..\..\.editorconfig"  />
+		<AdditionalFiles Include="..\..\.editorconfig" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -62,10 +62,11 @@
 	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
 	  <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.2" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.10" />
+	  <PackageReference Include="System.Text.Json" Version="7.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SpeckLib\SpeckLib.csproj" />
+    <ProjectReference Include="..\Crash.Changes\Crash.Changes.csproj" />
   </ItemGroup>
 
 </Project>

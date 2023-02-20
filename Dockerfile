@@ -8,7 +8,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /
 COPY ["src/Crash.Server/Crash.Server.csproj", "src/Crash.Server/"]
-COPY ["src/SpeckLib/SpeckLib.csproj", "src/SpeckLib/"]
+COPY ["src/Crash.Changes/Crash.Changes.csproj", "src/Crash.Changes/"]
 RUN dotnet restore "src/Crash.Server/Crash.Server.csproj"
 COPY . .
 WORKDIR "/src/Crash.Server"

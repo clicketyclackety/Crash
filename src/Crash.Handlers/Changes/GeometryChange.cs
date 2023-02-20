@@ -1,0 +1,70 @@
+﻿using System;
+using Crash.Common.Events;
+using Rhino.FileIO;
+using Rhino.Geometry;
+using Rhino.Runtime;
+
+namespace Crash.Common.Changes
+{
+
+	/// <summary>
+	/// Local instance of a received Change.
+	/// </summary>
+	public struct GeometryChange : ICachedChange
+	{
+		IChange Change { get; set; }
+
+		public GeometryBase Geometry { get; private set; }
+
+		public Guid BakdId { get; set; }
+
+		public DateTime Stamp => Change.Stamp;
+
+		public Guid Id => Change.Id;
+
+		public string? Owner => Change.Owner;
+
+		public string? Payload => Change.Payload;
+
+		public int Action
+		{
+			get => Change.Action;
+			[Obsolete("For Deserialization only", true)]
+			set => Change.Action = value;
+		}
+
+
+		public GeometryChange()
+		{
+
+		}
+
+		public GeometryChange(IChange Change)
+		{
+			Change = Change;
+			var options = new SerializationOptions();
+			GeometryBase? geometry = CommonObject.FromJSON(Change.Payload) as GeometryBase;
+			Geometry = geometry;
+		}
+
+		public static GeometryChange CreateNew(string owner, GeometryBase geometry)
+		{
+			var options = new SerializationOptions();
+			string? payload = geometry?.ToJSON(options);
+
+			var Change = new Change(Guid.NewGuid(), owner, payload);
+			var instance = new GeometryChange(Change) { Geometry = geometry };
+
+			return instance;
+		}
+
+
+		public Action<CrashEventArgs> Draw { get; set; }
+
+		public Action<CrashEventArgs> AddToDocument { get; set; }
+
+		public Action<CrashEventArgs> RemoveFromDocument { get; set; }
+
+
+	}
+}

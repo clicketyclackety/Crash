@@ -10,10 +10,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Text.Json" Version="7.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Crash.Client\Crash.Client.csproj" />
+    <ProjectReference Include="..\..\src\Crash.Common\Crash.Common.csproj" />
   </ItemGroup>
 
 </Project>

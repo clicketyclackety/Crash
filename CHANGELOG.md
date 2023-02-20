@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 - Close Shared Model Command
 
 ### Changed
-- Specks are better implemented
+- Changes are better implemented
 
 ### Fixed
 - Undo/Redo is supported now

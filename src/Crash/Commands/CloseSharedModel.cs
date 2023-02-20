@@ -3,7 +3,8 @@ using Rhino;
 
 using Crash.Events;
 using Crash.Tables;
-using Crash.Document;
+using Crash.Client;
+using Crash.Common.Document;
 
 namespace Crash.Commands
 {

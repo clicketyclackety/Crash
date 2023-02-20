@@ -1,4 +1,4 @@
-﻿using Crash.Document;
+﻿using Crash.Common.Document;
 using Rhino.Commands;
 
 
@@ -6,7 +6,7 @@ namespace Crash.Commands
 {
 
     /// <summary>
-    /// Command to Release Specks
+    /// Command to Release Changes
     /// </summary>
     [CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
     public sealed class ReleaseCommand : Command

@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 
 using Crash.Common.View;
+using Crash.Geometry;
 
 namespace Crash.Changes.Tests.Serialization
 {
@@ -26,13 +27,6 @@ namespace Crash.Changes.Tests.Serialization
 			};
 		}
 
-		[TestCase(double.NaN, double.NaN, double.NaN)]
-		[TestCase(double.MaxValue, double.MinValue, double.NaN)]
-		public void TestCameraSerializationMaximums(double x, double y, double z)
-		{
-			TestCameraSerializtion(new Camera(x, y, z));
-		}
-
 		[TestCase(1)]
 		[TestCase(10)]
 		[TestCase(100)]
@@ -40,10 +34,25 @@ namespace Crash.Changes.Tests.Serialization
 		{
 			for (var i = 0; i < count; i++)
 			{
-				var x = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
-				var y = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
-				var z = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
-				TestCameraSerializtion(new Camera(x, y, z));
+				var xLocation = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
+				var yLocation = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
+				var zLocation = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
+				CPoint location = new CPoint(xLocation, yLocation, zLocation);
+
+				var xTarget = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
+				var yTarget = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
+				var zTarget = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
+				CPoint target = new CPoint(xTarget, yTarget, zTarget);
+
+				long ticks = TestContext.CurrentContext.Random.NextLong(DateTime.MinValue.Ticks, DateTime.MaxValue.Ticks);
+				DateTime time = new DateTime(ticks);
+
+				Camera camera = new Camera(location, target)
+				{
+					Time = time
+				};
+
+				TestCameraSerializtion(camera);
 			}
 		}
 
@@ -51,9 +60,8 @@ namespace Crash.Changes.Tests.Serialization
 		{
 			var json = JsonSerializer.Serialize(Camera, TestOptions);
 			var CameraOut = JsonSerializer.Deserialize<Camera>(json, TestOptions);
-			Assert.That(Camera.X, Is.EqualTo(CameraOut.X));
-			Assert.That(Camera.Y, Is.EqualTo(CameraOut.Y));
-			Assert.That(Camera.Z, Is.EqualTo(CameraOut.Z));
+			Assert.That(Camera, Is.EqualTo(CameraOut));
+			Assert.That(Camera.Time, Is.EqualTo(CameraOut.Time));
 		}
 
 	}

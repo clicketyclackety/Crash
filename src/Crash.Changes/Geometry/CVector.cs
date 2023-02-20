@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+
 using Crash.Changes.Serialization;
 
 namespace Crash.Geometry
@@ -38,6 +39,7 @@ namespace Crash.Geometry
 
 		public override int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode();
 
+		public override string ToString() => $"{X},{Y},{Z}";
 
 		public static implicit operator CVector(CPoint p) => new CVector(p.X, p.Y, p.Z);
 

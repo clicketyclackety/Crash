@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using Crash.Common.Tests.Validity;
 using Crash.Geometry;
 
 namespace Crash.Common.Tests.Serialization
@@ -26,11 +27,11 @@ namespace Crash.Common.Tests.Serialization
 			};
 		}
 
-		[TestCase(double.NaN, double.NaN, double.NaN)]
-		[TestCase(double.MaxValue, double.MinValue, double.NaN)]
-		public void TestCTransformSerializationMaximums(double x, double y, double z)
+		[TestCaseSource(typeof(InvalidValues), nameof(InvalidValues.TestCases))]
+		public bool TestCTransformSerializationMaximums(params double[] values)
 		{
-			TestCTransformSerializtion(new CTransform(x, y, z));
+			TestCTransformSerializtion(new CTransform(values));
+			return false;
 		}
 
 		[TestCase(1)]
@@ -40,10 +41,16 @@ namespace Crash.Common.Tests.Serialization
 		{
 			for (var i = 0; i < count; i++)
 			{
-				var x = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
-				var y = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
-				var z = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
-				TestCTransformSerializtion(new CTransform(x, y, z));
+				var doubleValues = GetRandomTransformValues().ToArray();
+				TestCTransformSerializtion(new CTransform(doubleValues));
+			}
+		}
+
+		private IEnumerable<double> GetRandomTransformValues()
+		{
+			for (double i = 0; i < 16; i++)
+			{
+				yield return TestContext.CurrentContext.Random.NextDouble(Int16.MinValue, Int16.MaxValue);
 			}
 		}
 
@@ -51,9 +58,15 @@ namespace Crash.Common.Tests.Serialization
 		{
 			var json = JsonSerializer.Serialize(cTransform, TestOptions);
 			var cTransformOut = JsonSerializer.Deserialize<CTransform>(json, TestOptions);
-			Assert.That(cTransform.X, Is.EqualTo(cTransformOut.X));
-			Assert.That(cTransform.Y, Is.EqualTo(cTransformOut.Y));
-			Assert.That(cTransform.Z, Is.EqualTo(cTransformOut.Z));
+
+			var cDoublesEnumer = cTransform.GetEnumerator();
+			var cDoublesOutEnumer = cTransformOut.GetEnumerator();
+			while (cDoublesEnumer.MoveNext() &
+				  cDoublesOutEnumer.MoveNext())
+			{
+				Assert.That(cDoublesEnumer.Current, Is.EqualTo(cDoublesOutEnumer.Current));
+			}
+
 		}
 
 	}

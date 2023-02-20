@@ -47,7 +47,7 @@ namespace Crash.Common.Tests.Validity
 		}
 
 		[TestCaseSource(typeof(InvalidValues), nameof(InvalidValues.TestCases))]
-		public bool IsNotValid(double[] mValues)
+		public bool IsNotValid(params double[] mValues)
 		{
 			CTransform transform = new CTransform(mValues);
 			return transform.IsValid();
@@ -61,10 +61,10 @@ namespace Crash.Common.Tests.Validity
 		{
 			get
 			{
-				yield return new TestCaseData(new CPoint(0, 0, 0), new CPoint(0, 0, 0), DateTime.Now).Returns(false);
-				yield return new TestCaseData(CPoint.Unset, CPoint.Unset, DateTime.MaxValue).Returns(false);
-				yield return new TestCaseData(CPoint.Unset, CPoint.Unset, DateTime.MinValue).Returns(false);
-				yield return new TestCaseData(CPoint.Origin, new CPoint(1, 2, 3), DateTime.MinValue).Returns(false);
+				yield return new TestCaseData(new double[] { double.MinValue }).Returns(false);
+				yield return new TestCaseData(new double[] { double.MaxValue }).Returns(false);
+				yield return new TestCaseData(new double[] { double.NaN }).Returns(false);
+				yield return new TestCaseData(new double[] { double.NaN, double.MaxValue }).Returns(false);
 			}
 		}
 	}

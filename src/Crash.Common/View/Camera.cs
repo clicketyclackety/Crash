@@ -8,7 +8,7 @@ namespace Crash.Common.View
 
 	// TODO : Unit Test serialization
 	[JsonConverter(typeof(CameraConverter))]
-	public struct Camera
+	public struct Camera : IEquatable<Camera>
 	{
 
 		public CPoint Location { get; set; }
@@ -28,6 +28,21 @@ namespace Crash.Common.View
 			=> Location != Target &&
 			Time > DateTime.MinValue &&
 			Time < DateTime.MaxValue;
+
+		public override int GetHashCode() => Location.GetHashCode() ^ Target.GetHashCode();
+
+		public override bool Equals(object obj)
+		{
+			if (obj is not Camera camera) return false;
+			return Equals(camera);
+		}
+
+		public bool Equals(Camera other)
+			=> this.Location == other.Location &&
+			   this.Target == other.Target;
+
+		public override string ToString()
+			=> $"Camera {Location}/{Target}";
 
 	}
 

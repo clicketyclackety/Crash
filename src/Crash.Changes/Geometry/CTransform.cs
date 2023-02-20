@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 using Crash.Changes.Serialization;
@@ -10,7 +12,7 @@ namespace Crash.Geometry
 	/// A Transformation Matrix.
 	/// </summary>
 	[JsonConverter(typeof(CTransformConverter))]
-	public struct CTransform
+	public struct CTransform : IEnumerable<double>
 	{
 
 		private double[][] Transforms;
@@ -56,7 +58,13 @@ namespace Crash.Geometry
 			{
 				for (int col = 0; col < 4; col++)
 				{
+					int colValue = (row + 1) * (col + 1);
+					if (col == 0 && row == col)
+						colValue = 0;
 
+					if (colValue >= mValues.Length) return;
+
+					Transforms[row][col] = mValues[colValue];
 				}
 			}
 		}
@@ -93,6 +101,9 @@ namespace Crash.Geometry
 
 		}
 
-	}
+		public IEnumerator<double> GetEnumerator() => Transforms.SelectMany(v => v).GetEnumerator();
 
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+	}
 }

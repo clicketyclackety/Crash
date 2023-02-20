@@ -1,13 +1,15 @@
-﻿namespace Crash.Events
+﻿using Crash.Common.Events;
+
+namespace Crash.Events
 {
-    public sealed class IdleAction
+	public sealed class IdleAction
 	{
 
-		Action<EventArgs> _action;
+		Action<CrashEventArgs> _action;
 
-		EventArgs _args;
+		CrashEventArgs _args;
 
-		public IdleAction(Action<EventArgs> action, EventArgs args)
+		public IdleAction(Action<CrashEventArgs> action, CrashEventArgs args)
 		{
 			_action = action;
 			_args = args;

@@ -20,8 +20,4 @@
     <ProjectReference Include="..\..\src\Crash.Common\Crash.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Serialization\" />
-  </ItemGroup>
-
 </Project>

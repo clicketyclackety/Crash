@@ -1,7 +1,10 @@
-﻿using Crash.Client;
+﻿using System.Runtime.CompilerServices;
+
+using Crash.Client;
 using Crash.Common.Tables;
 using Crash.Events;
 
+[assembly: InternalsVisibleTo("Crash.Common.Tests")]
 namespace Crash.Common.Document
 {
 
@@ -20,10 +23,11 @@ namespace Crash.Common.Document
 		#endregion
 
 		#region Connectivity
+		// TODO : Change set?
 
-		public CrashClient? LocalClient { get; internal set; }
+		public CrashClient? LocalClient { get; set; }
 
-		public CrashServer? LocalServer { get; internal set; }
+		public CrashServer? LocalServer { get; set; }
 
 		#endregion
 
@@ -58,6 +62,14 @@ namespace Crash.Common.Document
 			if (null == other) return false;
 			return this.id == other.id;
 		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj is not CrashDoc other) return false;
+			return Equals(other);
+		}
+
+		public override int GetHashCode() => id.GetHashCode();
 
 		#endregion
 

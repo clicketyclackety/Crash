@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+
 using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Events;
@@ -38,7 +39,7 @@ namespace Crash.Common.Tables
 		/// </summary>
 		/// <param name="cache">the Changes</param>
 		/// <returns>returns the update task</returns>
-		public async Task UpdateChange(ICachedChange cache)
+		public async Task UpdateChangeAsync(ICachedChange cache)
 		{
 			if (cache == null) return;
 
@@ -65,7 +66,7 @@ namespace Crash.Common.Tables
 		/// Remove multiple Changes from the cache
 		/// </summary>
 		/// <param name="Changes">the Changes to remove</param>
-		internal void RemoveChanges(IEnumerable<global::IChange> Changes)
+		internal void RemoveChanges(IEnumerable<IChange> Changes)
 		{
 			if (null == Changes) return;
 
@@ -74,6 +75,19 @@ namespace Crash.Common.Tables
 			{
 				RemoveChange(enumer.Current.Id);
 			}
+		}
+
+		public bool TryGetValue<T>(Guid id, out T change) where T : ICachedChange
+		{
+			if (_cache.TryGetValue(id, out ICachedChange cachedChange) &&
+				cachedChange is T changeConverted)
+			{
+				change = changeConverted;
+				return true;
+			}
+
+			change = default(T);
+			return false;
 		}
 
 		#endregion
@@ -105,6 +119,8 @@ namespace Crash.Common.Tables
 		{
 			throw new NotImplementedException();
 		}
+
+		public IEnumerator<T> GetEnumerator<T>() => _cache.Values.Where(x => x is T).Cast<T>().GetEnumerator();
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{

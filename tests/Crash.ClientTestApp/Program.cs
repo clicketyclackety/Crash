@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Crash.Client;
 
 namespace Crash.ClientTestApp
@@ -29,14 +30,14 @@ namespace Crash.ClientTestApp
 				Console.WriteLine($"Added! {Change.Id}");
 			};
 
-			client.StartAsync().Wait();
+			client.StartAsync().RunSynchronously();
 
 			while (true)
 			{
 				var k = Console.ReadKey();
 				if (k.KeyChar == 'c')
 				{
-					client.Add(Change.CreateEmpty())?.Wait();
+					client.AddAsync(Change.CreateEmpty())?.Wait();
 				}
 				if (k.KeyChar == 'q')
 				{

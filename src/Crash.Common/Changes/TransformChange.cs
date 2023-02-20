@@ -1,12 +1,13 @@
 ﻿using System.Text.Json;
+
 using Crash.Geometry;
 
 namespace Crash.Common.Changes
 {
 
-	public sealed class TransformChange : global::IChange
+	public struct TransformChange : IChange
 	{
-		global::IChange Change { get; set; }
+		IChange Change { get; set; }
 
 		public CTransform Transform { get; private set; }
 
@@ -31,7 +32,7 @@ namespace Crash.Common.Changes
 
 		}
 
-		private TransformChange(global::IChange change)
+		public TransformChange(IChange change)
 		{
 			Change = change;
 			if (string.IsNullOrEmpty(Change.Payload))
@@ -45,7 +46,7 @@ namespace Crash.Common.Changes
 		public static TransformChange CreateNew(CTransform transform, string userName)
 		{
 			string json = JsonSerializer.Serialize(transform, Serialization.Options.Default);
-			global::IChange tempChange = new Change(Guid.NewGuid(), userName, json);
+			IChange tempChange = new Change(Guid.NewGuid(), userName, json);
 			return new TransformChange(tempChange);
 		}
 

@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Linq;
+using System.Text.Json.Serialization;
+
 using Crash.Changes.Serialization;
 
 namespace Crash.Geometry
@@ -47,6 +49,18 @@ namespace Crash.Geometry
 			Transforms[3][3] = m33;
 		}
 
+		public CTransform(params double[] mValues)
+			: this()
+		{
+			for (int row = 0; row < 4; row++)
+			{
+				for (int col = 0; col < 4; col++)
+				{
+
+				}
+			}
+		}
+
 		private static double[][] GetUniformMatrix(double value)
 		{
 			var matrix = new double[][]
@@ -63,6 +77,20 @@ namespace Crash.Geometry
 		{
 			get => Transforms[row][column];
 			set => Transforms[row][column] = value;
+		}
+
+		public bool IsValid()
+		{
+			double[] values = Transforms.SelectMany(t => t).ToArray();
+			return values.Length == 16 &&
+				!values.Any(v =>
+				{
+					return double.IsNaN(v) ||
+						double.IsInfinity(v) ||
+						double.IsNegativeInfinity(v) ||
+						double.IsPositiveInfinity(v);
+				});
+
 		}
 
 	}

@@ -1,8 +1,10 @@
 ﻿using System.Drawing;
+
 using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.View;
 using Crash.Handlers;
+
 using Rhino.Display;
 using Rhino.Geometry;
 
@@ -87,13 +89,13 @@ namespace Crash.UI
 		/// <param name="e"></param>
 		public void PostDrawObjects(object sender, DrawEventArgs e)
 		{
-			if (null == CrashDoc.ActiveDoc?.CacheTable) return;
-			if (null == CrashDoc.ActiveDoc?.Cameras) return;
+			if (null == CrashDocRegistry.ActiveDoc?.CacheTable) return;
+			if (null == CrashDocRegistry.ActiveDoc?.Cameras) return;
+			if (null == CrashDocRegistry.ActiveDoc?.Users) return;
 
 			// bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
 
-			IEnumerable<GeometryChange> Changes = CrashDoc.ActiveDoc.CacheTable.GetChanges().OrderBy(s => s.Owner);
-			var enumer = Changes.GetEnumerator();
+			var enumer = CrashDocRegistry.ActiveDoc.CacheTable.GetEnumerator<GeometryChange>();
 
 			while (enumer.MoveNext())
 			{
@@ -101,20 +103,20 @@ namespace Crash.UI
 
 				GeometryChange Change = enumer.Current;
 
-				User? user = CrashDoc.ActiveDoc?.Users?.Get(Change.Owner);
-				if (user?.Visible != true) continue;
+				User user = CrashDocRegistry.ActiveDoc.Users.Get(Change.Owner);
+				if (user.Visible != true) continue;
 
 				DrawChange(e, Change, user.Color);
 				UpdateBoundingBox(Change);
 			}
 
-			Dictionary<string, Camera> ActiveCameras = CrashDoc.ActiveDoc.Cameras.GetActiveCameras();
+			Dictionary<User, Camera> ActiveCameras = CrashDocRegistry.ActiveDoc.Cameras.GetActiveCameras();
 			foreach (var activeCamera in ActiveCameras)
 			{
 				if (e.Display.InterruptDrawing()) return;
 
-				User? user = CrashDoc.ActiveDoc?.Users?.Get(activeCamera.Key);
-				if (user?.Camera != CameraState.Visible) continue;
+				User user = activeCamera.Key;
+				if (user.Camera != CameraState.Visible) continue;
 
 				DrawCamera(e, activeCamera.Value, user.Color);
 			}

@@ -23,7 +23,7 @@
 
 			var client = new CrashClient("Me", new Uri("http://localhost:5000/Crash"));
 			await client.StartAsync();
-			await client.Select(Guid.Empty);
+			await client.SelectAsync(Guid.Empty);
 		}
 
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.

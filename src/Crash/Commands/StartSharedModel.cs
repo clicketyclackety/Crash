@@ -1,234 +1,231 @@
-﻿using System.IO;
+﻿using Crash.Client;
+using Crash.Common.Changes;
+using Crash.Common.Document;
+using Crash.Common.Events;
+using Crash.Handlers;
 
-using Rhino.Input.Custom;
-using Rhino.DocObjects;
 using Rhino.Commands;
+using Rhino.DocObjects;
 using Rhino.Geometry;
 using Rhino.Input;
-using Rhino;
-using Crash.Tables;
-using Crash.Common.Changes;
-using Crash.Client;
-using Crash.Common.Document;
+using Rhino.Input.Custom;
 
 namespace Crash.Commands
 {
 
-    /// <summary>
-    /// Command to start the shared model
-    /// </summary>
-    [CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
-    public sealed class StartSharedModel : Command
-    {
-        private RhinoDoc rhinoDoc;
-        private CrashDoc crashDoc;
+	/// <summary>
+	/// Command to start the shared model
+	/// </summary>
+	[CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
+	public sealed class StartSharedModel : Command
+	{
+		private RhinoDoc rhinoDoc;
+		private CrashDoc crashDoc;
 
-        private bool includePreExistingGeometry = false;
+		private bool includePreExistingGeometry = false;
 
-        /// <summary>
-        /// Empty constructor
-        /// </summary>
-        public StartSharedModel()
-        {
-            Instance = this;
-        }
+		/// <summary>
+		/// Empty constructor
+		/// </summary>
+		public StartSharedModel()
+		{
+			Instance = this;
+		}
 
-        /// <summary>
-        /// Command Instance
-        /// </summary>
-        public static StartSharedModel Instance { get; private set; }
+		/// <summary>
+		/// Command Instance
+		/// </summary>
+		public static StartSharedModel Instance { get; private set; }
 
-        /// <inheritdoc />
-        public override string EnglishName => "StartSharedModel";
+		/// <inheritdoc />
+		public override string EnglishName => "StartSharedModel";
 
-        /// <inheritdoc />
-        protected override Result RunCommand(RhinoDoc doc, RunMode mode)
-        {
-            rhinoDoc = doc;
+		/// <inheritdoc />
+		protected override Result RunCommand(RhinoDoc doc, RunMode mode)
+		{
+			rhinoDoc = doc;
+			CrashDoc? crashDoc = CrashDocRegistry.GetRelatedDocument(doc);
+			if (crashDoc?.LocalClient is object || ServerManager.CheckForActiveServer(crashDoc))
+			{
+				string closeCommand = CloseSharedModel.Instance.EnglishName;
+				RhinoApp.WriteLine("You are currently part of a Shared Model Session. " +
+					$"Please restart Rhino to create or join a new session using the {closeCommand}.");
 
-            if (ClientManager.CheckForActiveClient() || ServerManager.CheckForActiveServer(CrashDoc.ActiveDoc))
-            {
-                string closeCommand = CloseSharedModel.Instance.EnglishName;
-                RhinoApp.WriteLine("You are currently part of a Shared Model Session. " +
-                    $"Please restart Rhino to create or join a new session using the {closeCommand}.");
+				return Result.Success;
+			}
 
-                return Result.Success;
-            }
+			string name = Environment.UserName;
 
-            string name = Environment.UserName;
+			if (!_GetUsersName(ref name))
+			{
+				RhinoApp.WriteLine("Invalid name!");
+				return Result.Nothing;
+			}
 
-            if (!_GetUsersName(ref name))
-            {
-                RhinoApp.WriteLine("Invalid name!");
-                return Result.Nothing;
-            }
+			// TODO : Add Port Validation
+			// TODO : Add Port Suggestions to docs
+			if (!_GetPortFromUser(ref ClientManager.LastPort))
+			{
+				RhinoApp.WriteLine("Invalid Port!");
+				return Result.Nothing;
+			}
 
-            // TODO : Add Port Validation
-            // TODO : Add Port Suggestions to docs
-            if (!_GetPortFromUser(ref ServerManager.LastPort))
-            {
-                RhinoApp.WriteLine("Invalid Port!");
-                return Result.Nothing;
-            }
+			crashDoc = CrashDocRegistry.CreateAndRegisterDocument(doc);
 
-            CrashDoc crashDoc = CrashDoc.CreateAndRegisterDocument(doc);
+			_CreateCurrentUser(name);
 
-            _CreateCurrentUser(name);
+			if (_PreExistingGeometryCheck(doc))
+			{
+				includePreExistingGeometry = _ContinueOrQuit() == true;
+			}
 
-            if (_PreExistingGeometryCheck(doc))
-            {
-                includePreExistingGeometry = _ContinueOrQuit() == true;
-            }
+			// Start Server Host
+			crashDoc.LocalServer.OnConnected += Server_OnConnected;
+			crashDoc.LocalServer.OnFailure += Server_OnFailure;
 
-            // Start Server Host
-            crashDoc.LocalServer.OnConnected += Server_OnConnected;
-            crashDoc.LocalServer.OnFailure += Server_OnFailure;
+			while (!ServerManager.StartOrContinueLocalServer(crashDoc,
+					$"{ServerManager.DefaultURL}:{ClientManager.LastPort}"))
+			{
+				bool? close = _GetForceCloseOptions();
+				if (close == null)
+					return Result.Cancel;
 
-            while(!ServerManager.StartOrContinueLocalServer($"{ServerManager.DefaultURL}:{ServerManager.LastPort}"))
-            {
-                bool? close = _GetForceCloseOptions();
-                if (close == null)
-                    return Result.Cancel;
+				else if (close == true)
+				{
+					CrashServer.ForceCloselocalServers();
+					break;
+				}
+			}
 
-                else if (close == true)
-                {
-                    CrashServer.ForceCloselocalServers();
-                    break;
-                }
-            }
+			UsersForm.ToggleFormVisibility();
 
-            UsersForm.ToggleFormVisibility();
+			return Result.Success;
+		}
 
-            return Result.Success;
-        }
+		private void AddPreExistingGeometry(CrashDoc crashDoc)
+		{
+			string? user = crashDoc.Users?.CurrentUser.Name;
+			if (string.IsNullOrEmpty(user))
+			{
+				RhinoApp.WriteLine("User is invalid!");
+				return;
+			}
 
-        private void AddPreExistingGeometry()
-        {
-            CrashDoc cDoc = CrashDoc.ActiveDoc;
-            string? user = cDoc.Users?.CurrentUser?.Name;
-            if (string.IsNullOrEmpty(user))
-            {
-                RhinoApp.WriteLine("User is invalid!");
-                return;
-            }
+			var enumer = GetObjects(RhinoDoc.ActiveDoc).GetEnumerator();
+			while (enumer.MoveNext())
+			{
+				GeometryBase geom = enumer.Current.Geometry;
+				GeometryChange Change = GeometryChange.CreateNew(user, geom);
+				crashDoc.CacheTable?.UpdateChangeAsync(Change);
+			}
+		}
 
-            var enumer = GetObjects(RhinoDoc.ActiveDoc).GetEnumerator();
-            while(enumer.MoveNext())
-            {
-                GeometryBase geom = enumer.Current.Geometry;
-                GeometryChange Change = GeometryChange.CreateNew(user, geom);
-                cDoc.CacheTable?.UpdateChange(Change);
-            }
-        }
+		private bool? _ContinueOrQuit(bool defaultValue = false)
+			=> CommandUtils.GetBoolean(ref defaultValue,
+				"Would you like to include preExisting Geometry?",
+				"dontInclude",
+				"include");
 
-        private bool? _ContinueOrQuit(bool defaultValue = false)
-            => CommandUtils.GetBoolean(ref defaultValue,
-                "Would you like to include preExisting Geometry?",
-                "dontInclude",
-                "include");
+		private IEnumerable<RhinoObject> GetObjects(RhinoDoc doc)
+		{
+			ObjectEnumeratorSettings settings = new ObjectEnumeratorSettings()
+			{
+				ActiveObjects = true,
+				DeletedObjects = true,
+				HiddenObjects = true,
+				IncludeGrips = false,
+				IncludeLights = false,
+				LockedObjects = true,
+				NormalObjects = true,
+			};
+			return doc.Objects.GetObjectList(settings);
+		}
 
-        private IEnumerable<RhinoObject> GetObjects(RhinoDoc doc)
-        {
-            ObjectEnumeratorSettings settings = new ObjectEnumeratorSettings()
-            {
-                ActiveObjects = true,
-                DeletedObjects = true,
-                HiddenObjects = true,
-                IncludeGrips = false,
-                IncludeLights = false,
-                LockedObjects = true,
-                NormalObjects = true,
-            };
-            return doc.Objects.GetObjectList(settings);
-        }
+		private bool _PreExistingGeometryCheck(RhinoDoc doc)
+			=> GetObjects(doc).Count() > 0;
 
-        private bool _PreExistingGeometryCheck(RhinoDoc doc)
-            => GetObjects(doc).Count() > 0;
+		private void Server_OnFailure(object sender, CrashEventArgs e)
+		{
+			if (e.CrashDoc.LocalServer is object)
+			{
+				e.CrashDoc.LocalServer.OnFailure -= Server_OnFailure;
+			}
 
-        private void Server_OnFailure(object sender, EventArgs e)
-        {
-            CrashServer.OnFailure -= Server_OnFailure;
+			string message = "An Unknown Error occured";
 
-            string message = "An Unknown Error occured";
+			RhinoApp.WriteLine(message);
+		}
 
-            if (e is ErrorEventArgs errArgs)
-            {
-                message = errArgs.GetException().Message;
-            }
+		private void Server_OnConnected(object sender, CrashEventArgs e)
+		{
+			e.CrashDoc.LocalServer.OnConnected -= Server_OnConnected;
 
-            RhinoApp.WriteLine(message);
-        }
+			ClientManager clientManager = new ClientManager();
+			try
+			{
+				clientManager.StartOrContinueLocalClient(crashDoc, ClientManager.ClientUri).ConfigureAwait(false);
 
-        private void Server_OnConnected(object sender, EventArgs e)
-        {
-            CrashServer.OnConnected -= Server_OnConnected;
+				if (includePreExistingGeometry)
+					AddPreExistingGeometry(e.CrashDoc);
+			}
+			catch (UriFormatException)
+			{
+				RhinoApp.Write("Please enter a valid host! The Port is likely bad.");
+			}
+			catch (Exception ex)
+			{
+				RhinoApp.WriteLine(ex.Message);
+			}
+		}
 
-            ClientManager clientManager = new ClientManager();
-            try
-            {
-                clientManager.StartOrContinueLocalClient(ClientManager.ClientUri).ConfigureAwait(false);
+		private bool? _GetForceCloseOptions()
+		{
+			bool defaultValue = false;
 
-                if (includePreExistingGeometry)
-                    AddPreExistingGeometry();
-            }
-            catch (UriFormatException)
-            {
-                RhinoApp.Write("Please enter a valid host! The Port is likely bad.");
-            }
-            catch(Exception ex)
-            {
-                RhinoApp.WriteLine(ex.Message);
-            }
-        }
+			GetOption go = new GetOption();
+			go.AcceptEnterWhenDone(true);
+			go.AcceptNothing(true);
+			go.SetCommandPrompt("Would you like to Force Close any other servers?");
+			OptionToggle releaseValue = new OptionToggle(defaultValue, "NoThanks", "CloseAll");
+			int releaseIndex = go.AddOptionToggle("Close", ref releaseValue);
 
-        private bool? _GetForceCloseOptions()
-        {
-            bool defaultValue = false;
-
-            GetOption go = new GetOption();
-            go.AcceptEnterWhenDone(true);
-            go.AcceptNothing(true);
-            go.SetCommandPrompt("Would you like to Force Close any other servers?");
-            OptionToggle releaseValue = new OptionToggle(defaultValue, "NoThanks", "CloseAll");
-            int releaseIndex = go.AddOptionToggle("Close", ref releaseValue);
-
-            while (true)
-            {
-                GetResult result = go.Get();
-                if (result == GetResult.Option)
-                {
-                    int index = go.OptionIndex();
-                    if (index == releaseIndex)
-                    {
-                        defaultValue = !defaultValue;
-                    }
-                }
-                else if (result == GetResult.Cancel)
-                {
-                    return null;
-                }
-                else if (result == GetResult.Nothing)
-                {
-                    return defaultValue;
-                }
-            }
+			while (true)
+			{
+				GetResult result = go.Get();
+				if (result == GetResult.Option)
+				{
+					int index = go.OptionIndex();
+					if (index == releaseIndex)
+					{
+						defaultValue = !defaultValue;
+					}
+				}
+				else if (result == GetResult.Cancel)
+				{
+					return null;
+				}
+				else if (result == GetResult.Nothing)
+				{
+					return defaultValue;
+				}
+			}
 
 
-        }
+		}
 
-        // TODO : Ensure name is not already taken!
-        private bool _GetUsersName(ref string name)
-            => CommandUtils.GetValidString("Your Name", ref name);
+		// TODO : Ensure name is not already taken!
+		private bool _GetUsersName(ref string name)
+			=> CommandUtils.GetValidString("Your Name", ref name);
 
-        private bool _GetPortFromUser(ref int port)
-            => CommandUtils.GetInteger("Server port", ref port);
+		private bool _GetPortFromUser(ref int port)
+			=> CommandUtils.GetInteger("Server port", ref port);
 
-        private void _CreateCurrentUser(string name)
-        {
-            User user = new User(name);
-            crashDoc.Users.CurrentUser = user;
-        }
+		private void _CreateCurrentUser(string name)
+		{
+			User user = new User(name);
+			crashDoc.Users.CurrentUser = user;
+		}
 
-    }
+	}
 
 }

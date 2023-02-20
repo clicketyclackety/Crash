@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+
 using Crash.Common.Serialization;
 using Crash.Geometry;
 
@@ -25,7 +26,8 @@ namespace Crash.Common.View
 
 		public bool IsValid()
 			=> Location != Target &&
-			Time > DateTime.MinValue;
+			Time > DateTime.MinValue &&
+			Time < DateTime.MaxValue;
 
 	}
 

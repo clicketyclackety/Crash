@@ -7,27 +7,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Tables;
 using Crash.Common.View;
+
+using Rhino;
 using Rhino.Display;
 using Rhino.Geometry;
 
 namespace Crash.Handlers
 {
-	// TODO : Don't call the classes Handlers. It's lame.
-	public class CameraOperator
+
+	public static class CameraOperator
 	{
 		private const int MINIMUM_DISPLACEMENT = 1000; // What unit?
 		private const int CHANGE_DELAY = 200; // in milliseconds
 		private const int FOLLOW_DELAY = 750; // in milliseconds
 		private const int FPS = 30; // TODO: Make this a setting
 
-		CrashDoc crashDoc;
-
-		private Curve cameraLocationRail;
-		private Curve cameraTargetRail;
+		private static Curve cameraLocationRail;
+		private static Curve cameraTargetRail;
 
 		// TODO: Don't use static
 		private static DateTime lastChange = DateTime.Now;
@@ -43,8 +44,8 @@ namespace Crash.Handlers
 		// Intentionally Static
 		internal static void RhinoView_Modified(object sender, ViewEventArgs v)
 		{
-			if (null == CrashDoc.ActiveDoc?.LocalClient) return;
-			if (CrashDoc.ActiveDoc.Users.Any(u => u.Camera == CameraState.Follow)) return;
+			if (null == CrashDocRegistry.ActiveDoc?.LocalClient) return;
+			if (CrashDocRegistry.ActiveDoc.Users.Any(u => u.Camera == CameraState.Follow)) return;
 
 			RhinoView view = v.View;
 			Point3d cameraLocation = view.ActiveViewport.CameraLocation;
@@ -60,14 +61,14 @@ namespace Crash.Handlers
 				lastChange = currentChange;
 
 				var camera = new Camera(cameraLocation.ToCrash(), cameraTarget.ToCrash());
-				var cameraChange = CameraChange.CreateNew(camera, CrashDoc.ActiveDoc.Users.CurrentUser.Name);
+				var cameraChange = CameraChange.CreateNew(camera, CrashDocRegistry.ActiveDoc.Users.CurrentUser.Name);
 				var serverChange = new Change(cameraChange);
 
-				Task.Run(() => CrashDoc.ActiveDoc.LocalClient.CameraChange(serverChange));
+				Task.Run(() => CrashDocRegistry.ActiveDoc.LocalClient.CameraChangeAsync(serverChange));
 			}
 		}
 
-		private (Curve, Curve) constructInterpolatedPathFromCameras(IEnumerable<Camera> cameras)
+		private static (Curve, Curve) constructInterpolatedPathFromCameras(IEnumerable<Camera> cameras)
 		{
 			// TODO: needs to take time into account
 			Curve locationCurve = NurbsCurve.CreateInterpolatedCurve(cameras.Select(c => c.Location).ToRhino(), 3);
@@ -76,7 +77,7 @@ namespace Crash.Handlers
 			return (locationCurve, targetCurve);
 		}
 
-		private void setCurrentCameraRails(IEnumerable<Camera> cameras)
+		private static void setCurrentCameraRails(IEnumerable<Camera> cameras)
 		{
 			var rails = constructInterpolatedPathFromCameras(cameras);
 
@@ -85,15 +86,18 @@ namespace Crash.Handlers
 		}
 
 		// What about queue?
-		internal void FollowCamera()
+		public static void FollowCamera()
 		{
-			var toFollow = CrashDoc.ActiveDoc.Users.Where(u => u.Camera == CameraState.Follow).FirstOrDefault();
-			if (string.IsNullOrEmpty(toFollow?.Name)) return;
+			var crashDoc = CrashDocRegistry.ActiveDoc;
+			if (null == crashDoc) return;
+
+			var toFollow = crashDoc.Users.Where(u => u.Camera == CameraState.Follow).FirstOrDefault();
+			if (string.IsNullOrEmpty(toFollow.Name)) return;
 
 			double param = 0;
 			while (true)
 			{
-				if (!crashDoc.Cameras.TryGetCamera(toFollow?.Name, out var currentCameras)) break;
+				if (!crashDoc.Cameras.TryGetCamera(toFollow, out var currentCameras)) break;
 
 				if (crashDoc.Cameras.CameraIsInvalid)
 				{
@@ -110,12 +114,12 @@ namespace Crash.Handlers
 		}
 
 
-		private void PositionCamera(double parameter)
+		private static void PositionCamera(double parameter)
 		{
 			Point3d cameraLocation = cameraLocationRail.PointAtNormalizedLength(parameter);
 			Point3d cameraTarget = cameraTargetRail.PointAtNormalizedLength(parameter);
 
-			var activeView = crashDoc.HostRhinoDoc.Views.ActiveView;
+			var activeView = RhinoDoc.ActiveDoc.Views.ActiveView;
 			activeView.ActiveViewport.SetCameraLocations(cameraTarget, cameraLocation);
 		}
 

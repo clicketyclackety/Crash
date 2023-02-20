@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+
 using Crash.Common.Events;
 using Crash.Common.View;
 
@@ -31,7 +32,7 @@ namespace Crash.Common.Changes
 
 		}
 
-		private CameraChange(IChange change)
+		public CameraChange(IChange change)
 		{
 			Change = change;
 

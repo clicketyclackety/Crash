@@ -1,16 +1,17 @@
 ﻿using System.Collections;
+
 using Crash.Common.Document;
 
 namespace Crash.Events
 {
 
-    public sealed class IdleQueue : IEnumerable<IdleAction>, IDisposable
+	public sealed class IdleQueue : IEnumerable<IdleAction>, IDisposable
 	{
 		private ConcurrentQueue<IdleAction> idleQueue;
 
-        private CrashDoc hostDoc;
+		private CrashDoc hostDoc;
 
-        public IdleQueue(CrashDoc hostDoc)
+		public IdleQueue(CrashDoc hostDoc)
 		{
 			this.hostDoc = hostDoc;
 			idleQueue = new ConcurrentQueue<IdleAction>();
@@ -26,14 +27,14 @@ namespace Crash.Events
 
 		public int Count => idleQueue.Count;
 
-        public IEnumerator<IdleAction> GetEnumerator() => idleQueue.GetEnumerator();
+		public IEnumerator<IdleAction> GetEnumerator() => idleQueue.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => idleQueue.GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => idleQueue.GetEnumerator();
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-    }
+		public void Dispose()
+		{
+			throw new NotImplementedException();
+		}
+	}
 
 }

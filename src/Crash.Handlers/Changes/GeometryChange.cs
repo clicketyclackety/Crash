@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Text.Json;
+
 using Crash.Common.Events;
+
 using Rhino.FileIO;
 using Rhino.Geometry;
 using Rhino.Runtime;
@@ -16,7 +19,7 @@ namespace Crash.Common.Changes
 
 		public GeometryBase Geometry { get; private set; }
 
-		public Guid BakdId { get; set; }
+		public Guid RhinoId { get; set; }
 
 		public DateTime Stamp => Change.Stamp;
 
@@ -39,11 +42,16 @@ namespace Crash.Common.Changes
 
 		}
 
-		public GeometryChange(IChange Change)
+		public GeometryChange(IChange cange)
 		{
-			Change = Change;
+			Change = cange;
 			var options = new SerializationOptions();
 			GeometryBase? geometry = CommonObject.FromJSON(Change.Payload) as GeometryBase;
+			if (null == geometry)
+			{
+				throw new JsonException("Could not deserialize Geometry");
+			}
+
 			Geometry = geometry;
 		}
 

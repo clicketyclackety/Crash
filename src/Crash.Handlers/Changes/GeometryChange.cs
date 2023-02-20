@@ -2,6 +2,7 @@
 using System.Text.Json;
 
 using Crash.Common.Events;
+using Crash.Handlers.Changes;
 
 using Rhino.FileIO;
 using Rhino.Geometry;
@@ -13,7 +14,7 @@ namespace Crash.Common.Changes
 	/// <summary>
 	/// Local instance of a received Change.
 	/// </summary>
-	public struct GeometryChange : ICachedChange
+	public sealed class GeometryChange : ICachedChange, IRhinoChange
 	{
 		IChange Change { get; set; }
 

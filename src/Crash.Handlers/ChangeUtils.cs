@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Crash.Handlers.Changes;
 
 namespace Crash.Utils
 {
@@ -30,14 +31,7 @@ namespace Crash.Utils
 
 			rObj.UserDictionary.Set(ChangeIdKey, Change.Id);
 
-			/* REPLACE IN CacheTable
-            // Key/Key
-            if (_ChangeToRhino.ContainsKey(Change.Id))
-            {
-                _ChangeToRhino.TryRemove(Change.Id, out _);
-            }
-            _ChangeToRhino.TryAdd(Change.Id, rObj.Id);
-            */
+			Change.RhinoId = rObj.Id;
 		}
 	}
 

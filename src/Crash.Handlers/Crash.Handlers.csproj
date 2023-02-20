@@ -26,7 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Crash.Changes\Crash.Changes.csproj" />
     <ProjectReference Include="..\Crash.Common\Crash.Common.csproj" />
-    <ProjectReference Include="..\Crash.Utils\Crash.Utils.csproj" />
   </ItemGroup>
 
 </Project>

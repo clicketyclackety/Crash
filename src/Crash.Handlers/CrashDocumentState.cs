@@ -3,7 +3,6 @@ using System.Linq;
 
 using Crash.Common.Changes;
 using Crash.Common.Document;
-using Crash.Events;
 using Crash.Utils;
 
 using Rhino;
@@ -14,28 +13,26 @@ namespace Crash.Handlers
 	public sealed class CrashDocumentState : IDisposable
 	{
 
-		internal CrashDoc Document;
+		public CrashDoc Document;
 
 		internal CrashDocumentState(CrashDoc document)
 		{
 			Document = document;
-
 			RhinoApp.Idle += CallIdle;
+			Document.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
 		}
 
 		public override int GetHashCode() => Document.GetHashCode();
 
 		private void CallIdle(object sender, EventArgs e)
 		{
-			if (!Document.Queue.TryDequeue(out IdleAction action)) return;
+			Document.Queue.RunNextAction();
+		}
 
-			action.Invoke();
-
-			// Only runs after a queue is finished
-			if (Document.Queue.Count == 0)
-			{
-				CrashDocRegistry.GetRelatedDocument(Document)?.Views?.Redraw();
-			}
+		private void Queue_OnCompletedQueue(object sender, EventArgs e)
+		{
+			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(Document);
+			rhinoDoc?.Views?.Redraw();
 		}
 
 
@@ -131,7 +128,6 @@ namespace Crash.Handlers
 		}
 
 		#endregion
-
 
 		public void Dispose()
 		{

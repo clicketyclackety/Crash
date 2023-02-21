@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Crash.Client;
 using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Events;
@@ -17,8 +16,9 @@ namespace Crash.Utilities
 	/// <summary>
 	/// The request manager
 	/// </summary>
-	public sealed class ClientManager
+	public sealed class ClientState
 	{
+		/// TODO : Move these lower down
 		public const string CrashPath = "Crash";
 		public static string LastUrl = "http://localhost";
 		public static string UrlAndPort => $"{LastUrl}{PortExt}";
@@ -26,54 +26,20 @@ namespace Crash.Utilities
 		public static int LastPort = 5000;
 		public static Uri ClientUri => new Uri($"{UrlAndPort}/{CrashPath}");
 
-		private CrashDoc crashDoc;
+		private CrashDoc _crashDoc;
 
-		/// <summary>
-		/// Method to load the client
-		/// </summary>
-		/// <param name="uri">the uri of the client</param>
-		public async Task StartOrContinueLocalClient(CrashDoc crashDoc, Uri uri)
+		public ClientState(CrashDoc crashDoc)
 		{
-			if (null == crashDoc) return;
-
-			string userName = crashDoc?.Users?.CurrentUser.Name;
-			if (string.IsNullOrEmpty(userName))
-			{
-				throw new System.Exception("A User has not been assigned!");
-			}
-
-			CrashClient client = new CrashClient(userName, uri);
-			crashDoc.LocalClient = client;
-
-			client.OnInitialize += Init;
-
-			// TODO : Check for successful connection
-			await client.StartAsync();
+			this._crashDoc = crashDoc;
 		}
 
-		/// <summary>
-		/// Closes the local Client
-		/// </summary>
-		public async Task CloseLocalClient()
+		public void Init(IEnumerable<Change> Changes)
 		{
-			var client = crashDoc?.LocalClient;
-			if (null == client) return;
-
-			await client.StopAsync();
-
-			client = null;
-			crashDoc.Dispose();
-		}
-
-		// Move these?
-
-		private void Init(IEnumerable<Change> Changes)
-		{
-			crashDoc.LocalClient.OnInitialize -= Init;
+			_crashDoc.LocalClient.OnInitialize -= Init;
 
 			Rhino.RhinoApp.WriteLine("Loading Changes ...");
 
-			crashDoc.CacheTable.IsInit = true;
+			_crashDoc.CacheTable.IsInit = true;
 			try
 			{
 				_HandleChangesAsync(Changes);
@@ -84,7 +50,7 @@ namespace Crash.Utilities
 			}
 			finally
 			{
-				crashDoc.CacheTable.IsInit = false;
+				_crashDoc.CacheTable.IsInit = false;
 			}
 		}
 
@@ -136,7 +102,7 @@ namespace Crash.Utilities
 		{
 			if (null == change || string.IsNullOrEmpty(change.Owner)) return;
 
-			crashDoc.Users?.Add(change.Owner);
+			_crashDoc.Users?.Add(change.Owner);
 
 			ChangeAction _action = (ChangeAction)change.Action;
 			if (_action.HasFlag(ChangeAction.Camera))
@@ -175,8 +141,8 @@ namespace Crash.Utilities
 
 		private async Task _HandleLockAsync(Change change)
 		{
-			var rDoc = CrashDocRegistry.GetRelatedDocument(crashDoc);
-			if (crashDoc.CacheTable.TryGetValue(change.Id, out GeometryChange cachedChange))
+			var rDoc = CrashDocRegistry.GetRelatedDocument(_crashDoc);
+			if (_crashDoc.CacheTable.TryGetValue(change.Id, out GeometryChange cachedChange))
 			{
 				rDoc.Objects.Unlock(cachedChange.RhinoId, true);
 			}
@@ -186,8 +152,8 @@ namespace Crash.Utilities
 
 		private async Task HandleUnlockAsync(Change change)
 		{
-			var rDoc = CrashDocRegistry.GetRelatedDocument(crashDoc);
-			if (crashDoc.CacheTable.TryGetValue(change.Id, out GeometryChange cachedChange))
+			var rDoc = CrashDocRegistry.GetRelatedDocument(_crashDoc);
+			if (_crashDoc.CacheTable.TryGetValue(change.Id, out GeometryChange cachedChange))
 			{
 				rDoc.Objects.Lock(cachedChange.RhinoId, true);
 			}
@@ -198,7 +164,7 @@ namespace Crash.Utilities
 		private async Task _HandleTemporaryAddAsync(Change change)
 		{
 			GeometryChange geomChange = new GeometryChange(change);
-			crashDoc.CacheTable.AddToDocument(geomChange);
+			_crashDoc.CacheTable.AddToDocument(geomChange);
 
 			await Task.CompletedTask;
 		}
@@ -206,7 +172,7 @@ namespace Crash.Utilities
 		private async Task _HandleTransformAsync(Change change)
 		{
 			TransformChange transformChange = new TransformChange(change);
-			if (!crashDoc.CacheTable.TryGetValue(change.Id, out ICachedChange cachedChange))
+			if (!_crashDoc.CacheTable.TryGetValue(change.Id, out ICachedChange cachedChange))
 			{
 				if (cachedChange is not GeometryChange geomChange) return;
 				geomChange.Geometry.Transform(transformChange.Transform.ToRhino());
@@ -230,9 +196,9 @@ namespace Crash.Utilities
 		{
 			GeometryChange localChange = new GeometryChange(change);
 
-			BakeArgs bakeArgs = new BakeArgs(crashDoc, localChange);
+			BakeArgs bakeArgs = new BakeArgs(_crashDoc, localChange);
 			IdleAction bakeAction = new IdleAction(Bake, bakeArgs);
-			crashDoc.Queue.AddAction(bakeAction);
+			_crashDoc.Queue.AddAction(bakeAction);
 
 			await Task.CompletedTask;
 		}
@@ -242,7 +208,7 @@ namespace Crash.Utilities
 			if (args is not DeleteArgs deleteArgs) return;
 
 			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(deleteArgs.CrashDoc);
-			if (!crashDoc.CacheTable.TryGetValue(deleteArgs.ChangeId, out GeometryChange change)) return;
+			if (!_crashDoc.CacheTable.TryGetValue(deleteArgs.ChangeId, out GeometryChange change)) return;
 
 			var rhinoObject = rhinoDoc.Objects.FindId(change.RhinoId);
 			rhinoDoc.Objects.Delete(rhinoObject, true, true);
@@ -250,9 +216,9 @@ namespace Crash.Utilities
 
 		private async Task _HandleRemoveAsync(Change change)
 		{
-			DeleteArgs removeArgs = new DeleteArgs(crashDoc, change.Id);
+			DeleteArgs removeArgs = new DeleteArgs(_crashDoc, change.Id);
 			IdleAction deleteAction = new IdleAction(Remove, removeArgs);
-			crashDoc.Queue.AddAction(deleteAction);
+			_crashDoc.Queue.AddAction(deleteAction);
 
 			await Task.CompletedTask;
 		}
@@ -261,10 +227,11 @@ namespace Crash.Utilities
 		private async Task _HandleCameraAsync(Change change)
 		{
 			CameraChange cameraChange = new CameraChange(change);
-			crashDoc?.Cameras?.TryAddCamera(cameraChange);
+			_crashDoc?.Cameras?.TryAddCamera(cameraChange);
 
 			await Task.CompletedTask;
 		}
+
 	}
 
 }

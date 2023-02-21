@@ -27,6 +27,10 @@
     <ProjectReference Include="..\..\src\Crash.Server\Crash.Server.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="..\..\.editorconfig" />
+  </ItemGroup>
+
 	<PropertyGroup>
 		<VSTestLogger>trx%3bLogFileName=$(MSBuildProjectName).trx</VSTestLogger>
 		<VSTestResultsDirectory>$(MSBuildThisFileDirectory)/TestResults/$(TargetFramework)</VSTestResultsDirectory>

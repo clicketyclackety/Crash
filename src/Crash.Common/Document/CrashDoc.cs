@@ -2,6 +2,7 @@
 
 using Crash.Client;
 using Crash.Common.Tables;
+using Crash.Communications;
 using Crash.Events;
 
 [assembly: InternalsVisibleTo("Crash.Common.Tests")]

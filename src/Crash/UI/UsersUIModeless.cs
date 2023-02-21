@@ -252,16 +252,17 @@ namespace Crash.UI
 
 			if (e.Item is User user)
 			{
+				// TODO : Pass user out by ref?
 				CameraState state = CycleState(user.Camera);
 				if (state == CameraState.Follow)
 				{
-					var users = CrashDocRegistry.ActiveDoc.Users;
-					// Need to pass by ref!
-					foreach (User userIter in CrashDocRegistry.ActiveDoc.Users)
+					var userEnumer = CrashDocRegistry.ActiveDoc.Users.GetEnumerator();
+					while (userEnumer.MoveNext())
 					{
-						if (userIter.Camera == CameraState.Follow)
+						User currUser = userEnumer.Current;
+						if (CameraState.Follow == currUser.Camera)
 						{
-							userIter.Camera = CameraState.Visible;
+							currUser.Camera = CameraState.Visible;
 						}
 					}
 

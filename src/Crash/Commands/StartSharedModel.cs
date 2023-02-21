@@ -2,6 +2,7 @@
 using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Events;
+using Crash.Communications;
 using Crash.Handlers;
 
 using Rhino.Commands;
@@ -21,6 +22,10 @@ namespace Crash.Commands
 	{
 		private RhinoDoc rhinoDoc;
 		private CrashDoc crashDoc;
+
+		private int LastPort = CrashServer.DefaultPort;
+		private string LastURL = CrashServer.DefaultURL;
+		private string LastURLAndPort => $"{LastURL}:{LastPort}";
 
 		private bool includePreExistingGeometry = false;
 
@@ -44,8 +49,8 @@ namespace Crash.Commands
 		protected override Result RunCommand(RhinoDoc doc, RunMode mode)
 		{
 			rhinoDoc = doc;
-			CrashDoc? crashDoc = CrashDocRegistry.GetRelatedDocument(doc);
-			if (crashDoc?.LocalClient is object || ServerManager.CheckForActiveServer(crashDoc))
+			crashDoc = CrashDocRegistry.GetRelatedDocument(doc);
+			if (crashDoc?.LocalClient is object || crashDoc.LocalServer.IsRunning)
 			{
 				string closeCommand = CloseSharedModel.Instance.EnglishName;
 				RhinoApp.WriteLine("You are currently part of a Shared Model Session. " +
@@ -64,7 +69,7 @@ namespace Crash.Commands
 
 			// TODO : Add Port Validation
 			// TODO : Add Port Suggestions to docs
-			if (!_GetPortFromUser(ref ClientManager.LastPort))
+			if (!_GetPortFromUser(ref LastPort))
 			{
 				RhinoApp.WriteLine("Invalid Port!");
 				return Result.Nothing;
@@ -83,8 +88,7 @@ namespace Crash.Commands
 			crashDoc.LocalServer.OnConnected += Server_OnConnected;
 			crashDoc.LocalServer.OnFailure += Server_OnFailure;
 
-			while (!ServerManager.StartOrContinueLocalServer(crashDoc,
-					$"{ServerManager.DefaultURL}:{ClientManager.LastPort}"))
+			while (crashDoc.LocalServer.IsRunning)
 			{
 				bool? close = _GetForceCloseOptions();
 				if (close == null)
@@ -97,9 +101,24 @@ namespace Crash.Commands
 				}
 			}
 
-			UsersForm.ToggleFormVisibility();
+			try
+			{
+				crashDoc.LocalServer.Start(LastURLAndPort);
+				crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
+			}
+			catch
+			{
+				RhinoApp.WriteLine("The server ran into difficulties starting");
+			}
 
 			return Result.Success;
+		}
+
+		private void Queue_OnCompletedQueue(object sender, EventArgs e)
+		{
+			crashDoc.Queue.OnCompletedQueue -= Queue_OnCompletedQueue;
+
+			UsersForm.ToggleFormVisibility();
 		}
 
 		private void AddPreExistingGeometry(CrashDoc crashDoc)
@@ -160,10 +179,10 @@ namespace Crash.Commands
 		{
 			e.CrashDoc.LocalServer.OnConnected -= Server_OnConnected;
 
-			ClientManager clientManager = new ClientManager();
 			try
 			{
-				clientManager.StartOrContinueLocalClient(crashDoc, ClientManager.ClientUri).ConfigureAwait(false);
+				ClientState clientState = new ClientState(crashDoc);
+				CrashClient.StartOrContinueLocalClient(crashDoc, new Uri(LastURLAndPort), clientState.Init);
 
 				if (includePreExistingGeometry)
 					AddPreExistingGeometry(e.CrashDoc);

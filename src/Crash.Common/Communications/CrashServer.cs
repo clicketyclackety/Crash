@@ -6,13 +6,15 @@ using Crash.Common.Events;
 
 using Microsoft.AspNetCore.Connections;
 
-namespace Crash.Client
+namespace Crash.Communications
 {
 	/// <summary>
 	/// Crash server class to handle the ServerProcess
 	/// </summary>
 	public sealed class CrashServer : IDisposable
 	{
+		public const int DefaultPort = 8080;
+		public const string DefaultURL = "http://localhost";
 
 		private CrashDoc _crashDoc;
 
@@ -35,6 +37,14 @@ namespace Crash.Client
 			Dispose(false);
 		}
 
+		public void CloseLocalServer(CrashDoc crashDoc)
+		{
+			CrashServer? server = crashDoc?.LocalServer;
+			if (null == server) return;
+
+			server?.Stop();
+			server?.Dispose();
+		}
 
 		/// <summary>
 		/// Method to start the server
@@ -43,32 +53,27 @@ namespace Crash.Client
 		/// <param name="isMac">Is the given OS Mac?</param>
 		/// <param name="errorMessage">The error, if nay</param>
 		/// <returns>True on success, false otherwise</returns>
-		public bool Start(string url, out string errorMessage)
+		public void Start(string url)
 		{
-			errorMessage = "Server Started Successfully";
+			string errorMessage = "Server Started Successfully";
 
 			if (checkForPreExistingServer())
 			{
 				errorMessage = "Server Process is already running!";
-				return false;
+				throw new Exception(errorMessage);
 			}
 
 			try
 			{
 				var serverExecutable = getServerExecutablePath();
 				createAndRegisterServerProcess(serverExecutable, url);
-				return true;
 			}
 			catch (FileNotFoundException)
 			{
 				errorMessage = "Could not find Server exe";
-			}
-			catch (Exception ex)
-			{
-				errorMessage = ex.Message;
+				throw new FileNotFoundException(errorMessage);
 			}
 
-			return false;
 		}
 
 		private bool checkForPreExistingServer()

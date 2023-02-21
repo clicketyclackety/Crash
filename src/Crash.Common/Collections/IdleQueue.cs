@@ -5,10 +5,12 @@ using Crash.Common.Document;
 namespace Crash.Events
 {
 
+	/// <summary>
+	/// A Queue for running during the Rhino Idle Event.
+	/// </summary>
 	public sealed class IdleQueue : IEnumerable<IdleAction>, IDisposable
 	{
 		private ConcurrentQueue<IdleAction> idleQueue;
-
 		private CrashDoc hostDoc;
 
 		public IdleQueue(CrashDoc hostDoc)
@@ -22,8 +24,18 @@ namespace Crash.Events
 			idleQueue.Enqueue(action);
 		}
 
-		public bool TryDequeue(out IdleAction action)
-			=> idleQueue.TryDequeue(out action);
+		public void RunNextAction()
+		{
+			if (idleQueue.Count == 0) return;
+
+			idleQueue.TryDequeue(out IdleAction action);
+			action?.Invoke();
+
+			if (0 == idleQueue.Count)
+			{
+				OnCompletedQueue?.Invoke(this, null);
+			}
+		}
 
 		public int Count => idleQueue.Count;
 
@@ -33,8 +45,11 @@ namespace Crash.Events
 
 		public void Dispose()
 		{
-			throw new NotImplementedException();
+			// What to do with the events?
 		}
+
+		public event EventHandler OnCompletedQueue;
+
 	}
 
 }

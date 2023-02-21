@@ -1,4 +1,6 @@
-﻿using Crash.Common.Document;
+﻿using Crash.Client;
+using Crash.Common.Document;
+using Crash.Communications;
 using Crash.Handlers;
 
 using Rhino.Commands;
@@ -14,6 +16,10 @@ namespace Crash.Commands
 	{
 
 		private RhinoDoc rhinoDoc;
+		private CrashDoc? crashDoc;
+
+		private string LastURL = $"{CrashServer.DefaultURL}:{CrashServer.DefaultPort}";
+
 
 		/// <summary>
 		/// Default Constructor
@@ -33,7 +39,7 @@ namespace Crash.Commands
 		protected override Result RunCommand(RhinoDoc doc, RunMode mode)
 		{
 			rhinoDoc = doc;
-			CrashDoc? crashDoc = CrashDocRegistry.GetRelatedDocument(doc);
+			crashDoc = CrashDocRegistry.GetRelatedDocument(doc);
 
 			// Check Crash Doc
 			if (crashDoc?.LocalClient is object)
@@ -56,13 +62,7 @@ namespace Crash.Commands
 				return Result.Nothing;
 			}
 
-			string url = ClientManager.UrlAndPort;
-			if (_GetServerURL(ref url))
-			{
-				_SetLastPortFromUrl(url);
-				_SetLastUrlFromUrl(url);
-			}
-			else
+			if (!_GetServerURL(ref LastURL))
 			{
 				RhinoApp.WriteLine("Invalid URL Input");
 				return Result.Nothing;
@@ -72,38 +72,20 @@ namespace Crash.Commands
 			_CreateCurrentUser(crashDoc, name);
 
 			// TODO : Ensure Requested Server is available, and notify if not
-			ClientManager clientManager = new ClientManager();
-			clientManager.StartOrContinueLocalClient(crashDoc, ClientManager.ClientUri).ConfigureAwait(false);
+			ClientState clientState = new ClientState(crashDoc);
+			CrashClient.StartOrContinueLocalClient(crashDoc, ClientState.ClientUri,
+													clientState.Init);
 
-			UsersForm.ToggleFormVisibility();
+			crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
 
 			return Result.Success;
 		}
 
-		private void _SetLastPortFromUrl(string url)
+		private void Queue_OnCompletedQueue(object sender, EventArgs e)
 		{
-			string[] ports = url.Replace("/", "").Split(':');
-			foreach (string port in ports)
-			{
-				if (!int.TryParse(port, out int givenPort)) continue;
+			crashDoc.Queue.OnCompletedQueue -= Queue_OnCompletedQueue;
 
-				ClientManager.LastPort = givenPort;
-				return;
-			}
-
-			ClientManager.LastPort = int.MinValue;
-		}
-
-		private void _SetLastUrlFromUrl(string urlWithPort)
-		{
-			string[] urlParts = urlWithPort.Split(':');
-			string[] nonPortParts = urlParts.Where(v => !int.TryParse(v, out _)).ToArray();
-			string url = string.Join(":", nonPortParts);
-
-			if (!string.IsNullOrEmpty(url))
-			{
-				ClientManager.LastUrl = url;
-			}
+			UsersForm.ToggleFormVisibility();
 		}
 
 		private bool _GetUsersName(ref string name)

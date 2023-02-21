@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using Crash.Common.Document;
+using Crash.Communications;
+
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Crash.Client
 {
@@ -67,6 +70,38 @@ namespace Crash.Client
 
 			_connection.Closed += ConnectionClosedAsync;
 			_connection.Reconnecting += ConnectionReconnectingAsync;
+		}
+
+		public static async Task StartOrContinueLocalClient(CrashDoc crashDoc, Uri uri,
+															Action<IEnumerable<Change>> OnInit)
+		{
+			if (null == crashDoc) return;
+
+			string userName = crashDoc?.Users?.CurrentUser.Name;
+			if (string.IsNullOrEmpty(userName))
+			{
+				throw new System.Exception("A User has not been assigned!");
+			}
+
+			var state = crashDoc?.LocalClient?._connection?.State;
+			if (state is object && state != HubConnectionState.Disconnected)
+				await Task.CompletedTask;
+
+			CrashClient client = new CrashClient(userName, uri);
+			crashDoc.LocalClient = client;
+			client.OnInitialize += OnInit;
+
+			// TODO : Check for successful connection
+			await client.StartAsync();
+		}
+
+		public static async Task CloseLocalServer(CrashDoc crashDoc)
+		{
+			CrashServer? server = crashDoc?.LocalServer;
+			if (null == server) return;
+
+			server?.Stop();
+			server?.Dispose();
 		}
 
 		private Task ConnectionReconnectingAsync(Exception? arg)

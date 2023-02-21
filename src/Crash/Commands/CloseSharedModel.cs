@@ -31,7 +31,7 @@ namespace Crash.Commands
 		/// <inheritdoc />
 		protected override Result RunCommand(RhinoDoc doc, RunMode mode)
 		{
-			CrashClient? client = CrashDocRegistry.ActiveDoc?.LocalClient;
+			Client.CrashClient? client = CrashDocRegistry.ActiveDoc?.LocalClient;
 			if (null == client) return Result.Success;
 
 			bool? choice = _GetReleaseChoice();

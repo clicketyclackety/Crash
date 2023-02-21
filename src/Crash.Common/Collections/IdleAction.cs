@@ -2,7 +2,13 @@
 
 namespace Crash.Events
 {
-	public sealed class IdleAction
+
+	/// <summary>
+	/// Idle Actions are called in a FIFO order by the IdleQueue.
+	/// Inheriting from this is fine.
+	/// Do not override Invoke though.
+	/// </summary>
+	public class IdleAction : IDisposable
 	{
 
 		Action<CrashEventArgs> _action;
@@ -18,6 +24,11 @@ namespace Crash.Events
 		public void Invoke()
 		{
 			_action(_args);
+		}
+
+		public void Dispose()
+		{
+
 		}
 
 	}

@@ -20,4 +20,8 @@
     <ProjectReference Include="..\..\src\Crash.Common\Crash.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="..\..\.editorconfig" />
+  </ItemGroup>
+
 </Project>

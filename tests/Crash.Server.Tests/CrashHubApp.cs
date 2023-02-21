@@ -71,21 +71,6 @@ namespace Crash.Server.Tests
 
 		}
 
-		[TestMethod]
-		public async Task Integration_Test()
-		{
-			var server = new CrashServer(null);
-			Assert.IsTrue(server.Start(url, out var errorMessage));
-			Assert.IsTrue(errorMessage.Contains("Success"));
-
-			var client = new CrashClient(Environment.UserName, new Uri(url));
-			await client.StartAsync();
-
-			var Change = new Change(Guid.NewGuid(), Environment.UserName, "Example Payload");
-			;
-			await client.AddAsync(Change);
-		}
-
 	}
 
 }

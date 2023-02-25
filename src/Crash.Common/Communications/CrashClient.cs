@@ -12,6 +12,9 @@ namespace Crash.Client
 	{
 		HubConnection _connection;
 		string _user;
+		CrashDoc _crashDoc;
+
+		public bool IsConnected => _connection.State != HubConnectionState.Disconnected;
 
 		/// <summary>
 		/// Closed event
@@ -36,6 +39,11 @@ namespace Crash.Client
 		/// </summary>
 		/// <returns></returns>
 		public Task StopAsync() => _connection.StopAsync();
+
+		public CrashClient(CrashDoc crashDoc)
+		{
+			_crashDoc = crashDoc;
+		}
 
 		/// <summary>
 		/// Crash client constructor
@@ -88,6 +96,7 @@ namespace Crash.Client
 				await Task.CompletedTask;
 
 			CrashClient client = new CrashClient(userName, uri);
+			client._crashDoc = crashDoc;
 			crashDoc.LocalClient = client;
 			client.OnInitialize += OnInit;
 

@@ -42,7 +42,7 @@ namespace Crash.Commands
 			crashDoc = CrashDocRegistry.GetRelatedDocument(doc);
 
 			// Check Crash Doc
-			if (crashDoc?.LocalClient is object)
+			if (crashDoc?.LocalClient?.IsConnected == true)
 			{
 				RhinoApp.WriteLine("You are currently part of a Shared Model Session.");
 
@@ -73,10 +73,18 @@ namespace Crash.Commands
 
 			// TODO : Ensure Requested Server is available, and notify if not
 			ClientState clientState = new ClientState(crashDoc);
-			CrashClient.StartOrContinueLocalClient(crashDoc, ClientState.ClientUri,
-													clientState.Init);
+			Task task = CrashClient.StartOrContinueLocalClient(crashDoc, new Uri(LastURL),
+													clientState.Init); // .WithTimeout(new TimeSpan(0, 0, 30));
+			task.RunSynchronously();
+			if (!task.Wait(30_000))
+			{
+				RhinoApp.WriteLine("The Server Connection timed out");
+				return Result.Failure;
+			}
 
 			crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
+
+			InteractivePipe.Active.Enabled = true;
 
 			return Result.Success;
 		}

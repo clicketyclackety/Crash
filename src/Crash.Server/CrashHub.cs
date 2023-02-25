@@ -1,4 +1,5 @@
 ﻿using Crash.Changes.Extensions;
+
 using Microsoft.AspNetCore.SignalR;
 
 namespace Crash.Server

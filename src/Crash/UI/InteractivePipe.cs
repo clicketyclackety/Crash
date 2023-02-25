@@ -18,11 +18,12 @@ namespace Crash.UI
 	// grabs things from the CrashDoc
 	// There's no need to recreate the same class again and again
 	// and store so much geometry.
-	public sealed class InteractivePipe : IDisposable
+	internal sealed class InteractivePipe : IDisposable
 	{
 
-		private readonly int FAR_AWAY;
-		private readonly int VERY_FAR_AWAY;
+		double scale = RhinoDoc.ActiveDoc is object ? RhinoMath.UnitScale(UnitSystem.Meters, RhinoDoc.ActiveDoc.ModelUnitSystem) : 0;
+		private int FAR_AWAY => (int)scale * 15_000;
+		private int VERY_FAR_AWAY => (int)scale * 75_000;
 
 		// TODO : Does this ever get shrunk? It should do.
 		// TODO : Don't draw things not in the view port
@@ -33,7 +34,7 @@ namespace Crash.UI
 		/// <summary>
 		/// Pipeline enabled, disabling hides it
 		/// </summary>
-		public bool Enabled
+		internal bool Enabled
 		{
 			get => enabled;
 			set
@@ -55,7 +56,7 @@ namespace Crash.UI
 			}
 		}
 
-		public static InteractivePipe Active;
+		internal static InteractivePipe Active;
 
 		/// <summary>
 		/// Empty constructor
@@ -64,12 +65,7 @@ namespace Crash.UI
 		{
 			bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
 			PipeCameraCache = new Dictionary<Color, Line[]>();
-			Enabled = true;
-
-			double scale = RhinoMath.UnitScale(UnitSystem.Meters, RhinoDoc.ActiveDoc.ModelUnitSystem);
-			FAR_AWAY = (int)scale * 15_000;
-			FAR_AWAY = (int)scale * 15_000;
-			VERY_FAR_AWAY = (int)scale * 75_000;
+			Active = this;
 		}
 
 		/// <summary>
@@ -77,7 +73,7 @@ namespace Crash.UI
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		public void CalculateBoundingBox(object sender, CalculateBoundingBoxEventArgs e)
+		internal void CalculateBoundingBox(object sender, CalculateBoundingBoxEventArgs e)
 		{
 			e.IncludeBoundingBox(bbox);
 		}
@@ -87,7 +83,7 @@ namespace Crash.UI
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		public void PostDrawObjects(object sender, DrawEventArgs e)
+		internal void PostDrawObjects(object sender, DrawEventArgs e)
 		{
 			if (null == CrashDocRegistry.ActiveDoc?.CacheTable) return;
 			if (null == CrashDocRegistry.ActiveDoc?.Cameras) return;
@@ -262,6 +258,7 @@ namespace Crash.UI
 		{
 			throw new NotImplementedException();
 		}
+
 	}
 
 }

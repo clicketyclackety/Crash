@@ -19,6 +19,7 @@ namespace Crash.Common.Tables
 
 		private Dictionary<User, FixedSizedQueue<Camera>> cameraLocations;
 
+
 		public CameraTable(CrashDoc hostDoc)
 		{
 			cameraLocations = new Dictionary<User, FixedSizedQueue<Camera>>();
@@ -56,7 +57,7 @@ namespace Crash.Common.Tables
 			return cameraLocations.ToDictionary(cl => cl.Key, cl => cl.Value.FirstOrDefault());
 		}
 
-		public void TryAddCamera(CameraChange cameraChange)
+		public bool TryAddCamera(CameraChange cameraChange)
 		{
 			User user = new User(cameraChange.Owner);
 			FixedSizedQueue<Camera> queue;
@@ -65,13 +66,15 @@ namespace Crash.Common.Tables
 			{
 				queue = new FixedSizedQueue<Camera>(MAX_CAMERAS_IN_QUEUE);
 				queue.Enqueue(cameraChange.Camera);
+				cameraLocations.Add(user, queue);
 			}
 			else
 			{
-				cameraLocations.TryGetValue(user, out queue);
+				if (!cameraLocations.TryGetValue(user, out queue)) return false;
+				queue.Enqueue(cameraChange.Camera);
 			}
 
-			cameraLocations.Add(user, queue);
+			return true;
 		}
 
 		public void TryAddCamera(IEnumerable<CameraChange> cameraChanges)
@@ -83,7 +86,11 @@ namespace Crash.Common.Tables
 		}
 
 		public bool TryGetCamera(User user, out FixedSizedQueue<Camera> cameras)
-			=> cameraLocations.TryGetValue(user, out cameras);
+		{
+			bool test = cameraLocations.TryGetValue(user, out cameras);
+			;
+			return test;
+		}
 
 		public IEnumerator<Camera> GetEnumerator() => cameraLocations.Values.SelectMany(c => c).GetEnumerator();
 

@@ -42,11 +42,13 @@ namespace Crash.Common.Document
 
 		public CrashDoc()
 		{
+			id = Guid.NewGuid();
+
 			Users = new UserTable(this);
 			CacheTable = new ChangeTable(this);
 			Cameras = new CameraTable(this);
+
 			Queue = new IdleQueue(this);
-			id = Guid.NewGuid();
 		}
 
 

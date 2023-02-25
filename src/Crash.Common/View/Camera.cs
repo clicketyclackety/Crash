@@ -6,7 +6,9 @@ using Crash.Geometry;
 namespace Crash.Common.View
 {
 
-	// TODO : Unit Test serialization
+	/// <summary>
+	/// The Camera represents a user view.
+	/// </summary>
 	[JsonConverter(typeof(CameraConverter))]
 	public struct Camera : IEquatable<Camera>
 	{

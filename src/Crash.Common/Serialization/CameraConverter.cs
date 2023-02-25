@@ -8,7 +8,7 @@ namespace Crash.Common.Serialization
 {
 
 	/// <summary>
-	/// Converts the Camera class to and from JSON.
+	/// Converts the Camera class to and from JSON efficiently
 	/// </summary>
 	public class CameraConverter : JsonConverter<Camera>
 	{

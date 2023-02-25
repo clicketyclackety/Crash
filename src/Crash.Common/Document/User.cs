@@ -61,7 +61,7 @@ namespace Crash.Common.Document
 
 		public bool IsValid() => !string.IsNullOrEmpty(Name);
 
-		public override int GetHashCode() => Name.ToLower().GetHashCode();
+		public override int GetHashCode() => string.IsNullOrEmpty(Name) ? -1 : Name.GetHashCode();
 
 		public override bool Equals(object obj)
 		{

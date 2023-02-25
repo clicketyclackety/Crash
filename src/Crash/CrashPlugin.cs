@@ -21,7 +21,7 @@ namespace Crash
 		/// <inheritdoc />
 		protected override LoadReturnCode OnLoad(ref string errorMessage)
 		{
-			InteractivePipe.Active = new InteractivePipe() { Enabled = true };
+			InteractivePipe.Active = new InteractivePipe() { Enabled = false };
 
 			return base.OnLoad(ref errorMessage);
 		}

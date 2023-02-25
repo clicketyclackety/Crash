@@ -4,6 +4,7 @@ using Crash.Server.Model;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Crash.Server.Tests
 {
@@ -66,8 +67,6 @@ namespace Crash.Server.Tests
 
 			var Change = new Change(Guid.NewGuid(), Environment.UserName, "Example Payload");
 			crashClient.AddAsync(Change);
-
-			;
 
 		}
 

@@ -54,7 +54,7 @@ namespace Crash.Common.Changes
 		public static CameraChange CreateNew(Camera camera, string userName)
 		{
 			string json = JsonSerializer.Serialize(camera, Serialization.Options.Default);
-			global::IChange cameraChange = new Change(Guid.NewGuid(), userName, json);
+			IChange cameraChange = new Change(Guid.NewGuid(), userName, json);
 			return new CameraChange(cameraChange);
 		}
 

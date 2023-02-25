@@ -23,19 +23,16 @@ namespace Crash.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LockedBy")
+					b.Property<DateTime>("Stamp")
+						.HasColumnType("TEXT");
+
+					b.Property<string>("Owner")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Owner")
-                        .HasColumnType("TEXT");
+					b.Property<string>("Payload")
+						.HasColumnType("TEXT");
 
-                    b.Property<string>("Payload")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("Stamp")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("Temporary")
+					b.Property<int>("Action")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");

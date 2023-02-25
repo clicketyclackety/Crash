@@ -50,7 +50,7 @@ namespace Crash.Commands
 		{
 			rhinoDoc = doc;
 			crashDoc = CrashDocRegistry.GetRelatedDocument(doc);
-			if (crashDoc?.LocalClient is object || crashDoc.LocalServer.IsRunning)
+			if (crashDoc?.LocalServer is object && crashDoc.LocalServer.IsRunning)
 			{
 				string closeCommand = CloseSharedModel.Instance.EnglishName;
 				RhinoApp.WriteLine("You are currently part of a Shared Model Session. " +
@@ -84,10 +84,7 @@ namespace Crash.Commands
 				includePreExistingGeometry = _ContinueOrQuit() == true;
 			}
 
-			// Start Server Host
-			crashDoc.LocalServer.OnConnected += Server_OnConnected;
-			crashDoc.LocalServer.OnFailure += Server_OnFailure;
-
+			/*
 			while (crashDoc.LocalServer.IsRunning)
 			{
 				bool? close = _GetForceCloseOptions();
@@ -100,16 +97,25 @@ namespace Crash.Commands
 					break;
 				}
 			}
+			*/
 
 			try
 			{
+				crashDoc.LocalServer = new CrashServer(crashDoc);
 				crashDoc.LocalServer.Start(LastURLAndPort);
 				crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
+
+				// Start Server Host
+				crashDoc.LocalServer.OnConnected += Server_OnConnected;
+				crashDoc.LocalServer.OnFailure += Server_OnFailure;
 			}
-			catch
+			catch (Exception ex)
 			{
-				RhinoApp.WriteLine("The server ran into difficulties starting");
+				RhinoApp.WriteLine("The server ran into difficulties starting.");
+				RhinoApp.WriteLine($"More specifically ; {ex.Message}.");
 			}
+
+			InteractivePipe.Active.Enabled = true;
 
 			return Result.Success;
 		}

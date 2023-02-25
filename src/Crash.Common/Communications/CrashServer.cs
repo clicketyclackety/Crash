@@ -176,7 +176,7 @@ namespace Crash.Communications
 			if (started)
 			{
 				process.OutputDataReceived -= Process_OutputDataReceived;
-				OnConnected?.Invoke(this, null);
+				OnConnected?.Invoke(this, new CrashEventArgs(_crashDoc));
 			}
 		}
 

@@ -15,6 +15,7 @@ namespace Crash.Common.Tables
 
 		private CrashDoc crashDoc;
 
+		// TODO : Remove set from _users
 		public User CurrentUser { get; set; }
 
 		public UserTable(CrashDoc hostDoc)
@@ -23,9 +24,10 @@ namespace Crash.Common.Tables
 			crashDoc = hostDoc;
 		}
 
+		/// <summary>Adds a User only if they are not the Current User</summary>
 		public bool Add(User user)
 		{
-			// TODO : Add logic preventing add of current user?
+			if (CurrentUser.Equals(user)) return false;
 
 			if (!_users.ContainsKey(user.Name))
 			{
@@ -38,13 +40,17 @@ namespace Crash.Common.Tables
 			return false;
 		}
 
+		/// <summary>Adds a User only if they are not the Current User</summary>
 		public bool Add(string userName)
 		{
 			var user = new User(userName);
-
 			return Add(user);
 		}
 
+		/// <summary>Removes a User</summary>
+		public void Remove(User user) => Remove(user.Name);
+
+		/// <summary>Removes a User</summary>
 		public void Remove(string userName)
 		{
 			if (_users.TryGetValue(userName, out var user))
@@ -55,18 +61,23 @@ namespace Crash.Common.Tables
 			_users.Remove(userName);
 		}
 
+		/// <summary>Get a User by name</summary>
 		public User Get(string userName)
 		{
-			string lowerUserName = userName.ToLower();
-			if (_users.ContainsKey(lowerUserName)) return _users[lowerUserName];
-			return default(User);
+			string cleanUserName = User.CleanedUserName(userName);
+			if (_users.ContainsKey(cleanUserName))
+				return _users[cleanUserName];
+
+			return default;
 		}
 
 		public IEnumerator<User> GetEnumerator() => _users.Values.GetEnumerator();
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+		/// <summary>Fires each time a User is successfully added via Add</summary>
 		public event EventHandler<UserEventArgs> OnUserAdded;
+		/// <summary>Fires each time a User is successfuly removed via Remove</summary>
 		public event EventHandler<UserEventArgs> OnUserRemoved;
 
 	}

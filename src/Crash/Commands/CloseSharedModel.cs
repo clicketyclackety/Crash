@@ -1,5 +1,4 @@
-﻿using Crash.Client;
-using Crash.Handlers;
+﻿using Crash.Handlers;
 
 using Rhino.Commands;
 
@@ -42,6 +41,7 @@ namespace Crash.Commands
 				client.DoneAsync();
 
 			CrashDocRegistry.ActiveDoc?.Dispose();
+			InteractivePipe.Active.Enabled = false;
 
 			_EmptyModel(doc);
 

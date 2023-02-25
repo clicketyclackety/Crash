@@ -30,7 +30,6 @@ namespace Crash.Handlers
 		private static Curve cameraLocationRail;
 		private static Curve cameraTargetRail;
 
-		// TODO: Don't use static
 		private static DateTime lastChange = DateTime.Now;
 		private static Point3d lastLocation = Point3d.Unset;
 		private static Point3d lastTarget = Point3d.Unset;

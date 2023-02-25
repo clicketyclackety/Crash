@@ -18,13 +18,6 @@ namespace Crash.Utilities
 	/// </summary>
 	public sealed class ClientState
 	{
-		/// TODO : Move these lower down
-		public const string CrashPath = "Crash";
-		public static string LastUrl = "http://localhost";
-		public static string UrlAndPort => $"{LastUrl}{PortExt}";
-		private static string PortExt => LastPort <= 0 ? string.Empty : $":{LastPort}";
-		public static int LastPort = 5000;
-		public static Uri ClientUri => new Uri($"{UrlAndPort}/{CrashPath}");
 
 		private CrashDoc _crashDoc;
 

@@ -50,23 +50,44 @@ namespace Crash.Common.Tables.Tests
 		public void TestAddMoreThanMaxCameras()
 		{
 			// Arrange
+			int overMax = (CameraTable.MAX_CAMERAS_IN_QUEUE + 5);
 			CameraTable cameraTable = new CameraTable(new CrashDoc());
 
-			// Act
 			string userName = "Jeff";
 			User user = new User(userName);
-			int overMax = (CameraTable.MAX_CAMERAS_IN_QUEUE + 5);
+
+			// Act
 			for (int i = 0; i < overMax; i++)
 			{
 				Camera camera = new Camera(CPoint.Origin, new CPoint(1, 2, 3));
 				var change = CameraChange.CreateNew(camera, userName);
 				Assert.IsTrue(cameraTable.TryAddCamera(change));
 			}
+
 			Assert.IsNotEmpty(cameraTable);
 
 			// Assert
 			Assert.IsTrue(cameraTable.TryGetCamera(user, out FixedSizedQueue<Camera> cameras));
 			Assert.That(cameras.Count, Is.EqualTo(CameraTable.MAX_CAMERAS_IN_QUEUE));
+		}
+
+		[Test]
+		public void TestGetActiveCameras()
+		{
+			CameraTable cameraTable = new CameraTable(new CrashDoc());
+			string userName = "Jeff";
+
+			// Act
+			for (int i = 0; i < 5; i++)
+			{
+				Camera camera = new Camera(CPoint.Origin, new CPoint(1, 2, 3));
+				var change = CameraChange.CreateNew(camera, userName);
+				Assert.IsTrue(cameraTable.TryAddCamera(change));
+			}
+
+			// Assert
+			Assert.IsNotEmpty(cameraTable);
+			Assert.That(cameraTable.GetActiveCameras().Count, Is.EqualTo(1));
 		}
 
 		public sealed class CameraChanges

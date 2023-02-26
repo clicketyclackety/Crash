@@ -3,11 +3,17 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.Generic;
+
 using Crash.Geometry;
+
 using Rhino.Geometry;
 
 namespace Crash.Handlers
 {
+
+	/// <summary>
+	/// Geometry Converter Classes
+	/// </summary>
 	public static class Geometry
 	{
 

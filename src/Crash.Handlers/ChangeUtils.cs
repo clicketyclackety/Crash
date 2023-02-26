@@ -5,10 +5,12 @@ using Crash.Handlers.Changes;
 namespace Crash.Utils
 {
 
+	/// <summary>Utilities for Change Objects.</summary>
 	public static class ChangeUtils
 	{
 		private static string ChangeIdKey = "ChangeID";
 
+		/// <summary>Acquires the ChangeId from the Rhino Object</summary>
 		public static Guid? GetChangeId(Rhino.DocObjects.RhinoObject rObj)
 		{
 			if (rObj == null) return null;
@@ -19,6 +21,7 @@ namespace Crash.Utils
 			return null;
 		}
 
+		/// <summary>Adds the ChangeId to the Rhino Object and vice Verse.</summary>
 		public static void SyncHost(Rhino.DocObjects.RhinoObject rObj, IRhinoChange Change)
 		{
 			if (null == Change || rObj == null) return;
@@ -33,6 +36,7 @@ namespace Crash.Utils
 
 			Change.RhinoId = rObj.Id;
 		}
+
 	}
 
 }

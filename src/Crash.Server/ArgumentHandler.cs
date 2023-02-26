@@ -2,7 +2,9 @@
 
 namespace Crash.Server
 {
-	public class ArgumentHandler
+
+	/// <summary>Handles Arguments for the start up program</summary>
+	public sealed class ArgumentHandler
 	{
 
 		const string pattern = @"--([\w]+ [\S]+)";

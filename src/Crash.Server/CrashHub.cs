@@ -1,22 +1,26 @@
-﻿using Crash.Changes.Extensions;
+﻿using System.Runtime.CompilerServices;
+
+using Crash.Changes.Extensions;
+using Crash.Server.Model;
 
 using Microsoft.AspNetCore.SignalR;
 
+[assembly: InternalsVisibleTo("Crash.Server.Tests")]
 namespace Crash.Server
 {
 
 	/// <summary>
 	/// Server Implementation of ICrashClient EndPoints
 	/// </summary>
-	public sealed class CrashHub : Hub<ICrashClient>
+	public sealed class CrashHub : Hub<ICrashClient>, IAsyncEnumerable<Change>
 	{
-		Model.CrashContext _context;
+		CrashContext _context;
 
 		/// <summary>
 		/// Initialize with SqLite DB
 		/// </summary>
 		/// <param name="context"></param>
-		public CrashHub(Model.CrashContext context)
+		public CrashHub(CrashContext context)
 		{
 			_context = context;
 		}
@@ -135,8 +139,8 @@ namespace Crash.Server
 					return;
 
 				modSpec.RemoveAction(ChangeAction.Temporary);
-				modSpec.RemoveAction(ChangeAction.Lock);
-				modSpec.AddAction(ChangeAction.Unlock);
+				modSpec.RemoveAction(ChangeAction.Unlock);
+				modSpec.AddAction(ChangeAction.Lock);
 
 				_context.Changes.Update(modSpec);
 				await _context.SaveChangesAsync();
@@ -158,16 +162,15 @@ namespace Crash.Server
 		{
 			try
 			{
-				var unSelect = _context.Changes.FirstOrDefault(r => r.Id == id);
-				if (unSelect == null)
+				var modSpec = _context.Changes.FirstOrDefault(r => r.Id == id);
+				if (modSpec == null)
 					return;
 
-				ChangeAction changeAction = (ChangeAction)unSelect.Action;
-				changeAction ^= ChangeAction.Temporary;
-				changeAction |= ChangeAction.Unlock;
-				unSelect.Action = (int)changeAction;
+				modSpec.RemoveAction(ChangeAction.Temporary);
+				modSpec.RemoveAction(ChangeAction.Lock);
+				modSpec.AddAction(ChangeAction.Unlock);
 
-				_context.Changes.Update(unSelect);
+				_context.Changes.Update(modSpec);
 				await _context.SaveChangesAsync();
 			}
 			catch (Exception ex)
@@ -209,5 +212,17 @@ namespace Crash.Server
 			var Changes = _context.Changes.ToArray();
 			await Clients.Caller.Initialize(Changes);
 		}
+
+		public IAsyncEnumerator<Change> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+			=> _context.Changes.GetAsyncEnumerator(cancellationToken);
+
+		public int Count => _context.Changes.Count();
+
+		internal bool TryGet(Guid changeId, out Change change)
+		{
+			change = _context.Changes.FirstOrDefault(c => c.Id == changeId);
+			return change is object;
+		}
+
 	}
 }

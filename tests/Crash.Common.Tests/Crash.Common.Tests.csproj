@@ -24,8 +24,4 @@
     <AdditionalFiles Include="..\..\.editorconfig" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Changes\" />
-  </ItemGroup>
-
 </Project>

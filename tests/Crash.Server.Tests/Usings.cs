@@ -1,1 +1,1 @@
-﻿
+global using NUnit.Framework;

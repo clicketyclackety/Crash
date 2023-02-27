@@ -53,7 +53,9 @@ namespace Crash.Communications
 		/// <param name="isMac">Is the given OS Mac?</param>
 		/// <param name="errorMessage">The error, if nay</param>
 		/// <returns>True on success, false otherwise</returns>
-		public void Start(string url)
+		public void Start(string url) => Start(getStartInfo(getServerExecutablePath(), url));
+
+		internal void Start(ProcessStartInfo startInfo)
 		{
 			string errorMessage = "Server Started Successfully";
 
@@ -66,14 +68,14 @@ namespace Crash.Communications
 			try
 			{
 				var serverExecutable = getServerExecutablePath();
-				createAndRegisterServerProcess(serverExecutable, url);
+
+				createAndRegisterServerProcess(startInfo);
 			}
 			catch (FileNotFoundException)
 			{
 				errorMessage = "Could not find Server exe";
 				throw new FileNotFoundException(errorMessage);
 			}
-
 		}
 
 		private bool checkForPreExistingServer()
@@ -95,40 +97,45 @@ namespace Crash.Communications
 			return processes.All(p => null == p || p.HasExited);
 		}
 
-		private string getServerExecutablePath()
+		internal string getServerExecutablePath()
 		{
-			var currentPath = Path.GetDirectoryName(typeof(CrashServer).Assembly.Location);
-			var serverExes = Directory.GetFiles(currentPath, $"{ProcessName}.exe", SearchOption.AllDirectories);
-
-			if (null == serverExes || serverExes.Length == 0)
+			string currentDirectory = typeof(CrashServer).Assembly.Location;
+			string[] serverExes = Array.Empty<string>();
+			do
 			{
-				throw new FileNotFoundException("Could not find Server Eexcutable!");
+				currentDirectory = Path.GetDirectoryName(currentDirectory);
+				serverExes = Directory.GetFiles(currentDirectory, $"{ProcessName}.exe", SearchOption.AllDirectories);
 			}
+			while (null == serverExes || serverExes.Length == 0);
 
 			var serverExecutable = serverExes.FirstOrDefault();
 			return serverExecutable;
 		}
 
 		// https://stackoverflow.com/questions/4291912/process-start-how-to-get-the-output
-		private ProcessStartInfo getstartInfo(string serverExecutable, string url)
+		internal ProcessStartInfo getStartInfo(string serverExecutable, string url)
 		{
 			var startInfo = new ProcessStartInfo()
 			{
 				FileName = serverExecutable,
-				Arguments = $"--urls \"{url}\"",
-				CreateNoWindow = true,
+				Arguments = $"--urls {url}",
+				CreateNoWindow = !Debugger.IsAttached,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
 				UseShellExecute = false,
 			};
+
 			return startInfo;
 		}
 
 		// https://stackoverflow.com/questions/285760/how-to-spawn-a-process-and-capture-its-stdout-in-net
-		private void createAndRegisterServerProcess(string serverExecutable, string url)
+		internal void createAndRegisterServerProcess(ProcessStartInfo startInfo)
 		{
+			if (null == startInfo)
+				throw new ArgumentNullException("Process Info is null");
+
 			process = new Process();
-			process.StartInfo = getstartInfo(serverExecutable, url);
+			process.StartInfo = startInfo;
 			process.EnableRaisingEvents = true;
 
 			// Register fresh
@@ -137,16 +144,24 @@ namespace Crash.Communications
 			process.OutputDataReceived += Process_OutputDataReceived;
 			process.ErrorDataReceived += Process_ErrorDataReceived;
 
-			process.Start();
-			process.BeginOutputReadLine();
-			process.BeginErrorReadLine();
+			if (!process.Start())
+				throw new ApplicationException("Failed to start server!");
+
+			if (startInfo.RedirectStandardOutput)
+				process.BeginOutputReadLine();
+
+			if (startInfo.RedirectStandardError)
+				process.BeginErrorReadLine();
 		}
 
+		internal List<string> Messages = new List<string>();
 
 		private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
 		{
 			var data = e.Data;
 			if (string.IsNullOrEmpty(data)) return;
+			Messages.Add(data);
+
 			EventArgs args;
 
 			if (data.Contains("failed to bind") ||
@@ -156,20 +171,25 @@ namespace Crash.Communications
 				var portInUseMessage = "Given Port is already in use! Try another!";
 				args = new ErrorEventArgs(new AddressInUseException(portInUseMessage));
 			}
+			else if (data.Contains("hostpolicy.dll"))
+			{
+				args = new ErrorEventArgs(new AddressInUseException("Unknown error."));
+			}
 			else
 			{
 				args = new ErrorEventArgs(new Exception(data));
 			}
 
-			process.ErrorDataReceived -= Process_ErrorDataReceived;
+			// process.ErrorDataReceived -= Process_ErrorDataReceived;
 			OnFailure?.Invoke(this, new CrashEventArgs(_crashDoc));
-			Stop();
+			// Stop();
 		}
 
 		private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
 		{
 			var data = e.Data;
 			if (string.IsNullOrEmpty(data)) return;
+			Messages.Add(data);
 
 			Console.WriteLine(data);
 			var started = data.ToLower().Contains("now listening on: http");
@@ -183,8 +203,7 @@ namespace Crash.Communications
 		private void Process_Exited(object sender, EventArgs e)
 		{
 			// TODO : Capture Exit and either attempt restart or exit application
-			// Stop();
-			;
+			Messages.Add("Exited!");
 		}
 
 

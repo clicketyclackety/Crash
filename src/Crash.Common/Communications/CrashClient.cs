@@ -5,11 +5,25 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Crash.Client
 {
+
 	/// <summary>
 	/// Crash client class
 	/// </summary>
-	public sealed class CrashClient
+	public class CrashClient
 	{
+		#region consts
+		const string ADD = "Add";
+		const string DELETE = "Delete";
+		const string DONE = "Done";
+		const string UPDATE = "Update";
+		const string SELECT = "Select";
+		const string UNSELECT = "Unselect";
+		const string INITIALIZE = "Initialize";
+		const string CAMERACHANGE = "CameraChange";
+
+		public const string DefaultURL = "http://0.0.0.0";
+		#endregion
+
 		HubConnection _connection;
 		string _user;
 		CrashDoc _crashDoc;
@@ -40,17 +54,12 @@ namespace Crash.Client
 		/// <returns></returns>
 		public Task StopAsync() => _connection.StopAsync();
 
-		public CrashClient(CrashDoc crashDoc)
-		{
-			_crashDoc = crashDoc;
-		}
-
 		/// <summary>
 		/// Crash client constructor
 		/// </summary>
 		/// <param name="userName">user name</param>
 		/// <param name="url">url</param>
-		public CrashClient(string userName, Uri url)
+		public CrashClient(CrashDoc crashDoc, string userName, Uri url)
 		{
 			if (string.IsNullOrEmpty(userName))
 			{
@@ -60,27 +69,43 @@ namespace Crash.Client
 			{
 				throw new UriFormatException("URL Cannot be null");
 			}
+			if (!url.AbsoluteUri.Contains("/Crash"))
+			{
+				throw new UriFormatException("URL must end in /Crash to connect!");
+			}
 
+			_crashDoc = crashDoc;
 			_user = userName;
-			_connection = new HubConnectionBuilder()
-				.WithUrl(url)
-				.WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromSeconds(10) })
-				.Build();
+			_connection = getHubConnection(url);
+			RegisterConnections();
+		}
 
-			_connection.On<string, Change>("Add", (user, Change) => OnAdd?.Invoke(user, Change));
-			_connection.On<string, Guid>("Delete", (user, id) => OnDelete?.Invoke(user, id));
-			_connection.On<string, Guid, Change>("Update", (user, id, Change) => OnUpdate?.Invoke(user, id, Change));
-			_connection.On<string>("Done", (user) => OnDone?.Invoke(user));
-			_connection.On<string, Guid>("Select", (user, id) => OnSelect?.Invoke(user, id));
-			_connection.On<string, Guid>("Unselect", (user, id) => OnUnselect?.Invoke(user, id));
-			_connection.On<Change[]>("Initialize", (Changes) => OnInitialize?.Invoke(Changes));
-			_connection.On<string, Change>("CameraChange", (user, Change) => OnCameraChange?.Invoke(user, Change));
+		internal static HubConnection getHubConnection(Uri url)
+		{
+			return new HubConnectionBuilder()
+			   .WithUrl(url)
+			   .WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromSeconds(10) })
+			   .Build();
+		}
+
+		internal void RegisterConnections()
+		{
+			// How to test?
+			// Does it need to be AddAsync now?
+			_connection.On<string, Change>(ADD, (user, Change) => OnAdd?.Invoke(user, Change));
+			_connection.On<string, Guid>(DELETE, (user, id) => OnDelete?.Invoke(user, id));
+			_connection.On<string, Guid, Change>(UPDATE, (user, id, Change) => OnUpdate?.Invoke(user, id, Change));
+			_connection.On<string>(DONE, (user) => OnDone?.Invoke(user));
+			_connection.On<string, Guid>(SELECT, (user, id) => OnSelect?.Invoke(user, id));
+			_connection.On<string, Guid>(UNSELECT, (user, id) => OnUnselect?.Invoke(user, id));
+			_connection.On<Change[]>(INITIALIZE, (Changes) => OnInitialize?.Invoke(Changes));
+			_connection.On<string, Change>(CAMERACHANGE, (user, Change) => OnCameraChange?.Invoke(user, Change));
 
 			_connection.Closed += ConnectionClosedAsync;
 			_connection.Reconnecting += ConnectionReconnectingAsync;
 		}
 
-		public static async Task StartOrContinueLocalClient(CrashDoc crashDoc, Uri uri,
+		public static async Task StartOrContinueLocalClientAsync(CrashDoc crashDoc, Uri uri,
 															Action<IEnumerable<Change>> OnInit)
 		{
 			if (null == crashDoc) return;
@@ -95,7 +120,7 @@ namespace Crash.Client
 			if (state is object && state != HubConnectionState.Disconnected)
 				await Task.CompletedTask;
 
-			CrashClient client = new CrashClient(userName, uri);
+			CrashClient client = new CrashClient(crashDoc, userName, uri);
 			client._crashDoc = crashDoc;
 			crashDoc.LocalClient = client;
 			client.OnInitialize += OnInit;
@@ -133,7 +158,7 @@ namespace Crash.Client
 		/// <returns></returns>
 		public async Task UpdateAsync(Guid id, Change Change)
 		{
-			await _connection.InvokeAsync("Update", _user, id, Change);
+			await _connection.InvokeAsync(UPDATE, _user, id, Change);
 		}
 
 		/// <summary>
@@ -143,29 +168,25 @@ namespace Crash.Client
 		/// <returns>returns task</returns>
 		public async Task DeleteAsync(Guid id)
 		{
-			await _connection.InvokeAsync("Delete", _user, id);
+			await _connection.InvokeAsync(DELETE, _user, id);
 		}
 
-		/// <summary>
-		/// Add to database
-		/// </summary>
-		/// <param name="Change">Change</param>
-		/// <returns>task</returns>
+		/// <summary>Adds a change to database </summary>
 		public async Task AddAsync(Change Change)
 		{
-			await _connection.InvokeAsync("Add", _user, Change);
+			await _connection.InvokeAsync(ADD, _user, Change);
 		}
 
 		/// <summary>Done</summary>
 		public async Task DoneAsync()
 		{
-			await _connection.InvokeAsync("Done", _user);
+			await _connection.InvokeAsync(DONE, _user);
 		}
 
 		/// <summary>Select event</summary>
 		public async Task SelectAsync(Guid id)
 		{
-			await _connection.InvokeAsync("Select", _user, id);
+			await _connection.InvokeAsync(SELECT, _user, id);
 		}
 
 		/// <summary>
@@ -175,7 +196,7 @@ namespace Crash.Client
 		/// <returns></returns>
 		public async Task UnselectAsync(Guid id)
 		{
-			await _connection.InvokeAsync("Unselect", _user, id);
+			await _connection.InvokeAsync(UNSELECT, _user, id);
 		}
 
 		/// <summary>
@@ -185,7 +206,7 @@ namespace Crash.Client
 		/// <returns></returns>
 		public async Task CameraChangeAsync(Change Change)
 		{
-			await _connection.InvokeAsync("CameraChange", _user, Change);
+			await _connection.InvokeAsync(CAMERACHANGE, _user, Change);
 		}
 
 		/// <summary>

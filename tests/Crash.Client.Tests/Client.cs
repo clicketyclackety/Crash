@@ -1,4 +1,6 @@
-﻿namespace Crash.Client.Tests
+﻿using Crash.Common.Document;
+
+namespace Crash.Client.Tests
 {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 
@@ -9,19 +11,20 @@
 		[TestMethod]
 		public void InvalidConstructorArgs()
 		{
-
-			Assert.ThrowsException<ArgumentException>(() => new CrashClient(null, null));
-			Assert.ThrowsException<ArgumentException>(() => new CrashClient(string.Empty, null));
-			Assert.ThrowsException<UriFormatException>(() => new CrashClient(string.Empty, new Uri(string.Empty)));
-			Assert.ThrowsException<UriFormatException>(() => new CrashClient(string.Empty, new Uri("htp://@.co://192")));
-			Assert.ThrowsException<UriFormatException>(() => new CrashClient("Paul", null));
+			CrashDoc crashDoc = new CrashDoc();
+			Assert.ThrowsException<ArgumentException>(() => new CrashClient(crashDoc, null, null));
+			Assert.ThrowsException<ArgumentException>(() => new CrashClient(crashDoc, string.Empty, null));
+			Assert.ThrowsException<UriFormatException>(() => new CrashClient(crashDoc, string.Empty, new Uri(string.Empty)));
+			Assert.ThrowsException<UriFormatException>(() => new CrashClient(crashDoc, string.Empty, new Uri("htp://@.co://192")));
+			Assert.ThrowsException<UriFormatException>(() => new CrashClient(crashDoc, "Paul", null));
 		}
 
 		// [TestMethod] // Seems to be failing
 		public async Task SelectAsync()
 		{
 
-			var client = new CrashClient("Me", new Uri("http://localhost:5000/Crash"));
+			var crashDoc = new CrashDoc();
+			var client = new CrashClient(crashDoc, "Me", new Uri("http://localhost:5000/Crash"));
 			await client.StartAsync();
 			await client.SelectAsync(Guid.Empty);
 		}

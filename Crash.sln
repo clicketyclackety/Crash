@@ -40,6 +40,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Common.Tests", "tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server.Tests", "tests\Crash.Server.Tests\Crash.Server.Tests.csproj", "{AA1EC5CB-DE00-4131-B373-BF2D68272FA3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Integration.Tests", "tests\Crash.Integration.Tests\Crash.Integration.Tests.csproj", "{BAB96982-1FB2-4EDF-88A5-DFA0A0EC9A36}"
+	ProjectSection(ProjectDependencies) = postProject
+		{546E1EBF-7B4C-49C4-92F4-4325C248A473} = {546E1EBF-7B4C-49C4-92F4-4325C248A473}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +91,10 @@ Global
 		{AA1EC5CB-DE00-4131-B373-BF2D68272FA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA1EC5CB-DE00-4131-B373-BF2D68272FA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA1EC5CB-DE00-4131-B373-BF2D68272FA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAB96982-1FB2-4EDF-88A5-DFA0A0EC9A36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAB96982-1FB2-4EDF-88A5-DFA0A0EC9A36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAB96982-1FB2-4EDF-88A5-DFA0A0EC9A36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAB96982-1FB2-4EDF-88A5-DFA0A0EC9A36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,6 +105,7 @@ Global
 		{19BB92CF-8ED3-4A75-A252-B8D54EA25BC3} = {F8397E91-1EEA-4960-9685-7F76B23F642D}
 		{9CAFF6D2-E619-44BB-8BEC-75BCC9B45E40} = {F8397E91-1EEA-4960-9685-7F76B23F642D}
 		{AA1EC5CB-DE00-4131-B373-BF2D68272FA3} = {F8397E91-1EEA-4960-9685-7F76B23F642D}
+		{BAB96982-1FB2-4EDF-88A5-DFA0A0EC9A36} = {F8397E91-1EEA-4960-9685-7F76B23F642D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D9F64F3-0D9F-4D7F-9445-5215BF29D663}

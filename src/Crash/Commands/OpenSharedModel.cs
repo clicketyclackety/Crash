@@ -73,7 +73,7 @@ namespace Crash.Commands
 
 			// TODO : Ensure Requested Server is available, and notify if not
 			ClientState clientState = new ClientState(crashDoc);
-			Task task = CrashClient.StartOrContinueLocalClient(crashDoc, new Uri(LastURL),
+			Task task = CrashClient.StartOrContinueLocalClientAsync(crashDoc, new Uri(LastURL),
 													clientState.Init); // .WithTimeout(new TimeSpan(0, 0, 30));
 			task.RunSynchronously();
 			if (!task.Wait(30_000))

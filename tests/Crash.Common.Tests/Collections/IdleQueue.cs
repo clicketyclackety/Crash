@@ -4,7 +4,8 @@ using Crash.Events;
 
 namespace Crash.Common.Tests
 {
-	public class IdleQueueTests
+
+	public sealed class IdleQueueTests
 	{
 		[Test]
 		public void Count_ReturnsZero_WhenQueueIsEmpty()

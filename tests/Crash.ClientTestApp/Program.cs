@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Crash.Client;
+using Crash.Common.Document;
 
 namespace Crash.ClientTestApp
 {
@@ -23,7 +24,8 @@ namespace Crash.ClientTestApp
 			Console.WriteLine("\tc = Create Change");
 			Console.WriteLine("\tq = Quit");
 
-			var client = new CrashClient(userId, new Uri("http://localhost:8080/Crash"));
+			var crashDoc = new CrashDoc();
+			var client = new CrashClient(crashDoc, userId, new Uri("http://localhost:8080/Crash"));
 
 			client.OnAdd += (user, Change) =>
 			{

@@ -24,8 +24,10 @@ namespace Crash.Commands
 		private CrashDoc crashDoc;
 
 		private int LastPort = CrashServer.DefaultPort;
-		private string LastURL = CrashServer.DefaultURL;
-		private string LastURLAndPort => $"{LastURL}:{LastPort}";
+		private string LastServerURL = CrashServer.DefaultURL;
+		private string LastClientURL = CrashClient.DefaultURL;
+		private string LastServerURLAndPort => $"{LastServerURL}:{LastPort}";
+		private string LastClientURLAndPort => $"{LastClientURL}:{LastPort}/Crash";
 
 		private bool includePreExistingGeometry = false;
 
@@ -102,12 +104,12 @@ namespace Crash.Commands
 			try
 			{
 				crashDoc.LocalServer = new CrashServer(crashDoc);
-				crashDoc.LocalServer.Start(LastURLAndPort);
-				crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
 
-				// Start Server Host
+				crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
 				crashDoc.LocalServer.OnConnected += Server_OnConnected;
 				crashDoc.LocalServer.OnFailure += Server_OnFailure;
+
+				crashDoc.LocalServer.Start(LastServerURLAndPort);
 			}
 			catch (Exception ex)
 			{
@@ -188,7 +190,7 @@ namespace Crash.Commands
 			try
 			{
 				ClientState clientState = new ClientState(crashDoc);
-				CrashClient.StartOrContinueLocalClient(crashDoc, new Uri(LastURLAndPort), clientState.Init);
+				CrashClient.StartOrContinueLocalClientAsync(crashDoc, new Uri(LastClientURLAndPort), clientState.Init);
 
 				if (includePreExistingGeometry)
 					AddPreExistingGeometry(e.CrashDoc);

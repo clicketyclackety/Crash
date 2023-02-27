@@ -201,6 +201,13 @@ namespace Crash.Server
 			await Clients.Others.CameraChange(user, new Change(Change)); // Why the new class?
 		}
 
+		/// <summary>User disconnects</summary>
+		public override Task OnDisconnectedAsync(Exception? exception)
+		{
+			// Does this account for not reconnecting?
+			return base.OnDisconnectedAsync(exception);
+		}
+
 		/// <summary>
 		/// On Connected send user Changes from DB
 		/// </summary>

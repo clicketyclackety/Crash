@@ -8,7 +8,7 @@ namespace Crash.Integration.Tests
 	public sealed class ClientServerTests
 	{
 		const string port = "8080";
-		const string clientUrl = $"http://localhost:{port}/Crash";
+		const string clientUrl = $"http://127.0.0.1:{port}/Crash";
 		const string serverUrl = $"http://0.0.0.0:{port}";
 		static Uri uri = new Uri(clientUrl);
 

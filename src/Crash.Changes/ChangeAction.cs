@@ -7,7 +7,7 @@
 [Flags]
 public enum ChangeAction
 {
-	Unset = 1 << 0,
+	None = 1 << 0,
 
 	Add = 1 << 1,
 	Remove = 1 << 2,

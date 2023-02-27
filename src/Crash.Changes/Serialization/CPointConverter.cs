@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Crash.Geometry;
 
 namespace Crash.Changes.Serialization
@@ -18,12 +19,24 @@ namespace Crash.Changes.Serialization
 				throw new JsonException();
 			}
 
-			if (reader.Read() && reader.TryGetDouble(out double x) &&
-				reader.Read() && reader.TryGetDouble(out double y) &&
-				reader.Read() && reader.TryGetDouble(out double z) &&
-				reader.Read() && reader.TokenType == JsonTokenType.EndArray)
+			string? x, y, z;
+
+			if (!reader.Read()) throw new JsonException("Couldn't find x!");
+			x = reader.GetString();
+
+			if (!reader.Read()) throw new JsonException("Couldn't find y!");
+			y = reader.GetString();
+
+			if (!reader.Read()) throw new JsonException("Couldn't find z!");
+			z = reader.GetString();
+
+			if (reader.Read() && reader.TokenType == JsonTokenType.EndArray)
 			{
-				return new CPoint(x, y, z);
+				double xNum = FloatingDoubleConverter.FromString(x);
+				double yNum = FloatingDoubleConverter.FromString(y);
+				double zNum = FloatingDoubleConverter.FromString(z);
+
+				return new CPoint(xNum, yNum, zNum);
 			}
 			else
 			{
@@ -34,9 +47,9 @@ namespace Crash.Changes.Serialization
 		public override void Write(Utf8JsonWriter writer, CPoint value, JsonSerializerOptions options)
 		{
 			writer.WriteStartArray();
-			writer.WriteNumberValue(value.X);
-			writer.WriteNumberValue(value.Y);
-			writer.WriteNumberValue(value.Z);
+			writer.WriteStringValue(FloatingDoubleConverter.ToString(value.X));
+			writer.WriteStringValue(FloatingDoubleConverter.ToString(value.Y));
+			writer.WriteStringValue(FloatingDoubleConverter.ToString(value.Z));
 			writer.WriteEndArray();
 		}
 	}

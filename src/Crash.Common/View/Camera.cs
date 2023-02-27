@@ -26,8 +26,14 @@ namespace Crash.Common.View
 			Time = DateTime.UtcNow;
 		}
 
+		/// <summary>A non-existant Camera</summary>
+		public static Camera None => new Camera(CPoint.None, CPoint.None);
+
+
 		public bool IsValid()
 			=> Location != Target &&
+			   Location != CPoint.None &&
+			   Target != CPoint.None &&
 			Time > DateTime.MinValue &&
 			Time < DateTime.MaxValue;
 

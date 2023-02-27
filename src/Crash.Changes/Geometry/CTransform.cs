@@ -94,7 +94,9 @@ namespace Crash.Geometry
 				!values.Any(v =>
 				{
 					return double.IsNaN(v) ||
-						   double.IsInfinity(v);
+							double.IsInfinity(v) ||
+						   double.MaxValue == v ||
+						   double.MinValue == v;
 				});
 
 		}

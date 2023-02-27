@@ -32,10 +32,9 @@ namespace Crash.Common.Tables
 			if (!_users.ContainsKey(user.Name))
 			{
 				_users.Add(user.Name, user);
+				OnUserAdded?.Invoke(this, new UserEventArgs(user));
 				return true;
 			}
-
-			OnUserAdded?.Invoke(this, new UserEventArgs(user));
 
 			return false;
 		}
@@ -55,7 +54,7 @@ namespace Crash.Common.Tables
 		{
 			if (_users.TryGetValue(userName, out var user))
 			{
-				OnUserAdded?.Invoke(this, new UserEventArgs(user));
+				OnUserRemoved?.Invoke(this, new UserEventArgs(user));
 			}
 
 			_users.Remove(userName);

@@ -5,49 +5,31 @@ using Crash.Geometry;
 
 namespace Crash.Changes.Serialization
 {
+
 	public sealed class CTransformConverter : JsonConverter<CTransform>
 	{
-		/*
-		const string m00_KEY = "00";
-		const string m01_KEY = "01";
-		const string m02_KEY = "02";
-		const string m03_KEY = "03";
-
-		const string m10_KEY = "10";
-		const string m11_KEY = "11";
-		const string m12_KEY = "12";
-		const string m13_KEY = "13";
-
-		const string m20_KEY = "20";
-		const string m21_KEY = "21";
-		const string m22_KEY = "22";
-		const string m23_KEY = "23";
-
-		const string m30_KEY = "30";
-		const string m31_KEY = "31";
-		const string m32_KEY = "32";
-		const string m33_KEY = "33";
-		*/
 
 		private static double GetValue(ref Utf8JsonReader reader)
 		{
-			if (reader.TokenType != JsonTokenType.Number)
+			if (reader.TokenType != JsonTokenType.String)
 			{
 				return 0;
 			}
-			double value = reader.GetDouble();
+
+			string? numberValue = reader.GetString();
+			double number = FloatingDoubleConverter.FromString(numberValue);
 
 			reader.Read();
 
-			return value;
+			return number;
 		}
 
 		private static void SetValue(ref Utf8JsonWriter writer, int row, int column, CTransform transform)
 		{
 			double value = transform[row, column];
-			if (value == 0) return;
+			string numberValue = FloatingDoubleConverter.ToString(value);
 
-			writer.WriteNumberValue(value);
+			writer.WriteStringValue(numberValue);
 		}
 
 		public override CTransform Read(ref Utf8JsonReader reader, System.Type typeToConvert, JsonSerializerOptions options)
@@ -63,7 +45,7 @@ namespace Crash.Changes.Serialization
 
 				GetValue(ref reader), // [1,0]
 				GetValue(ref reader), // [1,1]
-				GetValue(ref reader), // [1,2]
+				GetValue(ref reader), // [1,2] 
 				GetValue(ref reader), // [1,3]
 
 				GetValue(ref reader), // [2,0]
@@ -111,4 +93,5 @@ namespace Crash.Changes.Serialization
 		}
 
 	}
+
 }

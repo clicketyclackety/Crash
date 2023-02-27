@@ -1,4 +1,5 @@
-﻿public sealed class Change : IChange
+﻿/// <summary>Provides a reliable class for communication</summary>
+public sealed class Change : IChange
 {
 
 	public DateTime Stamp { get; set; }
@@ -9,7 +10,7 @@
 
 	public string? Payload { get; set; }
 
-	public int Action { get; set; } = 0;
+	public int Action { get; set; } = (int)ChangeAction.None;
 
 	// For Deserialize Only
 	public Change() { }

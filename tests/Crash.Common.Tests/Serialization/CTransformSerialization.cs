@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Collections;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 using Crash.Geometry;
@@ -8,8 +9,6 @@ namespace Crash.Common.Tests.Serialization
 	[TestFixture]
 	public sealed class CTransformSerializationTests
 	{
-		const double MIN = -123456789.123456789;
-		const double MAX = MIN * -1;
 
 		internal readonly static JsonSerializerOptions TestOptions;
 
@@ -26,14 +25,11 @@ namespace Crash.Common.Tests.Serialization
 			};
 		}
 
-		/*
-		[TestCaseSource(typeof(InvalidTransformValues), nameof(InvalidValues.TestCases))]
-		public bool TestCTransformSerializationMaximums(double[] values)
+		[TestCaseSource(typeof(InvalidTransformValues), nameof(InvalidTransformValues.TestCases))]
+		public void TestCTransformSerializationMaximums(CTransform transform)
 		{
-			TestCTransformSerialization(new CTransform(values));
-			return false;
+			TestCTransformSerialization(transform);
 		}
-		*/
 
 		[TestCase(1)]
 		[TestCase(10)]
@@ -69,6 +65,22 @@ namespace Crash.Common.Tests.Serialization
 			}
 
 		}
+
+		public static class InvalidTransformValues
+		{
+			public static IEnumerable TestCases
+			{
+				get
+				{
+					yield return new CTransform(double.NaN, 0);
+					yield return new CTransform(double.NegativeInfinity);
+					yield return new CTransform(double.PositiveInfinity);
+					yield return new CTransform(double.MaxValue);
+					yield return new CTransform(double.MinValue);
+				}
+			}
+		}
+
 
 	}
 }

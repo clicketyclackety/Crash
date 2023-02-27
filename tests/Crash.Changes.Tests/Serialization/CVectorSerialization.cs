@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Crash.Geometry;
 
 namespace Crash.Changes.Tests.Serialization
@@ -27,6 +28,7 @@ namespace Crash.Changes.Tests.Serialization
 
 		[TestCase(double.NaN, double.NaN, double.NaN)]
 		[TestCase(double.MaxValue, double.MinValue, double.NaN)]
+		[TestCase(double.NegativeInfinity, double.PositiveInfinity, double.NaN)]
 		public void TestCVectorSerializationMaximums(double x, double y, double z)
 		{
 			TestCVectorSerializtion(new CVector(x, y, z));

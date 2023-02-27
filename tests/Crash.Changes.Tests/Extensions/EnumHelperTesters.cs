@@ -7,7 +7,7 @@ namespace Crash.Changes.Tests.Extensions
 	public sealed class EnumHelperTesters
 	{
 
-		[TestCase(ChangeAction.Unset | ChangeAction.Unset, ChangeAction.Unset)]
+		[TestCase(ChangeAction.None | ChangeAction.None, ChangeAction.None)]
 		[TestCase(ChangeAction.Add | ChangeAction.Add, ChangeAction.Add)]
 		[TestCase(ChangeAction.Remove | ChangeAction.Remove, ChangeAction.Remove)]
 		[TestCase(ChangeAction.Update | ChangeAction.Update, ChangeAction.Update)]
@@ -32,7 +32,7 @@ namespace Crash.Changes.Tests.Extensions
 			Assert.True(newAction.HasFlag(adder));
 		}
 
-		[TestCase(ChangeAction.Unset | ChangeAction.Unset, ChangeAction.Unset)]
+		[TestCase(ChangeAction.None | ChangeAction.None, ChangeAction.None)]
 		[TestCase(ChangeAction.Add | ChangeAction.Add, ChangeAction.Add)]
 		[TestCase(ChangeAction.Remove | ChangeAction.Remove, ChangeAction.Remove)]
 		[TestCase(ChangeAction.Update | ChangeAction.Update, ChangeAction.Update)]

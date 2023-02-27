@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Crash.Geometry;
 
 namespace Crash.Changes.Tests.Serialization
@@ -7,8 +8,6 @@ namespace Crash.Changes.Tests.Serialization
 	[TestFixture]
 	public sealed class CPointSerializationTests
 	{
-		const double MIN = -123456789.123456789;
-		const double MAX = MIN * -1;
 
 		internal readonly static JsonSerializerOptions TestOptions;
 
@@ -27,6 +26,7 @@ namespace Crash.Changes.Tests.Serialization
 
 		[TestCase(double.NaN, double.NaN, double.NaN)]
 		[TestCase(double.MaxValue, double.MinValue, double.NaN)]
+		[TestCase(double.NegativeInfinity, double.PositiveInfinity, double.NaN)]
 		public void TestCPointSerializationMaximums(double x, double y, double z)
 		{
 			TestCPointSerializtion(new CPoint(x, y, z));
@@ -39,9 +39,9 @@ namespace Crash.Changes.Tests.Serialization
 		{
 			for (var i = 0; i < count; i++)
 			{
-				var x = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
-				var y = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
-				var z = TestContext.CurrentContext.Random.NextDouble(MIN, MAX);
+				var x = TestContext.CurrentContext.Random.NextDouble(Int16.MinValue, Int16.MaxValue);
+				var y = TestContext.CurrentContext.Random.NextDouble(Int16.MinValue, Int16.MaxValue);
+				var z = TestContext.CurrentContext.Random.NextDouble(Int16.MinValue, Int16.MaxValue);
 				TestCPointSerializtion(new CPoint(x, y, z));
 			}
 		}

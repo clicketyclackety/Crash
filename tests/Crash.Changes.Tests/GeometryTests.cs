@@ -20,7 +20,7 @@ namespace Crash.Changes.Tests
 		[Test]
 		public void CPointConsts()
 		{
-			var unset = CPoint.Unset;
+			var unset = CPoint.None;
 			Assert.That(unset.X, Is.EqualTo(double.NaN));
 			Assert.That(unset.Y, Is.EqualTo(double.NaN));
 			Assert.That(unset.Z, Is.EqualTo(double.NaN));
@@ -29,7 +29,7 @@ namespace Crash.Changes.Tests
 			unset.Y = 300;
 			unset.Z = 500;
 
-			var newUnset = CPoint.Unset;
+			var newUnset = CPoint.None;
 			Assert.That(newUnset.X, Is.EqualTo(double.NaN));
 			Assert.That(newUnset.Y, Is.EqualTo(double.NaN));
 			Assert.That(newUnset.Z, Is.EqualTo(double.NaN));

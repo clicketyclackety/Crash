@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 
 using Crash.Common.Changes;
+using Crash.Common.View;
+using Crash.Geometry;
 using Crash.Server.Model;
 
 using Microsoft.AspNetCore.SignalR;
@@ -72,9 +74,20 @@ namespace Crash.Server.Tests2
 		[TestCaseSource(typeof(Changes), nameof(Changes.TestCases))]
 		public async Task Test_Update_Async(Change change)
 		{
-			// Assert.That(_crashHub.Count, Is.EqualTo(0));
-			await _crashHub.Update(change.Owner, change.Id, change);
-			// Assert.That(_crashHub.Count, Is.EqualTo(1));
+			int currCount = _crashHub.Count;
+			string testPayload = TestContext.CurrentContext.Random.NextGuid().ToString();
+			Assert.That(change.Payload, Is.Not.EqualTo(testPayload));
+			Change newChange = new Change(change.Id, change.Owner, testPayload);
+
+			await _crashHub.Add(change.Owner, change);
+			Assert.That(_crashHub.Count, Is.EqualTo(currCount + 1));
+			currCount = _crashHub.Count;
+
+			await _crashHub.Update(change.Owner, change.Id, newChange);
+			Assert.That(_crashHub.Count, Is.EqualTo(currCount));
+
+			Assert.That(_crashHub.TryGet(newChange.Id, out Change updatedChange), Is.True);
+			Assert.That(updatedChange.Payload, Is.EqualTo(testPayload));
 		}
 
 		[TestCaseSource(typeof(Changes), nameof(Changes.TestCases))]
@@ -124,9 +137,10 @@ namespace Crash.Server.Tests2
 
 			Assert.That(_crashHub.TryGet(change.Id, out Change found), Is.True);
 			ChangeAction action = (ChangeAction)found.Action;
+
 			Assert.That(action.HasFlag(ChangeAction.Unlock), Is.False);
 
-			await _crashHub.Select(change.Owner, change.Id);
+			await _crashHub.Unselect(change.Owner, change.Id);
 			Assert.That(_crashHub.TryGet(change.Id, out Change updatedFound), Is.True);
 			ChangeAction updatedAction = (ChangeAction)updatedFound.Action;
 
@@ -136,97 +150,13 @@ namespace Crash.Server.Tests2
 		[TestCaseSource(typeof(CameraChanges), nameof(CameraChanges.TestCases))]
 		public async Task Test_CameraChange_Async(CameraChange cameraChange)
 		{
-			// Assert.That(_crashHub.Count, Is.EqualTo(0));
-			// await _crashHub.CameraChange(cameraChange.Owner, cameraChange);
-			// Assert.That(_crashHub.Count, Is.EqualTo(1));
+			int previousCount = _crashHub.Count;
+			Change change = new Change(cameraChange);
+			await _crashHub.CameraChange(cameraChange.Owner, change);
+			Assert.That(_crashHub.Count, Is.EqualTo(previousCount + 1));
 		}
-
 
 		/*
-		[Test]
-		public void TestFunction()
-		{
-			// Arrange
-			var hubContext = new Mock<IHubCallerClients>();
-			var clientProxy = new Mock<IClientProxy>();
-			var connectionId = Guid.NewGuid().ToString();
-			var httpContext = new DefaultHttpContext();
-			httpContext.Connection.Id = connectionId;
-			hubContext.Setup(x => x.Client(It.IsAny<string>())).Returns(clientProxy.Object);
-			var myHub = new MyHub(hubContext.Object);
-
-			// Act
-			myHub.MyMethod("hello");
-
-			// Assert
-			;
-
-			clientProxy.Verify(x => x.SendCoreAsync("MyMethod", new object[] { "hello" }, default(CancellationToken)), Times.Once);
-		}
-		*/
-
-		/*
-		[SetUp]
-		public void Setup()
-		{
-			var argHandler = new ArgumentHandler();
-			argHandler.EnsureDefaults();
-			var optionsBuilder = new DbContextOptionsBuilder<CrashContext>();
-			optionsBuilder.UseSqlite<CrashContext>();
-
-			CrashContext context = new CrashContext(optionsBuilder.Options);
-			CrashHub crashHub = new CrashHub(context);
-			_crashHub = crashHub;
-		}
-
-		public async Task Setup()
-		{
-			string[] args = new string[] { };
-			var builder = WebApplication.CreateBuilder(args);
-			var argHandler = new ArgumentHandler();
-			argHandler.EnsureDefaults();
-			argHandler.ParseArgs(args);
-
-			builder.Services.AddSignalR();
-
-			builder.Services.AddDbContext<CrashContext>(options =>
-						   options.UseSqlite($"Data Source={argHandler.DatabaseFileName}"));
-
-			builder.WebHost.UseUrls(argHandler.URL);
-
-			var app = builder.Build();
-
-			// TODO : Make a nice little webpage
-			app.MapGet("/", () => "Welcome to Crash!");
-			app.MapHub<CrashHub>("/Crash");
-
-			app.MigrateDatabase<CrashContext>();
-
-			_webApp = app;
-			// await app.RunAsync();
-			// Tell Client we're ready!
-		}
-
-		[TestCaseSource(typeof(Changes), nameof(Changes.TestCases))]
-		public async Task Test_Add(Change change)
-		{
-			int startCount = _crashHub.Count;
-
-			// app.Urls // test getting these!
-
-			await _crashHub.Add(change.Owner, change);
-
-			Assert.That(startCount, Is.LessThan(_crashHub.Count));
-		}
-
-		[TestCaseSource(typeof(Changes), nameof(Changes.TestCases))]
-		public async Task Test_Add2(Change change)
-		{
-			var app = _webApp;
-			;
-
-		}
-
 		[Test]
 		public async Task Get_URLs()
 		{
@@ -256,7 +186,8 @@ namespace Crash.Server.Tests2
 			{
 				get
 				{
-					yield return CameraChange.CreateNew(new Common.View.Camera(), "James");
+					Camera camera = new Camera(CPoint.Origin, new CPoint(1, 2, 3));
+					yield return CameraChange.CreateNew(camera, "Jerry");
 				}
 			}
 		}

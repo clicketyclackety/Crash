@@ -61,8 +61,8 @@ namespace Crash.Common.Tests.Validity
 			get
 			{
 				yield return new TestCaseData(new CPoint(0, 0, 0), new CPoint(0, 0, 0), DateTime.Now).Returns(false);
-				yield return new TestCaseData(CPoint.Unset, CPoint.Unset, DateTime.MaxValue).Returns(false);
-				yield return new TestCaseData(CPoint.Unset, CPoint.Unset, DateTime.MinValue).Returns(false);
+				yield return new TestCaseData(CPoint.None, CPoint.None, DateTime.MaxValue).Returns(false);
+				yield return new TestCaseData(CPoint.None, CPoint.None, DateTime.MinValue).Returns(false);
 				yield return new TestCaseData(CPoint.Origin, new CPoint(1, 2, 3), DateTime.MinValue).Returns(false);
 			}
 		}

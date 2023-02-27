@@ -18,10 +18,10 @@ namespace Crash.Geometry
 
 
 		/// <summary>Returns a non existant point.</summary>
-		public static CPoint Unset => new CPoint(double.NaN, double.NaN, double.NaN);
+		public static CPoint None => new CPoint(double.NaN, double.NaN, double.NaN);
 
 		/// <summary>Returns a Point at 0,0,0.</summary>
-		public static CPoint Origin => default(CPoint);
+		public static CPoint Origin => new CPoint(0, 0, 0);
 
 
 		public CPoint() { }

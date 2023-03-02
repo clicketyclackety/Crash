@@ -1,7 +1,11 @@
-﻿using Crash.Client;
+﻿using System.Threading;
+
+using Crash.Client;
 using Crash.Common.Document;
 using Crash.Communications;
 using Crash.Handlers;
+
+using Microsoft.AspNetCore.SignalR.Client;
 
 using Rhino.Commands;
 
@@ -69,20 +73,32 @@ namespace Crash.Commands
 			}
 
 			crashDoc = CrashDocRegistry.CreateAndRegisterDocument(doc);
+			crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
 			_CreateCurrentUser(crashDoc, name);
 
 			// TODO : Ensure Requested Server is available, and notify if not
 			ClientState clientState = new ClientState(crashDoc);
-			Task task = CrashClient.StartOrContinueLocalClientAsync(crashDoc, new Uri(LastURL),
+			CrashClient.StartOrContinueLocalClientAsync(crashDoc, new Uri($"{LastURL}/Crash"),
 													clientState.Init); // .WithTimeout(new TimeSpan(0, 0, 30));
-			task.RunSynchronously();
-			if (!task.Wait(30_000))
+
+			int timeout = 4000;
+			for (int i = 0; i <= timeout; i += 100)
 			{
-				RhinoApp.WriteLine("The Server Connection timed out");
+				if (crashDoc?.LocalClient?.State == HubConnectionState.Connected)
+					break;
+
+				if (i % 1000 == 0)
+				{
+					RhinoApp.WriteLine($"Attempting to connect.... Attempt {(i / 1000) + 1}");
+				}
+
+				Thread.Sleep(100);
+			}
+			if (crashDoc?.LocalClient?.State != HubConnectionState.Connected)
+			{
+				RhinoApp.WriteLine("Failed to Connect to the Server from the client!");
 				return Result.Failure;
 			}
-
-			crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
 
 			InteractivePipe.Active.Enabled = true;
 

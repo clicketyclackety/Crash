@@ -57,10 +57,45 @@ namespace Crash.Common.Tests.Communications
 		{
 			string url = $"{CrashServer.DefaultURL}:{CrashServer.DefaultPort}";
 			CrashServer server = new CrashServer(new CrashDoc());
-			Assert.DoesNotThrow(() => server.Start(url));
+			Assert.DoesNotThrow(() => server.Start(GetStartInfo(url)));
+
+			var msgs = server.Messages;
 
 			Assert.That(server.process, Is.Not.Null);
 			Assert.That(server.IsRunning, Is.True);
+		}
+
+		private ProcessStartInfo GetStartInfo(string url)
+		{
+			string net60 = Path.GetDirectoryName(typeof(CrashServer_Tests).Assembly.Location);
+			string debug = Path.GetDirectoryName(net60);
+			string bin = Path.GetDirectoryName(debug);
+			string project = Path.GetDirectoryName(bin);
+			string tests = Path.GetDirectoryName(project);
+			string source = Path.GetDirectoryName(tests);
+
+			string crashServerPath = Path.Combine(source, "src", "Crash.Server", "bin", "debug");
+
+			// C:\Users\csykes\Documents\cloned_gits\Crash\src\Crash.Server\bin\Debug
+			// C:\Users\csykes\Documents\cloned_gits\Crash\tests\Crash.Integration.Tests\bin\Debug\net6.0
+
+			string[] exes = Directory.GetFiles(crashServerPath, "Crash.Server.exe");
+			string serverExecutable = exes.FirstOrDefault();
+			string serverExePath = Path.GetDirectoryName(serverExecutable);
+			string newDbName = $"{Guid.NewGuid()}.db";
+			string dbPath = Path.Combine(net60, newDbName);
+
+			var startInfo = new ProcessStartInfo()
+			{
+				FileName = serverExecutable,
+				Arguments = $"--urls \"{url}\" --path \"{dbPath}\"",
+				CreateNoWindow = true, // !Debugger.IsAttached,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				UseShellExecute = false,
+			};
+
+			return startInfo;
 		}
 
 		[Test]

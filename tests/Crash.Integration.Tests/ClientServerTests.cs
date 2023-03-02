@@ -1,4 +1,6 @@
-﻿using Crash.Client;
+﻿using System.Diagnostics;
+
+using Crash.Client;
 using Crash.Common.Document;
 using Crash.Communications;
 
@@ -36,10 +38,31 @@ namespace Crash.Integration.Tests
 		[Test]
 		public void ServerProcess()
 		{
+			bool onConnected = false;
+			bool onFailure = false;
+
 			CrashDoc crashDoc = new CrashDoc();
 			crashDoc.Users.CurrentUser = user;
+			crashDoc.LocalServer = new CrashServer(crashDoc);
+
+			crashDoc.LocalServer.OnConnected += (sender, args) => onConnected = true;
+			crashDoc.LocalServer.OnFailure += (sender, args) => onFailure = true;
 
 			CrashServer crashServer = StartServer(crashDoc);
+
+			Assert.That(crashServer.Connected, Is.True);
+
+			Assert.That(onConnected, Is.True, "Server Connection failed");
+			Assert.That(onFailure, Is.False, "Server failed!");
+			onConnected = false;
+			onFailure = false;
+
+			crashServer.Stop();
+
+			Assert.That(crashServer.process, Is.Null, "Process is not null");
+			Assert.That(crashServer.IsRunning, Is.False, "Server process is still running");
+			Assert.That(onConnected, Is.False, "Server Connection failed");
+			Assert.That(onFailure, Is.False, "Server failed!");
 		}
 
 		[Test]
@@ -58,11 +81,11 @@ namespace Crash.Integration.Tests
 			crashDoc.Users.CurrentUser = user;
 
 			CrashServer crashServer = crashDoc.LocalServer ?? new CrashServer(crashDoc);
-			Assert.DoesNotThrow(() => crashServer.Start(serverUrl));
+
+			var processInfo = GetStartInfo(serverUrl);
+			Assert.DoesNotThrow(() => crashServer.Start(processInfo));
 
 			var messages = crashServer.Messages;
-
-			Wait(() => crashServer.IsRunning);
 			Assert.That(crashServer.IsRunning, string.Join("\r\n", messages), Is.True);
 			Assert.That(crashServer.process, Is.Not.Null);
 
@@ -82,10 +105,43 @@ namespace Crash.Integration.Tests
 
 			Wait(() => crashClient.IsConnected);
 
-			Assert.That(crashClient.IsConnected, "Client is not connected", Is.True);
-			Assert.That(initRan, "Init did not run!", Is.True);
+			Assert.That(crashClient.IsConnected, Is.True, "Client is not connected");
+			Assert.That(initRan, Is.True, "Init did not run!");
 
 			return crashClient;
+		}
+
+		private ProcessStartInfo GetStartInfo(string url)
+		{
+			string net60 = Path.GetDirectoryName(typeof(ClientServerTests).Assembly.Location);
+			string debug = Path.GetDirectoryName(net60);
+			string bin = Path.GetDirectoryName(debug);
+			string project = Path.GetDirectoryName(bin);
+			string tests = Path.GetDirectoryName(project);
+			string source = Path.GetDirectoryName(tests);
+
+			string crashServerPath = Path.Combine(source, "src", "Crash.Server", "bin", "debug");
+
+			// C:\Users\csykes\Documents\cloned_gits\Crash\src\Crash.Server\bin\Debug
+			// C:\Users\csykes\Documents\cloned_gits\Crash\tests\Crash.Integration.Tests\bin\Debug\net6.0
+
+			string[] exes = Directory.GetFiles(crashServerPath, "Crash.Server.exe");
+			string serverExecutable = exes.FirstOrDefault();
+			string serverExePath = Path.GetDirectoryName(serverExecutable);
+			string newDbName = $"{Guid.NewGuid()}.db";
+			string dbPath = Path.Combine(net60, newDbName);
+
+			var startInfo = new ProcessStartInfo()
+			{
+				FileName = serverExecutable,
+				Arguments = $"--urls \"{url}\" --path \"{dbPath}\"",
+				CreateNoWindow = true, // !Debugger.IsAttached,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				UseShellExecute = false,
+			};
+
+			return startInfo;
 		}
 
 

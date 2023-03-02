@@ -2,8 +2,6 @@
 
 using Microsoft.AspNetCore.SignalR.Client;
 
-using Moq;
-
 namespace Crash.Common.Tests.Communications
 {
 
@@ -19,20 +17,6 @@ namespace Crash.Common.Tests.Communications
 
 			// Assert
 			Assert.IsNotNull(connection);
-		}
-
-		[Test]
-		public async Task Test()
-		{
-			// Arrange
-			var mockConnection = new Mock<HubConnection>();
-			mockConnection.Setup(m => m.StartAsync(default)).Returns(Task.CompletedTask);
-
-			// Act
-			string result = await mockConnection.Object.InvokeAsync<string>("SomeMethod");
-
-			// Assert
-			Assert.That(result, Is.EqualTo("Result"));
 		}
 
 	}

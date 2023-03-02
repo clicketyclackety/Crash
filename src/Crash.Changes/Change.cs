@@ -1,48 +1,52 @@
-﻿/// <summary>Provides a reliable class for communication</summary>
-public sealed class Change : IChange
+﻿namespace Crash.Changes
 {
-
-	public DateTime Stamp { get; set; }
-
-	public Guid Id { get; set; }
-
-	public string? Owner { get; set; }
-
-	public string? Payload { get; set; }
-
-	public int Action { get; set; } = (int)ChangeAction.None;
-
-	// For Deserialize Only
-	public Change() { }
-
-
-	public Change(Guid id, string owner, string? payload)
+	/// <summary>Provides a reliable class for communication</summary>
+	public sealed class Change : IChange
 	{
-		Id = id;
-		Owner = owner;
-		Payload = payload;
-		Stamp = DateTime.UtcNow;
-	}
 
-	public Change(IChange speck)
-	{
-		Stamp = speck.Stamp;
-		Id = speck.Id;
-		Owner = speck.Owner;
-		Payload = speck.Payload;
+		public DateTime Stamp { get; set; }
 
-		// May need to add Temporary (It was added previously)
-		ChangeAction action = (ChangeAction)speck.Action;
-		action ^= ChangeAction.Temporary;
-		speck.Action = (int)action;
-	}
+		public Guid Id { get; set; }
 
-	public static Change CreateEmpty()
-	{
-		return new Change()
+		public string? Owner { get; set; }
+
+		public string? Payload { get; set; }
+
+		public int Action { get; set; } = (int)ChangeAction.None;
+
+		// For Deserialize Only
+		public Change() { }
+
+
+		public Change(Guid id, string owner, string? payload)
 		{
-			Id = Guid.NewGuid()
-		};
+			Id = id;
+			Owner = owner;
+			Payload = payload;
+			Stamp = DateTime.UtcNow;
+		}
+
+		public Change(IChange speck)
+		{
+			Stamp = speck.Stamp;
+			Id = speck.Id;
+			Owner = speck.Owner;
+			Payload = speck.Payload;
+
+			// May need to add Temporary (It was added previously)
+			ChangeAction action = (ChangeAction)speck.Action;
+			action ^= ChangeAction.Temporary;
+			speck.Action = (int)action;
+		}
+
+		public static Change CreateEmpty()
+		{
+			return new Change()
+			{
+				Id = Guid.NewGuid()
+			};
+		}
+
 	}
 
 }

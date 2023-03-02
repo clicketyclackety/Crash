@@ -25,6 +25,7 @@ namespace Crash.Server
 			{
 				{ "URLS", _handleUrlArgs },
 				{ "PATH", _handleDatabasePath },
+				{ "NEWDB", _handleRegenDb },
 				{ "HELP", _handleHelpRequest }
 			};
 		}
@@ -156,7 +157,7 @@ namespace Crash.Server
 
 		#endregion
 
-		#region Databsae Args
+		#region Database Args
 
 		private void _handleDatabasePath(string givenPath)
 		{
@@ -169,11 +170,6 @@ namespace Crash.Server
 		{
 			DirectoryInfo dInfo = new DirectoryInfo(givenPath);
 			string wellFormattedPath = dInfo.FullName;
-
-			if (!string.IsNullOrEmpty(dInfo.Extension))
-			{
-				throw new Exception("Do not feed in a file Name!");
-			}
 
 			// if (!Uri.IsWellFormedUriString(dInfo.FullName, UriKind.RelativeOrAbsolute)) return false;
 			if (Path.GetInvalidPathChars().Where(c => wellFormattedPath.Contains(c)).Any())
@@ -193,8 +189,15 @@ namespace Crash.Server
 
 		private void _setDatabaseFilePath(string databasePath)
 		{
-			// databasePath.Replace("\\", "/");
-			DatabaseFileName = Path.Combine(databasePath, dbName);
+			DirectoryInfo dInfo = new DirectoryInfo(databasePath);
+			if (string.IsNullOrEmpty(dInfo.Extension))
+			{
+				DatabaseFileName = Path.Combine(databasePath, dbName);
+			}
+			else
+			{
+				DatabaseFileName = databasePath;
+			}
 		}
 
 		private void _ensureDatabaseDirectoryExists(string databaseFilePath)
@@ -203,6 +206,16 @@ namespace Crash.Server
 			{
 				Directory.CreateDirectory(databaseFilePath);
 			}
+		}
+
+		private void _handleRegenDb(string toggleArgs)
+		{
+			if (!bool.TryParse(toggleArgs, out bool result))
+			{
+
+			}
+
+
 		}
 
 		#endregion

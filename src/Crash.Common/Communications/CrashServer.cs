@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 using Crash.Common.Document;
 using Crash.Common.Events;
-
-using Microsoft.AspNetCore.Connections;
 
 namespace Crash.Communications
 {
@@ -13,7 +12,7 @@ namespace Crash.Communications
 	/// </summary>
 	public sealed class CrashServer : IDisposable
 	{
-		public const int DefaultPort = 8080;
+		public const int DefaultPort = 5000;
 		public const string DefaultURL = "http://localhost";
 
 		private CrashDoc _crashDoc;
@@ -21,6 +20,7 @@ namespace Crash.Communications
 		public Process? process { get; set; }
 
 		public bool IsRunning => process is object && !process.HasExited;
+		public bool Connected { get; private set; }
 
 		public const string ProcessName = "Crash.Server";
 
@@ -55,7 +55,7 @@ namespace Crash.Communications
 		/// <returns>True on success, false otherwise</returns>
 		public void Start(string url) => Start(getStartInfo(getServerExecutablePath(), url));
 
-		internal void Start(ProcessStartInfo startInfo)
+		internal void Start(ProcessStartInfo startInfo, int timeout = 3000)
 		{
 			string errorMessage = "Server Started Successfully";
 
@@ -67,14 +67,18 @@ namespace Crash.Communications
 
 			try
 			{
-				var serverExecutable = getServerExecutablePath();
-
 				createAndRegisterServerProcess(startInfo);
 			}
 			catch (FileNotFoundException)
 			{
 				errorMessage = "Could not find Server exe";
 				throw new FileNotFoundException(errorMessage);
+			}
+
+			for (int i = 0; i <= timeout; i += 100)
+			{
+				if (Connected) break;
+				Thread.Sleep(100);
 			}
 		}
 
@@ -118,8 +122,8 @@ namespace Crash.Communications
 			var startInfo = new ProcessStartInfo()
 			{
 				FileName = serverExecutable,
-				Arguments = $"--urls {url}",
-				CreateNoWindow = !Debugger.IsAttached,
+				Arguments = $"--urls \"{url}\"",
+				CreateNoWindow = true, // !Debugger.IsAttached,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
 				UseShellExecute = false,
@@ -137,6 +141,7 @@ namespace Crash.Communications
 			process = new Process();
 			process.StartInfo = startInfo;
 			process.EnableRaisingEvents = true;
+			// process.Refresh(); // May be useful?
 
 			// Register fresh
 			process.Disposed += Process_Exited;
@@ -169,20 +174,16 @@ namespace Crash.Communications
 				data.Contains("SocketException "))
 			{
 				var portInUseMessage = "Given Port is already in use! Try another!";
-				args = new ErrorEventArgs(new AddressInUseException(portInUseMessage));
+				Messages.Add(portInUseMessage);
 			}
 			else if (data.Contains("hostpolicy.dll"))
 			{
-				args = new ErrorEventArgs(new AddressInUseException("Unknown error."));
-			}
-			else
-			{
-				args = new ErrorEventArgs(new Exception(data));
+				Messages.Add("Crash.Server.exe was referenced incorrectly");
 			}
 
-			// process.ErrorDataReceived -= Process_ErrorDataReceived;
+			process.ErrorDataReceived -= Process_ErrorDataReceived;
 			OnFailure?.Invoke(this, new CrashEventArgs(_crashDoc));
-			// Stop();
+			Stop();
 		}
 
 		private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
@@ -195,7 +196,7 @@ namespace Crash.Communications
 			var started = data.ToLower().Contains("now listening on: http");
 			if (started)
 			{
-				process.OutputDataReceived -= Process_OutputDataReceived;
+				Connected = true;
 				OnConnected?.Invoke(this, new CrashEventArgs(_crashDoc));
 			}
 		}
@@ -216,7 +217,6 @@ namespace Crash.Communications
 		{
 			try
 			{
-				process?.Kill();
 				if (process is object)
 				{
 					// De-Register first to avoid duplicate calls
@@ -225,6 +225,8 @@ namespace Crash.Communications
 					process.OutputDataReceived -= Process_OutputDataReceived;
 					process.ErrorDataReceived -= Process_ErrorDataReceived;
 				}
+
+				process?.Kill();
 			}
 			catch
 			{

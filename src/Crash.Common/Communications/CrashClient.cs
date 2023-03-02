@@ -1,4 +1,5 @@
-﻿using Crash.Common.Document;
+﻿using Crash.Changes;
+using Crash.Common.Document;
 using Crash.Communications;
 
 using Microsoft.AspNetCore.SignalR.Client;
@@ -29,6 +30,7 @@ namespace Crash.Client
 		CrashDoc _crashDoc;
 
 		public bool IsConnected => _connection.State != HubConnectionState.Disconnected;
+		public HubConnectionState State => _connection.State;
 
 		/// <summary>
 		/// Closed event
@@ -120,13 +122,11 @@ namespace Crash.Client
 			if (state is object && state != HubConnectionState.Disconnected)
 				await Task.CompletedTask;
 
-			CrashClient client = new CrashClient(crashDoc, userName, uri);
-			client._crashDoc = crashDoc;
-			crashDoc.LocalClient = client;
-			client.OnInitialize += OnInit;
+			crashDoc.LocalClient = new CrashClient(crashDoc, userName, uri);
+			crashDoc.LocalClient.OnInitialize += OnInit;
 
 			// TODO : Check for successful connection
-			await client.StartAsync();
+			await crashDoc.LocalClient.StartAsync();
 		}
 
 		public static async Task CloseLocalServer(CrashDoc crashDoc)

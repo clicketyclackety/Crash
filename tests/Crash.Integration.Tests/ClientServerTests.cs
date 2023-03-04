@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net;
 
 using Crash.Client;
 using Crash.Common.Document;
@@ -9,10 +10,10 @@ namespace Crash.Integration.Tests
 
 	public sealed class ClientServerTests
 	{
-		const string port = "8080";
-		const string clientUrl = $"http://127.0.0.1:{port}/Crash";
-		const string serverUrl = $"http://0.0.0.0:{port}";
-		static Uri uri = new Uri(clientUrl);
+		string clientUrl => $"{CrashClient.DefaultURL}:{CrashServer.DefaultPort}";
+		string clientEndpoint => $"{clientUrl}/Crash";
+		string serverUrl => $"{CrashServer.DefaultURL}:{CrashServer.DefaultPort}";
+		Uri clientUri => new Uri(clientEndpoint);
 
 		const int timeout = 3000;
 		const int pollTime = 100;
@@ -23,20 +24,21 @@ namespace Crash.Integration.Tests
 		[SetUp]
 		public void Setup()
 		{
-			CrashServer.ForceCloselocalServers();
+			Assert.That(CrashServer.ForceCloselocalServers(1000),
+						"Not all server instances are closed",
+						Is.True);
 		}
 
-		[Test]
-		public async Task StartClient()
+		[TearDown]
+		public void TearDown()
 		{
-			CrashDoc crashDoc = new CrashDoc();
-			crashDoc.Users.CurrentUser = user;
-
-			CrashClient crashClient = await StartClientAsync(crashDoc);
+			Assert.That(CrashServer.ForceCloselocalServers(1000),
+						"Not all server instances are closed",
+						Is.True);
 		}
 
 		[Test]
-		public void ServerProcess()
+		public async Task ServerProcess()
 		{
 			bool onConnected = false;
 			bool onFailure = false;
@@ -57,6 +59,8 @@ namespace Crash.Integration.Tests
 			onConnected = false;
 			onFailure = false;
 
+			await EnsureSiteIsUp();
+
 			crashServer.Stop();
 
 			Assert.That(crashServer.process, Is.Null, "Process is not null");
@@ -65,13 +69,24 @@ namespace Crash.Integration.Tests
 			Assert.That(onFailure, Is.False, "Server failed!");
 		}
 
+		private async Task EnsureSiteIsUp()
+		{
+
+			// Perform a URL ping
+			var httpClient = new HttpClient();
+			var response = await httpClient.GetAsync(clientUrl);
+			Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+		}
+
 		[Test]
-		public async Task EndToEndAsync()
+		public async Task ServerAndClient()
 		{
 			CrashDoc crashDoc = new CrashDoc();
 			crashDoc.Users.CurrentUser = user;
 
 			CrashServer crashServer = StartServer(crashDoc);
+
+			await EnsureSiteIsUp();
 
 			CrashClient crashClient = await StartClientAsync(crashDoc);
 		}
@@ -94,14 +109,13 @@ namespace Crash.Integration.Tests
 
 		private async Task<CrashClient> StartClientAsync(CrashDoc crashDoc)
 		{
-			// Arbitrarys
-			Thread.Sleep(timeout);
-
-			CrashClient crashClient = crashDoc.LocalClient ?? new CrashClient(crashDoc, user.Name, uri);
+			CrashClient crashClient = new CrashClient(crashDoc, user.Name, clientUri);
+			crashDoc.LocalClient = crashClient;
 
 			bool initRan = false;
 			Action<IEnumerable<Change>> func = (changes) => initRan = true;
-			await CrashClient.StartOrContinueLocalClientAsync(crashDoc, uri, func);
+			// await crashDoc.LocalClient.StartLocalClient(func);
+			await crashDoc.LocalClient.StartLocalClient(Init);
 
 			Wait(() => crashClient.IsConnected);
 
@@ -109,6 +123,11 @@ namespace Crash.Integration.Tests
 			Assert.That(initRan, Is.True, "Init did not run!");
 
 			return crashClient;
+		}
+
+		private void Init(IEnumerable<Change> changes)
+		{
+			;
 		}
 
 		private ProcessStartInfo GetStartInfo(string url)
@@ -134,7 +153,7 @@ namespace Crash.Integration.Tests
 			var startInfo = new ProcessStartInfo()
 			{
 				FileName = serverExecutable,
-				Arguments = $"--urls \"{url}\" --path \"{dbPath}\"",
+				Arguments = $"--urls \"{url}\" --path \"{dbPath}\", --reset true",
 				CreateNoWindow = true, // !Debugger.IsAttached,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,

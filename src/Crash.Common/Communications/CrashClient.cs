@@ -1,5 +1,4 @@
-﻿using Crash.Changes;
-using Crash.Common.Document;
+﻿using Crash.Common.Document;
 using Crash.Communications;
 
 using Microsoft.AspNetCore.SignalR.Client;
@@ -22,7 +21,7 @@ namespace Crash.Client
 		const string INITIALIZE = "Initialize";
 		const string CAMERACHANGE = "CameraChange";
 
-		public const string DefaultURL = "http://0.0.0.0";
+		public const string DefaultURL = "http://localhost";
 		#endregion
 
 		HubConnection _connection;
@@ -94,7 +93,7 @@ namespace Crash.Client
 		{
 			// How to test?
 			// Does it need to be AddAsync now?
-			_connection.On<string, Change>(ADD, (user, Change) => OnAdd?.Invoke(user, Change));
+			_connection.On<string, Change>(ADD, OnAddInvoke);
 			_connection.On<string, Guid>(DELETE, (user, id) => OnDelete?.Invoke(user, id));
 			_connection.On<string, Guid, Change>(UPDATE, (user, id, Change) => OnUpdate?.Invoke(user, id, Change));
 			_connection.On<string>(DONE, (user) => OnDone?.Invoke(user));
@@ -103,30 +102,34 @@ namespace Crash.Client
 			_connection.On<Change[]>(INITIALIZE, (Changes) => OnInitialize?.Invoke(Changes));
 			_connection.On<string, Change>(CAMERACHANGE, (user, Change) => OnCameraChange?.Invoke(user, Change));
 
+			_connection.Reconnected += ConnectionReconnectedAsync;
 			_connection.Closed += ConnectionClosedAsync;
 			_connection.Reconnecting += ConnectionReconnectingAsync;
 		}
 
-		public static async Task StartOrContinueLocalClientAsync(CrashDoc crashDoc, Uri uri,
-															Action<IEnumerable<Change>> OnInit)
+		private void OnAddInvoke(string user, Change change)
 		{
-			if (null == crashDoc) return;
+			OnAdd?.Invoke(user, change);
+		}
 
-			string userName = crashDoc?.Users?.CurrentUser.Name;
-			if (string.IsNullOrEmpty(userName))
+		// TODO : Shouldn't be static.
+		public async Task StartLocalClient(Action<IEnumerable<Change>> OnInit)
+		{
+			if (null == _crashDoc)
 			{
-				throw new System.Exception("A User has not been assigned!");
+				throw new NullReferenceException("CrashDoc cannot be null!");
 			}
 
-			var state = crashDoc?.LocalClient?._connection?.State;
-			if (state is object && state != HubConnectionState.Disconnected)
-				await Task.CompletedTask;
+			string userName = _crashDoc?.Users?.CurrentUser.Name;
+			if (string.IsNullOrEmpty(userName))
+			{
+				throw new Exception("A User has not been assigned!");
+			}
 
-			crashDoc.LocalClient = new CrashClient(crashDoc, userName, uri);
-			crashDoc.LocalClient.OnInitialize += OnInit;
+			this.OnInitialize += OnInit;
 
 			// TODO : Check for successful connection
-			await crashDoc.LocalClient.StartAsync();
+			await this.StartAsync();
 		}
 
 		public static async Task CloseLocalServer(CrashDoc crashDoc)
@@ -145,6 +148,12 @@ namespace Crash.Client
 		}
 
 		private Task ConnectionClosedAsync(Exception? arg)
+		{
+			Console.WriteLine(arg);
+			return Task.CompletedTask;
+		}
+
+		private Task ConnectionReconnectedAsync(string? arg)
 		{
 			Console.WriteLine(arg);
 			return Task.CompletedTask;

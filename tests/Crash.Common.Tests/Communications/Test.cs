@@ -95,19 +95,6 @@ namespace Crash.Common.Tests.Communications
 		}
 
 		[Test]
-		public void StartOrContinueLocalClientAsync_NullCrashDoc_ReturnsTaskCompleted()
-		{
-			// Arrange
-			CrashDoc crashDoc = null;
-
-			// Act
-			var result = CrashClient.StartOrContinueLocalClientAsync(crashDoc, _mockUrl, null);
-
-			// Assert
-			Assert.IsTrue(result.IsCompletedSuccessfully);
-		}
-
-		[Test]
 		public async Task UpdateAsync_InvokesConnectionInvokeAsync()
 		{
 			// Arrange

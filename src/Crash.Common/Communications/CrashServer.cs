@@ -13,7 +13,7 @@ namespace Crash.Communications
 	public sealed class CrashServer : IDisposable
 	{
 		public const int DefaultPort = 5000;
-		public const string DefaultURL = "http://localhost";
+		public const string DefaultURL = "http://0.0.0.0";
 
 		private CrashDoc _crashDoc;
 
@@ -88,14 +88,23 @@ namespace Crash.Communications
 			return processes.Length != 0;
 		}
 
-		public static bool ForceCloselocalServers()
+		// TODO : Unit Test this
+		public static bool ForceCloselocalServers(int timeout = 0)
 		{
 			var processes = Process.GetProcessesByName(ProcessName, Environment.MachineName);
-			if (null == processes || processes.Length == 0) return false;
+			if (null == processes || processes.Length == 0) return true;
 
 			foreach (var serverProcess in processes)
 			{
 				serverProcess?.Kill();
+			}
+
+			// TODO : should this use a cancellation token?
+			int step = 100;
+			for (int i = 0; i < timeout; i++)
+			{
+				Thread.Sleep(step);
+				i += step;
 			}
 
 			return processes.All(p => null == p || p.HasExited);

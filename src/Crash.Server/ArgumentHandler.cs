@@ -17,6 +17,8 @@ namespace Crash.Server
 
 		public string DatabaseFileName { get; private set; }
 
+		public bool FreshDb { get; private set; }
+
 		private readonly Dictionary<string, Action<string>> argDict;
 
 		public ArgumentHandler()
@@ -65,7 +67,6 @@ namespace Crash.Server
 			{
 				string databasePath = _getDefaultDatabaseDirectory();
 				_handleDatabasePath(databasePath);
-				_setDatabaseFilePath(databasePath);
 			}
 		}
 
@@ -168,11 +169,7 @@ namespace Crash.Server
 
 		private void _validateDatabaseDirectory(string givenPath)
 		{
-			DirectoryInfo dInfo = new DirectoryInfo(givenPath);
-			string wellFormattedPath = dInfo.FullName;
-
-			// if (!Uri.IsWellFormedUriString(dInfo.FullName, UriKind.RelativeOrAbsolute)) return false;
-			if (Path.GetInvalidPathChars().Where(c => wellFormattedPath.Contains(c)).Any())
+			if (Path.GetInvalidPathChars().Where(c => givenPath.Contains(c)).Any())
 			{
 				throw new Exception("Invalid Characters in given path!");
 			}
@@ -181,16 +178,14 @@ namespace Crash.Server
 		private string _getDefaultDatabaseDirectory()
 		{
 			string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-			string databasePath = Path.Combine(appData, appName, dbDirectory);
-			string databaseDirectory = Path.Combine(databasePath);
+			string databaseDirectory = Path.Combine(appData, appName, dbDirectory);
 
 			return databaseDirectory;
 		}
 
 		private void _setDatabaseFilePath(string databasePath)
 		{
-			DirectoryInfo dInfo = new DirectoryInfo(databasePath);
-			if (string.IsNullOrEmpty(dInfo.Extension))
+			if (!Path.HasExtension(databasePath))
 			{
 				DatabaseFileName = Path.Combine(databasePath, dbName);
 			}
@@ -202,10 +197,35 @@ namespace Crash.Server
 
 		private void _ensureDatabaseDirectoryExists(string databaseFilePath)
 		{
-			if (!Directory.Exists(databaseFilePath))
+			string directoryName = GetDirectoryOfPath(databaseFilePath);
+			Directory.CreateDirectory(directoryName);
+		}
+
+
+		/// <summary>Checks a path for being a Directory or File</summary>
+		/// <returns>True on file, false on Directory</returns>
+		private bool IsFile(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("Input path cannot be null for IsFile check");
+
+			return Path.HasExtension(path);
+		}
+
+		/// <summary>If given a directory, returns the same string
+		/// If given a file, returns the current directory of the file</summary>
+		private string GetDirectoryOfPath(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("Input path cannot be null for GetDirectoryOfPath");
+
+			string fullDirectoryName = path;
+			if (IsFile(path))
 			{
-				Directory.CreateDirectory(databaseFilePath);
+				fullDirectoryName = Path.GetDirectoryName(path);
 			}
+
+			return fullDirectoryName;
 		}
 
 		private void _handleRegenDb(string toggleArgs)

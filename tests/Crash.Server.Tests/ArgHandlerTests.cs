@@ -270,9 +270,10 @@ namespace Crash.Server.Tests
 				return ipAddress;
 			}
 
-			#endregion
 
 		}
+
+		#endregion
 
 	}
 

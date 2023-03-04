@@ -8,10 +8,10 @@ namespace Crash.Server
 	{
 
 		const string pattern = @"--([\w]+ [\S]+)";
-		const string dbName = "Database.db";
-		const string appName = "Crash";
-		const string dbDirectory = "App_Data";
-		const string defaultURL = "http://localhost:8080";
+		internal const string dbName = "Database.db";
+		internal const string appName = "Crash";
+		internal const string dbDirectory = "App_Data";
+		internal const string defaultURL = "http://localhost:8080";
 
 		public string URL { get; private set; }
 
@@ -27,7 +27,7 @@ namespace Crash.Server
 			{
 				{ "URLS", _handleUrlArgs },
 				{ "PATH", _handleDatabasePath },
-				{ "NEWDB", _handleRegenDb },
+				{ "RESET", _handleRegenDb },
 				{ "HELP", _handleHelpRequest }
 			};
 		}
@@ -201,7 +201,6 @@ namespace Crash.Server
 			Directory.CreateDirectory(directoryName);
 		}
 
-
 		/// <summary>Checks a path for being a Directory or File</summary>
 		/// <returns>True on file, false on Directory</returns>
 		private bool IsFile(string path)
@@ -230,12 +229,34 @@ namespace Crash.Server
 
 		private void _handleRegenDb(string toggleArgs)
 		{
+			bool value = _getRegenerateDatabaseValue(toggleArgs);
+			_setRegenenerateDatabaseValue(value);
+			_regenerateDatabase(value);
+		}
+
+		private bool _getRegenerateDatabaseValue(string toggleArgs)
+		{
 			if (!bool.TryParse(toggleArgs, out bool result))
 			{
-
+				throw new ArgumentException($"Invalid Argument {toggleArgs}, could not parse into a boolean.");
 			}
 
+			return result;
+		}
 
+		private void _setRegenenerateDatabaseValue(bool value)
+		{
+			FreshDb = value;
+		}
+
+		private void _regenerateDatabase(bool value)
+		{
+			if (!value) return;
+
+			if (File.Exists(DatabaseFileName))
+			{
+				File.Delete(DatabaseFileName);
+			}
 		}
 
 		#endregion

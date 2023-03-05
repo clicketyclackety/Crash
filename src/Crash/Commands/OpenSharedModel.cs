@@ -103,6 +103,7 @@ namespace Crash.Commands
 			finally
 			{
 				crashDoc.CacheTable.IsInit = false;
+				UsersForm.ReDrawForm();
 			}
 		}
 

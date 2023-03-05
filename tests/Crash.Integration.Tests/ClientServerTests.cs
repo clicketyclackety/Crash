@@ -123,7 +123,7 @@ namespace Crash.Integration.Tests
 		private async Task<CrashClient> StartClientAsync(CrashDoc crashDoc)
 		{
 			bool initRan = false;
-			Action<Change[]> func = (changes) => initRan = true;
+			Action<IEnumerable<Change>> func = (changes) => initRan = true;
 
 			CrashClient crashClient = new CrashClient(crashDoc, user.Name, clientUri);
 			crashDoc.LocalClient = crashClient;

@@ -27,3 +27,5 @@ app.MapHub<CrashHub>("/Crash");
 
 app.MigrateDatabase<CrashContext>();
 app.Run();
+app.Logger.LogInformation($"Running Version {typeof(CrashHub).Assembly.GetName().Version} " +
+						$"of Crash.Server");

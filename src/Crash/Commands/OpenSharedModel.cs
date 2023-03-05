@@ -68,8 +68,6 @@ namespace Crash.Commands
 				return Result.Nothing;
 			}
 
-			UsersForm.ShowForm();
-
 			crashDoc = CrashDocRegistry.CreateAndRegisterDocument(doc);
 			_CreateCurrentUser(crashDoc, name);
 
@@ -81,6 +79,7 @@ namespace Crash.Commands
 			crashClient.StartLocalClient(clientState.Init);
 
 			InteractivePipe.Active.Enabled = true;
+			UsersForm.ShowForm();
 
 			return Result.Success;
 		}

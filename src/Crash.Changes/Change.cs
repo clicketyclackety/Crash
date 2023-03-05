@@ -1,4 +1,4 @@
-namespace Crash.Changes
+﻿namespace Crash.Changes
 {
 	/// <summary>Provides a reliable class for communication</summary>
 	public sealed class Change : IChange
@@ -32,11 +32,7 @@ namespace Crash.Changes
 			Id = speck.Id;
 			Owner = speck.Owner;
 			Payload = speck.Payload;
-
-			// May need to add Temporary (It was added previously)
-			ChangeAction action = (ChangeAction)speck.Action;
-			action ^= ChangeAction.Temporary;
-			speck.Action = (int)action;
+			Action = speck.Action;
 		}
 
 		public static Change CreateEmpty()

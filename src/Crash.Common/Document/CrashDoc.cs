@@ -61,10 +61,7 @@ namespace Crash.Common.Document
 
 		#region Methods
 		public bool Equals(CrashDoc other)
-		{
-			if (null == other) return false;
-			return this.id == other.id;
-		}
+			=> other?.GetHashCode() == GetHashCode();
 
 		public override bool Equals(object obj)
 		{

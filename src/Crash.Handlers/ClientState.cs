@@ -91,13 +91,14 @@ namespace Crash.Utilities
 			if (null == change || string.IsNullOrEmpty(change.Owner)) return;
 
 			_crashDoc.Users?.Add(change.Owner);
+			string currentUser = _crashDoc.Users.CurrentUser.Name;
 
 			ChangeAction _action = (ChangeAction)change.Action;
 			if (_action.HasFlag(ChangeAction.Camera))
 			{
 				await _HandleCameraAsync(change);
 			}
-			else if (_action.HasFlag(ChangeAction.Add) && _action.HasFlag(ChangeAction.Temporary))
+			else if (_action.HasFlag(ChangeAction.Add) && _action.HasFlag(ChangeAction.Temporary) && change.Owner != currentUser)
 			{
 				await _HandleTemporaryAddAsync(change);
 			}
@@ -211,7 +212,7 @@ namespace Crash.Utilities
 			await Task.CompletedTask;
 		}
 
-		// TODO : Add in order ofDate?
+		// TODO : Add in order of Date?
 		private async Task _HandleCameraAsync(Change change)
 		{
 			CameraChange cameraChange = new CameraChange(change);
@@ -224,6 +225,7 @@ namespace Crash.Utilities
 		{
 			throw new NotImplementedException();
 		}
+
 	}
 
 }

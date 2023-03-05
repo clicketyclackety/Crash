@@ -10,57 +10,6 @@ using Microsoft.Extensions.Logging;
 namespace Crash.Client
 {
 
-	public sealed class CrashLogger : ILogger, IDisposable
-	{
-		static LogLevel _currentLevel;
-		static List<string> _messages;
-
-		static CrashLogger()
-		{
-			_currentLevel = Debugger.IsAttached ? LogLevel.Trace : LogLevel.Information;
-			_messages = new List<string>();
-		}
-
-		public IDisposable BeginScope<TState>(TState state) => this;
-
-		public bool IsEnabled(LogLevel logLevel) => logLevel >= _currentLevel;
-
-		public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-		{
-			string _eventId = eventId.Name;
-			string formattedMessage = formatter.Invoke(state, exception);
-			string message = $"{logLevel} : {formattedMessage} : {_eventId}";
-
-			OnLoggingMessage?.Invoke(this, new LoggingEvent(message));
-		}
-
-		public static List<string> GetMessages() => _messages;
-
-		public void Dispose() { }
-
-		public static event EventHandler<LoggingEvent> OnLoggingMessage;
-
-		public sealed class LoggingEvent
-		{
-			public readonly string Message;
-			internal LoggingEvent(string message)
-			{
-				Message = message;
-			}
-		}
-
-	}
-
-	internal sealed class CrashLoggerProvider : ILoggerProvider
-	{
-		public ILogger CreateLogger(string categoryName) => new CrashLogger();
-
-		public void Dispose()
-		{
-
-		}
-	}
-
 	/// <summary>
 	/// Crash client class
 	/// </summary>
@@ -161,7 +110,8 @@ namespace Crash.Client
 		{
 			LogLevel logLevel = Debugger.IsAttached ? LogLevel.Trace : LogLevel.Information;
 			loggingBuilder.SetMinimumLevel(logLevel);
-			loggingBuilder.AddProvider(new CrashLoggerProvider());
+			var loggingProvider = new Common.Communications.Logging.CrashLoggerProvider();
+			loggingBuilder.AddProvider(loggingProvider);
 		}
 
 		internal void RegisterConnections()

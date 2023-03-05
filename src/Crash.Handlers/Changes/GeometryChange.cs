@@ -57,7 +57,7 @@ namespace Crash.Common.Changes
 
 			var Change = new Change(Guid.NewGuid(), owner, payload);
 			var instance = new GeometryChange(Change) { Geometry = geometry };
-			instance.Action = (int)ChangeAction.Add;
+			instance.Action = (int)(ChangeAction.Add | ChangeAction.Temporary);
 
 			return instance;
 		}

@@ -22,7 +22,6 @@ namespace Crash
 		protected override LoadReturnCode OnLoad(ref string errorMessage)
 		{
 			InteractivePipe.Active = new InteractivePipe() { Enabled = false };
-
 			return base.OnLoad(ref errorMessage);
 		}
 

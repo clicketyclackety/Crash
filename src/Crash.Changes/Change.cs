@@ -1,4 +1,4 @@
-﻿namespace Crash.Changes
+namespace Crash.Changes
 {
 	/// <summary>Provides a reliable class for communication</summary>
 	public sealed class Change : IChange
@@ -12,9 +12,9 @@
 
 		public string? Payload { get; set; }
 
-		public int Action { get; set; } = (int)ChangeAction.None;
+		public int Action { get; set; }
 
-		// For Deserialize Only
+		// For Deserialization Only
 		public Change() { }
 
 

@@ -2,7 +2,6 @@
 
 namespace Crash.Client.Tests
 {
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 
 	[TestClass]
 	public class Client
@@ -18,18 +17,6 @@ namespace Crash.Client.Tests
 			Assert.ThrowsException<UriFormatException>(() => new CrashClient(crashDoc, string.Empty, new Uri("htp://@.co://192")));
 			Assert.ThrowsException<UriFormatException>(() => new CrashClient(crashDoc, "Paul", null));
 		}
-
-		// [TestMethod] // Seems to be failing
-		public async Task SelectAsync()
-		{
-
-			var crashDoc = new CrashDoc();
-			var client = new CrashClient(crashDoc, "Me", new Uri("http://localhost:5000/Crash"));
-			await client.StartAsync();
-			await client.SelectAsync(Guid.Empty);
-		}
-
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
 	}
 

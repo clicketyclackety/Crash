@@ -37,13 +37,10 @@ namespace Crash.Communications
 			Dispose(false);
 		}
 
-		public void CloseLocalServer(CrashDoc crashDoc)
+		public void CloseLocalServer()
 		{
-			CrashServer? server = crashDoc?.LocalServer;
-			if (null == server) return;
-
-			server?.Stop();
-			server?.Dispose();
+			this?.Stop();
+			this?.Dispose();
 		}
 
 		/// <summary>

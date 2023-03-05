@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Crash.Changes;
-using Crash.Common.Changes;
+﻿using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Events;
 using Crash.Events;
@@ -17,7 +11,7 @@ namespace Crash.Utilities
 	/// <summary>
 	/// The request manager
 	/// </summary>
-	public sealed class ClientState
+	public sealed class ClientState : IDisposable
 	{
 
 		private CrashDoc _crashDoc;
@@ -27,9 +21,9 @@ namespace Crash.Utilities
 			this._crashDoc = crashDoc;
 		}
 
-		public void Init(IEnumerable<Change> Changes)
+		public void Init(Change[] Changes)
 		{
-			_crashDoc.LocalClient.OnInitialize -= Init;
+			// _crashDoc.LocalClient.OnInitialize -= Init;
 
 			Rhino.RhinoApp.WriteLine("Loading Changes ...");
 
@@ -226,6 +220,10 @@ namespace Crash.Utilities
 			await Task.CompletedTask;
 		}
 
+		public void Dispose()
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 }

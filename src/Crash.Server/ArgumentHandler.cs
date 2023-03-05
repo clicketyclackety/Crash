@@ -11,7 +11,7 @@ namespace Crash.Server
 		internal const string dbName = "Database.db";
 		internal const string appName = "Crash";
 		internal const string dbDirectory = "App_Data";
-		internal const string defaultURL = "http://localhost:8080";
+		internal const string defaultURL = "http://0.0.0.0:8080";
 
 		public string URL { get; private set; }
 

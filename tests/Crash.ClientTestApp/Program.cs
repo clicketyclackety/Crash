@@ -23,6 +23,10 @@ namespace Crash.ClientTestApp
 
 			Console.WriteLine("Crash Test App");
 			Console.WriteLine("\tc = Create Change");
+			Console.WriteLine("\tr = Relinquish Changes");
+			Console.WriteLine("\td = Delete a Change");
+			Console.WriteLine("\ts = Select a Change");
+			Console.WriteLine("\tu = UnSelect a Change");
 			Console.WriteLine("\tq = Quit");
 
 			var crashDoc = new CrashDoc();
@@ -33,26 +37,49 @@ namespace Crash.ClientTestApp
 				Console.WriteLine($"Added! {Change.Id}");
 			};
 
+			client.OnInitialize += Client_OnInitialize;
 			client.StartAsync();
 
 			while (true)
 			{
 				var k = Console.ReadKey();
+				if (client.State != Microsoft.AspNetCore.SignalR.Client.HubConnectionState.Connected)
+				{
+					Console.WriteLine(" --- Not Connected!");
+					continue;
+				}
+
 				if (k.KeyChar == 'c')
 				{
-					if (client.State != Microsoft.AspNetCore.SignalR.Client.HubConnectionState.Connected)
-					{
-						Console.WriteLine(" --- Not Connected!");
-						continue;
-					}
-
-					client.AddAsync(new Change(Guid.NewGuid(), Environment.UserName, "Example payload"))?.Wait();
+					client.AddAsync(new Change(Guid.NewGuid(), Environment.UserName, "Example payload"));
 				}
-				if (k.KeyChar == 'q')
+				else if (k.KeyChar == 'r')
+				{
+					client.DoneAsync();
+				}
+				else if (k.KeyChar == 's')
+				{
+					client.SelectAsync(Guid.NewGuid());
+				}
+				else if (k.KeyChar == 'u')
+				{
+					client.UnselectAsync(Guid.NewGuid());
+				}
+				else if (k.KeyChar == 'd')
+				{
+					client.DeleteAsync(Guid.NewGuid());
+				}
+				else if (k.KeyChar == 'q')
 				{
 					break;
 				}
 			}
+
+		}
+
+		private static void Client_OnInitialize(Change[] obj)
+		{
+			;
 
 		}
 	}

@@ -1,11 +1,7 @@
-﻿using System.Threading;
-
-using Crash.Client;
+﻿using Crash.Client;
 using Crash.Common.Document;
 using Crash.Communications;
 using Crash.Handlers;
-
-using Microsoft.AspNetCore.SignalR.Client;
 
 using Rhino.Commands;
 
@@ -22,7 +18,7 @@ namespace Crash.Commands
 		private RhinoDoc rhinoDoc;
 		private CrashDoc? crashDoc;
 
-		private string LastURL = $"{CrashServer.DefaultURL}:{CrashServer.DefaultPort}";
+		private string LastURL = $"{CrashClient.DefaultURL}:{CrashServer.DefaultPort}";
 
 
 		/// <summary>
@@ -80,30 +76,19 @@ namespace Crash.Commands
 			ClientState clientState = new ClientState(crashDoc);
 			string userName = crashDoc.Users.CurrentUser.Name;
 			crashDoc.LocalClient = new CrashClient(crashDoc, userName, new Uri($"{LastURL}/Crash"));
-			crashDoc.LocalClient.StartLocalClient(clientState.Init); // .WithTimeout(new TimeSpan(0, 0, 30));
+			// crashDoc.LocalClient.StartLocalClient(clientState.Init); // .WithTimeout(new TimeSpan(0, 0, 30));
 
-			int timeout = 4000;
-			for (int i = 0; i <= timeout; i += 100)
-			{
-				if (crashDoc?.LocalClient?.State == HubConnectionState.Connected)
-					break;
+			crashDoc.LocalClient.StartLocalClient(LocalClient_OnInitialize);
 
-				if (i % 1000 == 0)
-				{
-					RhinoApp.WriteLine($"Attempting to connect.... Attempt {(i / 1000) + 1}");
-				}
-
-				Thread.Sleep(100);
-			}
-			if (crashDoc?.LocalClient?.State != HubConnectionState.Connected)
-			{
-				RhinoApp.WriteLine("Failed to Connect to the Server from the client!");
-				return Result.Failure;
-			}
 
 			InteractivePipe.Active.Enabled = true;
 
 			return Result.Success;
+		}
+
+		private static void LocalClient_OnInitialize(Change[] obj)
+		{
+			throw new NotImplementedException();
 		}
 
 		private void Queue_OnCompletedQueue(object sender, EventArgs e)

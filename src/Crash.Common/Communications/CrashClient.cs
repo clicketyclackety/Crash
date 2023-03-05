@@ -93,7 +93,7 @@ namespace Crash.Client
 		{
 			// How to test?
 			// Does it need to be AddAsync now?
-			_connection.On<string, Change>(ADD, OnAddInvoke);
+			_connection.On<string, Change>(ADD, (user, change) => OnAdd?.Invoke(user, change));
 			_connection.On<string, Guid>(DELETE, (user, id) => OnDelete?.Invoke(user, id));
 			_connection.On<string, Guid, Change>(UPDATE, (user, id, Change) => OnUpdate?.Invoke(user, id, Change));
 			_connection.On<string>(DONE, (user) => OnDone?.Invoke(user));
@@ -107,13 +107,7 @@ namespace Crash.Client
 			_connection.Reconnecting += ConnectionReconnectingAsync;
 		}
 
-		private void OnAddInvoke(string user, Change change)
-		{
-			OnAdd?.Invoke(user, change);
-		}
-
-		// TODO : Shouldn't be static.
-		public async Task StartLocalClient(Action<IEnumerable<Change>> OnInit)
+		public async Task StartLocalClient(Action<Change[]> onInit)
 		{
 			if (null == _crashDoc)
 			{
@@ -126,7 +120,7 @@ namespace Crash.Client
 				throw new Exception("A User has not been assigned!");
 			}
 
-			this.OnInitialize += OnInit;
+			this.OnInitialize += onInit;
 
 			// TODO : Check for successful connection
 			await this.StartAsync();

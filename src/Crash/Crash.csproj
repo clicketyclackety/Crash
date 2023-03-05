@@ -25,12 +25,33 @@
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.5.22" />
     <PackageReference Include="RhinoCommon" Version="7.21.22208.13001" IncludeAssets="compile;build" />
+    <PackageReference Include="System.Text.Json" Version="7.0.2" />
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Crash.Client\Crash.Client.csproj" />
-    <ProjectReference Include="..\SpeckLib\SpeckLib.csproj" />
+    <ProjectReference Include="..\Crash.Common\Crash.Common.csproj" />
+    <ProjectReference Include="..\Crash.Handlers\Crash.Handlers.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Properties\Icons.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Icons.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Icons.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Icons.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   
   <ItemGroup>

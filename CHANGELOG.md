@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - Crash.Server docker container
 
 ### Changed
-- Specks are better implemented
+- Changes are better implemented
 - Baking should be much smoother now and less interruptive
 
 ### Fixed

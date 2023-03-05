@@ -1,43 +1,48 @@
-﻿using Rhino.PlugIns;
+﻿using Crash.Common.Document;
+using Crash.Handlers;
+
+using Rhino.PlugIns;
 
 
 namespace Crash
 {
 
-    ///<summary>
-    /// The crash plugin for multi user rhino collaboration
-    ///</summary>
-    public sealed class CrashPlugin : PlugIn
-    {
+	///<summary>
+	/// The crash plugin for multi user rhino collaboration
+	///</summary>
+	public sealed class CrashPlugin : PlugIn
+	{
 
-        public CrashPlugin()
-        {
-            Instance = this;
-        }
+		public CrashPlugin()
+		{
+			Instance = this;
+		}
 
-        /// <inheritdoc />
-        protected override LoadReturnCode OnLoad(ref string errorMessage)
-        {
-            new InteractivePipe() { Enabled = true };
-            LocalCache.Instance = new LocalCache();
-            return base.OnLoad(ref errorMessage);
-        }
+		/// <inheritdoc />
+		protected override LoadReturnCode OnLoad(ref string errorMessage)
+		{
+			InteractivePipe.Active = new InteractivePipe() { Enabled = false };
+			return base.OnLoad(ref errorMessage);
+		}
 
-        /// <inheritdoc />
-        protected override void OnShutdown()
-        {
-            ServerManager.CloseLocalServer();
-            ClientManager.CloseLocalClient();
-        }
+		/// <inheritdoc />
+		protected override void OnShutdown()
+		{
+			foreach (CrashDoc crashDoc in CrashDocRegistry.GetOpenDocuments())
+			{
+				crashDoc?.LocalServer?.Stop();
+				crashDoc?.LocalClient?.StopAsync().RunSynchronously();
+			}
+		}
 
-        /// <inheritdoc />
-        public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
+		/// <inheritdoc />
+		public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
 
-        /// <inheritdoc />
-        protected override string LocalPlugInName => "Crash";
+		/// <inheritdoc />
+		protected override string LocalPlugInName => "Crash";
 
-        ///<summary>Gets the only instance of the CrashPlugin plug-in.</summary>
-        public static CrashPlugin Instance { get; private set; }
+		///<summary>Gets the only instance of the CrashPlugin plug-in.</summary>
+		public static CrashPlugin Instance { get; private set; }
 
-    }
+	}
 }

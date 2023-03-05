@@ -19,7 +19,7 @@ namespace Crash.Server.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.10");
 
-            modelBuilder.Entity("Crash.Server.Model.Speck", b =>
+            modelBuilder.Entity("Crash.Server.Model.Change", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -42,7 +42,7 @@ namespace Crash.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Specks");
+                    b.ToTable("Changes");
                 });
 #pragma warning restore 612, 618
         }

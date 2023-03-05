@@ -23,7 +23,7 @@ namespace Crash.Utilities
 
 		public void Init(IEnumerable<Change> Changes)
 		{
-			// _crashDoc.LocalClient.OnInitialize -= Init;
+			_crashDoc.LocalClient.OnInitialize -= Init;
 
 			Rhino.RhinoApp.WriteLine("Loading Changes ...");
 
@@ -73,7 +73,7 @@ namespace Crash.Utilities
 			return 1;
 		}
 
-		private async Task _HandleChangesAsync(IEnumerable<Change> Changes)
+		public async Task _HandleChangesAsync(IEnumerable<Change> Changes)
 		{
 			var enumer = Changes.OrderBy(c => Sorter(c)).GetEnumerator();
 			while (enumer.MoveNext())

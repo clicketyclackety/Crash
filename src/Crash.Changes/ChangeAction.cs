@@ -7,20 +7,20 @@
 [Flags]
 public enum ChangeAction
 {
-	None = 1 << 0,
+	None = 0,
 
 	Add = 1 << 1,
 	Remove = 1 << 2,
 
-	Update = 1 << 4,
+	Update = 1 << 3,
 
-	Transform = 1 << 8,
+	Transform = 1 << 4,
 
-	Lock = 1 << 16,
-	Unlock = 1 << 32,
+	Lock = 1 << 5,
+	Unlock = 1 << 6,
 
-	Temporary = 1 << 64, //?
+	Temporary = 1 << 7, //?
 
-	Camera = 1 << 128,
+	Camera = 1 << 8,
 
 }

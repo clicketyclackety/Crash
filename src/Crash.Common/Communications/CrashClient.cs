@@ -1,15 +1,70 @@
-﻿using Crash.Common.Document;
-using Crash.Communications;
+﻿using System.Diagnostics;
 
+using Crash.Common.Document;
+
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Crash.Client
 {
 
+	public sealed class CrashLogger : ILogger, IDisposable
+	{
+		static LogLevel _currentLevel;
+		static List<string> _messages;
+
+		static CrashLogger()
+		{
+			_currentLevel = Debugger.IsAttached ? LogLevel.Trace : LogLevel.Information;
+			_messages = new List<string>();
+		}
+
+		public IDisposable BeginScope<TState>(TState state) => this;
+
+		public bool IsEnabled(LogLevel logLevel) => logLevel >= _currentLevel;
+
+		public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+		{
+			string _eventId = eventId.Name;
+			string formattedMessage = formatter.Invoke(state, exception);
+			string message = $"{logLevel} : {formattedMessage} : {_eventId}";
+
+			OnLoggingMessage?.Invoke(this, new LoggingEvent(message));
+		}
+
+		public static List<string> GetMessages() => _messages;
+
+		public void Dispose() { }
+
+		public static event EventHandler<LoggingEvent> OnLoggingMessage;
+
+		public sealed class LoggingEvent
+		{
+			public readonly string Message;
+			internal LoggingEvent(string message)
+			{
+				Message = message;
+			}
+		}
+
+	}
+
+	internal sealed class CrashLoggerProvider : ILoggerProvider
+	{
+		public ILogger CreateLogger(string categoryName) => new CrashLogger();
+
+		public void Dispose()
+		{
+
+		}
+	}
+
 	/// <summary>
 	/// Crash client class
 	/// </summary>
-	public class CrashClient
+	public sealed class CrashClient
 	{
 		#region consts
 		const string ADD = "Add";
@@ -21,6 +76,7 @@ namespace Crash.Client
 		const string INITIALIZE = "Initialize";
 		const string CAMERACHANGE = "CameraChange";
 
+		// TODO : Move to https
 		public const string DefaultURL = "http://localhost";
 		#endregion
 
@@ -81,18 +137,35 @@ namespace Crash.Client
 			RegisterConnections();
 		}
 
-		internal static HubConnection getHubConnection(Uri url)
-		{
-			return new HubConnectionBuilder()
-			   .WithUrl(url)
-			   .WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromSeconds(10) })
+		internal static HubConnection getHubConnection(Uri url) => new HubConnectionBuilder()
+			   .WithUrl(url).AddJsonProtocol()
+			   .AddJsonProtocol((opts) => JsonOptions())
+			   .ConfigureLogging(LoggingConfigurer)
+			   .WithAutomaticReconnect(new[] { TimeSpan.FromMilliseconds(10),
+											   TimeSpan.FromMilliseconds(100),
+											   TimeSpan.FromSeconds(1),
+											   TimeSpan.FromSeconds(10) })
 			   .Build();
+
+		internal static JsonHubProtocolOptions JsonOptions() => new JsonHubProtocolOptions()
+		{
+			PayloadSerializerOptions = new System.Text.Json.JsonSerializerOptions()
+			{
+				IgnoreReadOnlyFields = true,
+				IgnoreReadOnlyProperties = true,
+				NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals,
+			}
+		};
+
+		private static void LoggingConfigurer(ILoggingBuilder loggingBuilder)
+		{
+			LogLevel logLevel = Debugger.IsAttached ? LogLevel.Trace : LogLevel.Information;
+			loggingBuilder.SetMinimumLevel(logLevel);
+			loggingBuilder.AddProvider(new CrashLoggerProvider());
 		}
 
 		internal void RegisterConnections()
 		{
-			// How to test?
-			// Does it need to be AddAsync now?
 			_connection.On<string, Change>(ADD, (user, change) => OnAdd?.Invoke(user, change));
 			_connection.On<string, Guid>(DELETE, (user, id) => OnDelete?.Invoke(user, id));
 			_connection.On<string, Guid, Change>(UPDATE, (user, id, Change) => OnUpdate?.Invoke(user, id, Change));
@@ -114,7 +187,7 @@ namespace Crash.Client
 				throw new NullReferenceException("CrashDoc cannot be null!");
 			}
 
-			string userName = _crashDoc?.Users?.CurrentUser.Name;
+			string? userName = _crashDoc?.Users?.CurrentUser.Name;
 			if (string.IsNullOrEmpty(userName))
 			{
 				throw new Exception("A User has not been assigned!");
@@ -128,11 +201,8 @@ namespace Crash.Client
 
 		public static async Task CloseLocalServer(CrashDoc crashDoc)
 		{
-			CrashServer? server = crashDoc?.LocalServer;
-			if (null == server) return;
-
-			server?.Stop();
-			server?.Dispose();
+			crashDoc?.LocalServer?.Stop();
+			crashDoc?.LocalServer?.Dispose();
 		}
 
 		private Task ConnectionReconnectingAsync(Exception? arg)

@@ -71,6 +71,9 @@ namespace Crash.Commands
 			crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
 			_CreateCurrentUser(crashDoc, name);
 
+			CrashLogger.OnLoggingMessage -= CrashLogger_OnLoggingMessage;
+			CrashLogger.OnLoggingMessage += CrashLogger_OnLoggingMessage;
+
 			// TODO : Ensure Requested Server is available, and notify if not
 			ClientState clientState = new ClientState(crashDoc);
 			string userName = crashDoc.Users.CurrentUser.Name;
@@ -83,9 +86,18 @@ namespace Crash.Commands
 			return Result.Success;
 		}
 
-		private static void LocalClient_OnInitialize(IEnumerable<Change> obj)
+		private void CrashLogger_OnLoggingMessage(object sender, CrashLogger.LoggingEvent e)
+		{
+			RhinoApp.WriteLine(e.Message);
+		}
+
+		private void LocalClient_OnInitialize(IEnumerable<Change> changes)
 		{
 			RhinoApp.WriteLine("Loading Changes!");
+			;
+			ClientState state = new ClientState(crashDoc);
+			state._HandleChangesAsync(changes);
+
 		}
 
 		private void Queue_OnCompletedQueue(object sender, EventArgs e)

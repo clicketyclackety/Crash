@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-using Crash.Common.Changes;
+﻿using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Utils;
 
@@ -63,6 +60,7 @@ namespace Crash.Handlers
 			}
 
 			var Change = GeometryChange.CreateNew(userName, e.TheObject.Geometry);
+
 			ChangeUtils.SyncHost(e.TheObject, Change);
 
 			var serverChange = new Change(Change);

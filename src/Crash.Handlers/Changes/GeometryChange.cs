@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 using Crash.Common.Events;
 using Crash.Handlers.Changes;
@@ -30,12 +29,7 @@ namespace Crash.Common.Changes
 
 		public string? Payload => Change.Payload;
 
-		public int Action
-		{
-			get => Change.Action;
-			[Obsolete("For Deserialization only", true)]
-			set => Change.Action = value;
-		}
+		public int Action { get; set; }
 
 
 		public GeometryChange()
@@ -63,6 +57,7 @@ namespace Crash.Common.Changes
 
 			var Change = new Change(Guid.NewGuid(), owner, payload);
 			var instance = new GeometryChange(Change) { Geometry = geometry };
+			instance.Action = (int)ChangeAction.Add;
 
 			return instance;
 		}

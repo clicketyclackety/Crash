@@ -46,13 +46,11 @@ namespace Crash.Handlers
 
 		private void AddItemEvent(object sender, Rhino.DocObjects.RhinoObjectEventArgs e)
 		{
-			CrashDoc? crashDoc = CrashDocRegistry.GetRelatedDocument(e.TheObject.Document);
+			if (null == Document?.CacheTable) return;
+			if (Document.CacheTable.IsInit) return;
+			if (Document.CacheTable.SomeoneIsDone) return;
 
-			if (null == crashDoc?.CacheTable) return;
-			if (crashDoc.CacheTable.IsInit) return;
-			if (crashDoc.CacheTable.SomeoneIsDone) return;
-
-			var userName = crashDoc.Users?.CurrentUser.Name;
+			var userName = Document.Users?.CurrentUser.Name;
 			if (string.IsNullOrEmpty(userName))
 			{
 				Console.WriteLine("Current User is null");
@@ -64,64 +62,45 @@ namespace Crash.Handlers
 			ChangeUtils.SyncHost(e.TheObject, Change);
 
 			var serverChange = new Change(Change);
-			crashDoc?.LocalClient?.AddAsync(serverChange);
+			Document?.LocalClient?.AddAsync(serverChange);
 		}
 
 		internal void RemoveItemEvent(object sender, Rhino.DocObjects.RhinoObjectEventArgs e)
 		{
-			CrashDoc? crashDoc = CrashDocRegistry.GetRelatedDocument(e.TheObject.Document);
+			if (!ChangeUtils.TryGetChangeId(e.TheObject, out Guid id)) return;
 
-			if (null == crashDoc?.LocalClient) return;
-
-			var id = ChangeUtils.GetChangeId(e.TheObject);
-			if (id != null)
-				crashDoc.LocalClient.DeleteAsync(id.Value);
+			Document.LocalClient.DeleteAsync(id);
 		}
 
 		private void SelectItemEvent(object sender, Rhino.DocObjects.RhinoObjectSelectionEventArgs e)
 		{
-			CrashDoc? crashDoc = CrashDocRegistry.GetRelatedDocument(e.Document);
-			if (crashDoc?.LocalClient is not object) return;
-
 			foreach (var rhinoObject in e.RhinoObjects)
 			{
 				if (rhinoObject.IsLocked)
 					continue;
 
-				var ChangeId = Utils.ChangeUtils.GetChangeId(rhinoObject);
-
-				if (ChangeId == null)
-					continue;
+				if (!Utils.ChangeUtils.TryGetChangeId(rhinoObject, out Guid id)) continue;
 
 				if (e.Selected)
-					crashDoc.LocalClient?.SelectAsync(ChangeId.Value);
+					Document.LocalClient?.SelectAsync(id);
 				else
-					crashDoc.LocalClient?.UnselectAsync(ChangeId.Value);
-
+					Document.LocalClient?.UnselectAsync(id);
 			}
-
 		}
 
 		internal void SelectAllItemsEvent(object sender, Rhino.DocObjects.RhinoDeselectAllObjectsEventArgs e)
 		{
-			CrashDoc? crashDoc = CrashDocRegistry.GetRelatedDocument(e.Document);
-			if (null == crashDoc?.LocalClient) return;
-
 			var settings = new Rhino.DocObjects.ObjectEnumeratorSettings()
 			{
 				ActiveObjects = true
 			};
 
-			foreach (var rhinoObject in e.Document.Objects.GetObjectList(settings).ToList())
+			foreach (var rhinoObject in e.Document.Objects.GetObjectList(settings))
 			{
-				if (!rhinoObject.IsLocked)
-				{
-					var ChangeId = ChangeUtils.GetChangeId(rhinoObject);
-					if (null == ChangeId) continue;
+				if (rhinoObject.IsLocked) continue;
 
-					crashDoc.LocalClient.UnselectAsync(ChangeId.Value);
-				}
-
+				if (!ChangeUtils.TryGetChangeId(rhinoObject, out Guid ChangeId)) continue;
+				Document.LocalClient.UnselectAsync(ChangeId);
 			}
 		}
 

@@ -1,4 +1,5 @@
-﻿using Crash.Common.Changes;
+﻿using Crash.Client;
+using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Events;
 using Crash.Events;
@@ -15,16 +16,17 @@ namespace Crash.Utilities
 	{
 
 		private CrashDoc _crashDoc;
+		private CrashClient _localClient;
 
-		public ClientState(CrashDoc crashDoc)
+		public ClientState(CrashDoc crashDoc, CrashClient crashClient)
 		{
 			this._crashDoc = crashDoc;
+			this._localClient = crashClient;
+			RegisterServerCallEvents();
 		}
 
 		public void Init(IEnumerable<Change> Changes)
 		{
-			_crashDoc.LocalClient.OnInitialize -= Init;
-
 			Rhino.RhinoApp.WriteLine("Loading Changes ...");
 
 			_crashDoc.CacheTable.IsInit = true;
@@ -40,6 +42,18 @@ namespace Crash.Utilities
 			{
 				_crashDoc.CacheTable.IsInit = false;
 			}
+		}
+
+		private void RegisterServerCallEvents()
+		{
+			_localClient.OnAdd += (name, change) => _HandleChangeAsync(change);
+			_localClient.OnDelete += (name, id) => _HandleRemoveAsync(id);
+			_localClient.OnDelete += (name, id) => _HandleRemoveAsync(id);
+			_localClient.OnDone += (name) => _HandleDoneAsync(name);
+			// _localClient.OnUpdate += (name, id) => _HandleChangeAsync(name)
+			_localClient.OnSelect += (name, id) => _HandleLockAsync(id);
+			_localClient.OnUnselect += (name, id) => HandleUnlockAsync(id);
+			_localClient.OnCameraChange += (name, change) => _HandleChangeAsync(change);
 		}
 
 		private int Sorter(Change change)
@@ -108,16 +122,16 @@ namespace Crash.Utilities
 			}
 			else if (_action.HasFlag(ChangeAction.Remove))
 			{
-				await _HandleRemoveAsync(change);
+				await _HandleRemoveAsync(change.Id);
 			}
 
 			if (_action.HasFlag(ChangeAction.Lock))
 			{
-				await _HandleLockAsync(change);
+				await _HandleLockAsync(change.Id);
 			}
 			else if (_action.HasFlag(ChangeAction.Unlock))
 			{
-				await HandleUnlockAsync(change);
+				await HandleUnlockAsync(change.Id);
 			}
 
 			if (_action.HasFlag(ChangeAction.Transform))
@@ -128,10 +142,10 @@ namespace Crash.Utilities
 			await Task.CompletedTask;
 		}
 
-		private async Task _HandleLockAsync(Change change)
+		private async Task _HandleLockAsync(Guid changeId)
 		{
 			var rDoc = CrashDocRegistry.GetRelatedDocument(_crashDoc);
-			if (_crashDoc.CacheTable.TryGetValue(change.Id, out GeometryChange cachedChange))
+			if (_crashDoc.CacheTable.TryGetValue(changeId, out GeometryChange cachedChange))
 			{
 				rDoc.Objects.Unlock(cachedChange.RhinoId, true);
 			}
@@ -139,10 +153,10 @@ namespace Crash.Utilities
 			await Task.CompletedTask;
 		}
 
-		private async Task HandleUnlockAsync(Change change)
+		private async Task HandleUnlockAsync(Guid changeId)
 		{
 			var rDoc = CrashDocRegistry.GetRelatedDocument(_crashDoc);
-			if (_crashDoc.CacheTable.TryGetValue(change.Id, out GeometryChange cachedChange))
+			if (_crashDoc.CacheTable.TryGetValue(changeId, out GeometryChange cachedChange))
 			{
 				rDoc.Objects.Lock(cachedChange.RhinoId, true);
 			}
@@ -203,9 +217,9 @@ namespace Crash.Utilities
 			rhinoDoc.Objects.Delete(rhinoObject, true, true);
 		}
 
-		private async Task _HandleRemoveAsync(Change change)
+		private async Task _HandleRemoveAsync(Guid changeId)
 		{
-			DeleteArgs removeArgs = new DeleteArgs(_crashDoc, change.Id);
+			DeleteArgs removeArgs = new DeleteArgs(_crashDoc, changeId);
 			IdleAction deleteAction = new IdleAction(Remove, removeArgs);
 			_crashDoc.Queue.AddAction(deleteAction);
 
@@ -219,6 +233,11 @@ namespace Crash.Utilities
 			_crashDoc?.Cameras?.TryAddCamera(cameraChange);
 
 			await Task.CompletedTask;
+		}
+
+		private async Task _HandleDoneAsync(string user)
+		{
+
 		}
 
 		public void Dispose()

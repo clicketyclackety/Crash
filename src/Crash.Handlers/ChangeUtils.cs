@@ -1,6 +1,4 @@
-﻿using System;
-
-using Crash.Handlers.Changes;
+﻿using Crash.Handlers.Changes;
 
 namespace Crash.Utils
 {
@@ -11,14 +9,12 @@ namespace Crash.Utils
 		private static string ChangeIdKey = "ChangeID";
 
 		/// <summary>Acquires the ChangeId from the Rhino Object</summary>
-		public static Guid? GetChangeId(Rhino.DocObjects.RhinoObject rObj)
+		public static bool TryGetChangeId(Rhino.DocObjects.RhinoObject rObj, out Guid id)
 		{
-			if (rObj == null) return null;
+			id = Guid.Empty;
+			if (rObj == null) return false;
 
-			if (rObj.UserDictionary.TryGetGuid(ChangeIdKey, out var key))
-				return key;
-
-			return null;
+			return rObj.UserDictionary.TryGetGuid(ChangeIdKey, out id);
 		}
 
 		/// <summary>Adds the ChangeId to the Rhino Object and vice Verse.</summary>

@@ -74,37 +74,15 @@ namespace Crash.Commands
 			_CreateCurrentUser(crashDoc, name);
 
 			// TODO : Ensure Requested Server is available, and notify if not
-			ClientState clientState = new ClientState(crashDoc);
 			string userName = crashDoc.Users.CurrentUser.Name;
-			crashDoc.LocalClient = new CrashClient(crashDoc, userName, new Uri($"{LastURL}/Crash"));
-
-			crashDoc.LocalClient.StartLocalClient(LocalClient_OnInitialize);
+			var crashClient = new CrashClient(crashDoc, userName, new Uri($"{LastURL}/Crash"));
+			crashDoc.LocalClient = crashClient;
+			ClientState clientState = new ClientState(crashDoc, crashClient);
+			crashClient.StartLocalClient(clientState.Init);
 
 			InteractivePipe.Active.Enabled = true;
 
 			return Result.Success;
-		}
-
-		private void LocalClient_OnInitialize(IEnumerable<Change> changes)
-		{
-			Rhino.RhinoApp.WriteLine("Loading Changes ...");
-
-			crashDoc.CacheTable.IsInit = true;
-
-			try
-			{
-				ClientState state = new ClientState(crashDoc);
-				state._HandleChangesAsync(changes);
-			}
-			catch
-			{
-
-			}
-			finally
-			{
-				crashDoc.CacheTable.IsInit = false;
-				UsersForm.ReDrawForm();
-			}
 		}
 
 		private bool _GetUsersName(ref string name)

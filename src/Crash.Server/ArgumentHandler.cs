@@ -21,6 +21,7 @@ namespace Crash.Server
 
 		private readonly Dictionary<string, Action<string>> argDict;
 
+		// TODO : Add logging level
 		public ArgumentHandler()
 		{
 			argDict = new Dictionary<string, Action<string>>

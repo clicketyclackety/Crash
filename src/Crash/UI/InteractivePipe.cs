@@ -21,9 +21,9 @@ namespace Crash.UI
 	internal sealed class InteractivePipe : IDisposable
 	{
 
-		double scale = RhinoDoc.ActiveDoc is object ? RhinoMath.UnitScale(UnitSystem.Meters, RhinoDoc.ActiveDoc.ModelUnitSystem) : 0;
-		private int FAR_AWAY => (int)scale * 15_000;
-		private int VERY_FAR_AWAY => (int)scale * 75_000;
+		double scale => RhinoDoc.ActiveDoc is object ? RhinoMath.UnitScale(UnitSystem.Meters, RhinoDoc.ActiveDoc.ModelUnitSystem) : 0;
+		private int FAR_AWAY => (int)scale * 1_5000;
+		private int VERY_FAR_AWAY => (int)scale * 7_5000;
 
 		// TODO : Does this ever get shrunk? It should do.
 		// TODO : Don't draw things not in the view port
@@ -187,6 +187,9 @@ namespace Crash.UI
 			GeometryBase? geom = Change.Geometry;
 			if (geom == null) return;
 
+			User user = CrashDocRegistry.ActiveDoc.Users.Get(Change.Owner);
+			if (!user.Visible) return;
+
 			if (cachedMaterial.Diffuse != color)
 			{
 				cachedMaterial = new DisplayMaterial(color);
@@ -194,6 +197,8 @@ namespace Crash.UI
 
 			BoundingBox bbox = Change.Geometry.GetBoundingBox(false);
 			double distanceTo = e.Viewport.CameraLocation.DistanceTo(bbox.Center);
+
+			// Over a certain size, no need to draw either. BBox relative to distance is important.
 
 			if (distanceTo > VERY_FAR_AWAY)
 			{

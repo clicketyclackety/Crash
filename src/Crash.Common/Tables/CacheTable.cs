@@ -94,7 +94,10 @@ namespace Crash.Common.Tables
 
 		public void AddToDocument(ICachedChange cachedChange)
 		{
-			if (cachedChange.AddToDocument is not object) return;
+			if (cachedChange.AddToDocument is not object)
+			{
+				throw new NotImplementedException("AddToDocument not implemented for Change");
+			}
 
 			var args = new CrashEventArgs(_crashDoc);
 			cachedChange.AddToDocument.Invoke(args);
@@ -102,7 +105,10 @@ namespace Crash.Common.Tables
 
 		public void RemoveFromDocument(ICachedChange cachedChange)
 		{
-			if (cachedChange.AddToDocument is not object) return;
+			if (cachedChange.AddToDocument is not object)
+			{
+				throw new NotImplementedException("AddToDocument not implemented for Change");
+			}
 
 			var args = new CrashEventArgs(_crashDoc);
 			cachedChange.RemoveFromDocument.Invoke(args);
@@ -115,17 +121,11 @@ namespace Crash.Common.Tables
 		/// <returns>returns a list of the Changes</returns>
 		public IEnumerable<ICachedChange> GetChanges() => _cache.Values;
 
-		public IEnumerator<ICachedChange> GetEnumerator()
-		{
-			throw new NotImplementedException();
-		}
+		public IEnumerator<ICachedChange> GetEnumerator() => _cache.Values.GetEnumerator();
 
 		public IEnumerator<T> GetEnumerator<T>() => _cache.Values.Where(x => x is T).Cast<T>().GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			throw new NotImplementedException();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => _cache.Values.GetEnumerator();
 	}
-
 }
+

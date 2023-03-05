@@ -3,7 +3,7 @@
 namespace Crash.Common.Events
 {
 
-	public class CrashEventArgs
+	public class CrashEventArgs : EventArgs
 	{
 		public CrashDoc CrashDoc { get; set; }
 

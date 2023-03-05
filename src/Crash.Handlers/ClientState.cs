@@ -167,7 +167,8 @@ namespace Crash.Utilities
 		private async Task _HandleTemporaryAddAsync(Change change)
 		{
 			GeometryChange geomChange = new GeometryChange(change);
-			_crashDoc.CacheTable.AddToDocument(geomChange);
+
+			_crashDoc.CacheTable.UpdateChangeAsync(geomChange);
 
 			await Task.CompletedTask;
 		}
@@ -198,6 +199,8 @@ namespace Crash.Utilities
 		private async Task _HandleAddsync(Change change)
 		{
 			GeometryChange localChange = new GeometryChange(change);
+
+			// TODO : What about AddToDocument?
 
 			BakeArgs bakeArgs = new BakeArgs(_crashDoc, localChange);
 			IdleAction bakeAction = new IdleAction(Bake, bakeArgs);

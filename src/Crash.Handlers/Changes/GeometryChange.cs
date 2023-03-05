@@ -34,10 +34,10 @@ namespace Crash.Common.Changes
 
 		public GeometryChange()
 		{
-
+			Draw = PerformDraw;
 		}
 
-		public GeometryChange(IChange cange)
+		public GeometryChange(IChange cange) : this()
 		{
 			Change = cange;
 			var options = new SerializationOptions();
@@ -69,6 +69,15 @@ namespace Crash.Common.Changes
 
 		public Action<CrashEventArgs> RemoveFromDocument { get; set; }
 
+		private void PerformAddToDocument(CrashEventArgs e)
+		{
+
+		}
+
+		private void PerformDraw(CrashEventArgs e)
+		{
+			// TODO : Implement this
+		}
 
 	}
 }

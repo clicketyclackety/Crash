@@ -11,6 +11,7 @@ namespace Crash.Commands
 	/// <summary>
 	/// Command to Open a Shared Model
 	/// </summary>
+	[CommandStyle(Style.ScriptRunner)]
 	public sealed class OpenSharedModel : Command
 	{
 
@@ -67,8 +68,9 @@ namespace Crash.Commands
 				return Result.Nothing;
 			}
 
+			UsersForm.ShowForm();
+
 			crashDoc = CrashDocRegistry.CreateAndRegisterDocument(doc);
-			crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
 			_CreateCurrentUser(crashDoc, name);
 
 			// TODO : Ensure Requested Server is available, and notify if not
@@ -85,8 +87,6 @@ namespace Crash.Commands
 
 		private void LocalClient_OnInitialize(IEnumerable<Change> changes)
 		{
-			crashDoc.LocalClient.OnInitialize -= LocalClient_OnInitialize;
-
 			Rhino.RhinoApp.WriteLine("Loading Changes ...");
 
 			crashDoc.CacheTable.IsInit = true;
@@ -104,13 +104,6 @@ namespace Crash.Commands
 			{
 				crashDoc.CacheTable.IsInit = false;
 			}
-		}
-
-		private void Queue_OnCompletedQueue(object sender, EventArgs e)
-		{
-			crashDoc.Queue.OnCompletedQueue -= Queue_OnCompletedQueue;
-
-			UsersForm.ToggleFormVisibility();
 		}
 
 		private bool _GetUsersName(ref string name)

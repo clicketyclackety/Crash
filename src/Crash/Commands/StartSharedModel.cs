@@ -85,21 +85,6 @@ namespace Crash.Commands
 				includePreExistingGeometry = _ContinueOrQuit() == true;
 			}
 
-			/*
-			while (crashDoc.LocalServer.IsRunning)
-			{
-				bool? close = _GetForceCloseOptions();
-				if (close == null)
-					return Result.Cancel;
-
-				else if (close == true)
-				{
-					CrashServer.ForceCloselocalServers();
-					break;
-				}
-			}
-			*/
-
 			try
 			{
 				crashDoc.LocalServer = new CrashServer(crashDoc);

@@ -8,7 +8,7 @@ namespace Crash.Commands
 	/// <summary>
 	/// Command to Close a Shared Model
 	/// </summary>
-	[CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
+	[CommandStyle(Style.ScriptRunner)]
 	public sealed class CloseSharedModel : Command
 	{
 		private bool defaultValue = false;
@@ -37,7 +37,7 @@ namespace Crash.Commands
 			if (null == choice)
 				return Result.Cancel;
 
-			if (choice.Value)
+			if (choice.Value == true)
 				client.DoneAsync();
 
 			CrashDocRegistry.ActiveDoc?.Dispose();

@@ -42,15 +42,20 @@ namespace Crash.UI
 		private ObservableCollection<User>? m_users { get; set; }
 		internal static Crash.UI.UsersForm? ActiveForm { get; set; }
 
+		internal static void ShowForm()
+		{
+			var form = new UsersForm();
+			form.Closed += OnFormClosed;
+			form.Show();
+
+			ActiveForm = form;
+		}
+
 		internal static void ToggleFormVisibility()
 		{
 			if (null == ActiveForm)
 			{
-				var form = new UsersForm { Owner = RhinoEtoApp.MainWindow };
-				form.Closed += OnFormClosed;
-				form.Show();
-
-				ActiveForm = form;
+				ShowForm();
 			}
 			else
 			{
@@ -82,10 +87,10 @@ namespace Crash.UI
 
 		private void ReDrawEvent(object sender, EventArgs e) => ReDrawForm();
 
-		private void ReDrawEvent(IChange[] Changes) => ReDrawForm();
-
-		public UsersForm()
+		internal UsersForm()
 		{
+			Owner = RhinoEtoApp.MainWindow;
+
 			CrashDoc? crashDoc = CrashDocRegistry.ActiveDoc;
 			if (null == crashDoc)
 			{
@@ -101,11 +106,6 @@ namespace Crash.UI
 			// Intentional
 			crashDoc.Users.OnUserAdded += ReDrawEvent;
 			crashDoc.Users.OnUserRemoved += ReDrawEvent;
-
-			if (crashDoc?.LocalClient is object)
-			{
-				crashDoc.LocalClient.OnInitialize += ReDrawEvent;
-			}
 
 			Maximizable = false;
 			Minimizable = false;
@@ -299,11 +299,6 @@ namespace Crash.UI
 		{
 			this.SavePosition();
 			base.OnClosing(e);
-		}
-
-		protected void OnHelloButton()
-		{
-			MessageBox.Show(this, "Hello Rhino!", Title, MessageBoxButtons.OK);
 		}
 
 	}

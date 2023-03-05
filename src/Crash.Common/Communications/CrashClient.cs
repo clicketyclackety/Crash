@@ -107,7 +107,7 @@ namespace Crash.Client
 			_connection.Reconnecting += ConnectionReconnectingAsync;
 		}
 
-		public async Task StartLocalClient(Action<Change[]> onInit)
+		public async Task StartLocalClient(Action<IEnumerable<Change>> onInit)
 		{
 			if (null == _crashDoc)
 			{

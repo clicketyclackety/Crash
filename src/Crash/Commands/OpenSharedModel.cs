@@ -11,7 +11,6 @@ namespace Crash.Commands
 	/// <summary>
 	/// Command to Open a Shared Model
 	/// </summary>
-	[CommandStyle(Style.DoNotRepeat | Style.NotUndoable | Style.ScriptRunner)]
 	public sealed class OpenSharedModel : Command
 	{
 
@@ -76,19 +75,17 @@ namespace Crash.Commands
 			ClientState clientState = new ClientState(crashDoc);
 			string userName = crashDoc.Users.CurrentUser.Name;
 			crashDoc.LocalClient = new CrashClient(crashDoc, userName, new Uri($"{LastURL}/Crash"));
-			// crashDoc.LocalClient.StartLocalClient(clientState.Init); // .WithTimeout(new TimeSpan(0, 0, 30));
 
 			crashDoc.LocalClient.StartLocalClient(LocalClient_OnInitialize);
-
 
 			InteractivePipe.Active.Enabled = true;
 
 			return Result.Success;
 		}
 
-		private static void LocalClient_OnInitialize(Change[] obj)
+		private static void LocalClient_OnInitialize(IEnumerable<Change> obj)
 		{
-			throw new NotImplementedException();
+			RhinoApp.WriteLine("Loading Changes!");
 		}
 
 		private void Queue_OnCompletedQueue(object sender, EventArgs e)

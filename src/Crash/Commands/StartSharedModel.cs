@@ -17,7 +17,6 @@ namespace Crash.Commands
 	/// <summary>
 	/// Command to start the shared model
 	/// </summary>
-	[CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
 	public sealed class StartSharedModel : Command
 	{
 		private RhinoDoc rhinoDoc;

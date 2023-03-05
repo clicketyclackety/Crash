@@ -21,7 +21,7 @@ namespace Crash.Utilities
 			this._crashDoc = crashDoc;
 		}
 
-		public void Init(Change[] Changes)
+		public void Init(IEnumerable<Change> Changes)
 		{
 			// _crashDoc.LocalClient.OnInitialize -= Init;
 

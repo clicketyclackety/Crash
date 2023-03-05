@@ -87,9 +87,26 @@ namespace Crash.UI
 
 		private void ReDrawEvent(object sender, EventArgs e) => ReDrawForm();
 
-		// TODO : Split up and tidy this class
 		internal UsersForm()
 		{
+			Owner = RhinoEtoApp.MainWindow;
+
+			CrashDoc? crashDoc = CrashDocRegistry.ActiveDoc;
+			if (null == crashDoc)
+			{
+				m_users = new ObservableCollection<User>();
+				return;
+			}
+
+			m_users = new ObservableCollection<User>(crashDoc.Users);
+			RhinoDoc.ActiveDocumentChanged += ReDrawEvent;
+			// https://discourse.mcneel.com/t/are-eto-modeless-forms-supported-on-rhino-8-mac/154337/2?u=csykes
+			RhinoDoc.ActiveDocumentChanged += RhinoDoc_ActiveDocumentChanged;
+
+			// Intentional
+			crashDoc.Users.OnUserAdded += ReDrawEvent;
+			crashDoc.Users.OnUserRemoved += ReDrawEvent;
+
 			Maximizable = false;
 			Minimizable = false;
 			Padding = new Padding(5);
@@ -195,25 +212,6 @@ namespace Crash.UI
 				  new TableRow(user_layout)
 				}
 			};
-
-
-			Owner = RhinoEtoApp.MainWindow;
-
-			CrashDoc? crashDoc = CrashDocRegistry.ActiveDoc;
-			if (null == crashDoc)
-			{
-				m_users = new ObservableCollection<User>();
-				return;
-			}
-
-			m_users = new ObservableCollection<User>(crashDoc.Users);
-			RhinoDoc.ActiveDocumentChanged += ReDrawEvent;
-			// https://discourse.mcneel.com/t/are-eto-modeless-forms-supported-on-rhino-8-mac/154337/2?u=csykes
-			RhinoDoc.ActiveDocumentChanged += RhinoDoc_ActiveDocumentChanged;
-
-			// Intentional
-			crashDoc.Users.OnUserAdded += ReDrawEvent;
-			crashDoc.Users.OnUserRemoved += ReDrawEvent;
 
 		}
 

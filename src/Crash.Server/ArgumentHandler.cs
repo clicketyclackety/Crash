@@ -8,7 +8,8 @@ namespace Crash.Server
 	{
 
 		const string pattern = @"--([\w]+ [\S]+)";
-		internal const string dbName = "Database.db";
+		private static Version? vers = typeof(ArgumentHandler).Assembly.GetName().Version;
+		internal static string dbName = $"Database_{vers.Major}_{vers.Minor}_{vers.Build}.db";
 		internal const string appName = "Crash";
 		internal const string dbDirectory = "App_Data";
 		internal const string defaultURL = "http://0.0.0.0:8080";

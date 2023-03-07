@@ -20,9 +20,6 @@ namespace Crash.Geometry
 		/// <summary>Returns a non existant drection.</summary>
 		public static CVector Unset => new CVector(double.NaN, double.NaN, double.NaN);
 
-
-		public CVector() { }
-
 		public CVector(double x, double y, double z)
 		{
 			X = x;

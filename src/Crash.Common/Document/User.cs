@@ -44,7 +44,7 @@ namespace Crash.Common.Document
 		/// <param name="inputName">the name of the user</param>
 		public User(string inputName)
 		{
-			Name = inputName.ToLower();
+			_name = inputName.ToLower();
 
 			if (string.IsNullOrEmpty(inputName))
 			{

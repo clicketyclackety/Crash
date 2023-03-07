@@ -35,6 +35,8 @@ namespace Crash.Common.Changes
 		public GeometryChange()
 		{
 			Draw = PerformDraw;
+			RemoveFromDocument = PerformRemoveFromDocument;
+			AddToDocument = PerformAddToDocument;
 		}
 
 		public GeometryChange(IChange cange) : this()
@@ -48,6 +50,10 @@ namespace Crash.Common.Changes
 			}
 
 			Geometry = geometry;
+
+			Draw = PerformDraw;
+			RemoveFromDocument = PerformRemoveFromDocument;
+			AddToDocument = PerformAddToDocument;
 		}
 
 		public static GeometryChange CreateNew(string owner, GeometryBase geometry)
@@ -71,7 +77,12 @@ namespace Crash.Common.Changes
 
 		private void PerformAddToDocument(CrashEventArgs e)
 		{
+			// TODO : Implement this
+		}
 
+		private void PerformRemoveFromDocument(CrashEventArgs e)
+		{
+			// TODO : Implement this
 		}
 
 		private void PerformDraw(CrashEventArgs e)

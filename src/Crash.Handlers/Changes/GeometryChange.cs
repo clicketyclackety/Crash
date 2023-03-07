@@ -72,7 +72,6 @@ namespace Crash.Common.Changes
 		{
 			Change = change;
 			Action = change.Action;
-			var options = new SerializationOptions();
 			GeometryBase? geometry = CommonObject.FromJSON(Change.Payload) as GeometryBase;
 			if (null == geometry)
 			{
@@ -80,10 +79,6 @@ namespace Crash.Common.Changes
 			}
 
 			Geometry = geometry;
-
-			Draw = PerformDraw;
-			RemoveFromDocument = PerformRemoveFromDocument;
-			AddToDocument = PerformAddToDocument;
 		}
 
 		/// <summary>

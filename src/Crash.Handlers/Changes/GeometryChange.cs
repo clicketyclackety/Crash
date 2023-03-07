@@ -11,27 +11,51 @@ namespace Crash.Common.Changes
 {
 
 	/// <summary>
-	/// Local instance of a received Change.
+	/// Local instance of a received change of geometry
 	/// </summary>
 	public sealed class GeometryChange : ICachedChange, IRhinoChange
 	{
+		/// <inheritdoc />
 		IChange Change { get; set; }
 
+		/// <summary>
+		/// The rhino geometry of the change
+		/// </summary>
 		public GeometryBase Geometry { get; private set; }
 
+		/// <summary>
+		/// The rhino object id
+		/// </summary>
 		public Guid RhinoId { get; set; }
 
+		/// <summary>
+		/// The date time stamp
+		/// </summary>
 		public DateTime Stamp => Change.Stamp;
 
+		/// <summary>
+		/// The unique ID od the change
+		/// </summary>
 		public Guid Id => Change.Id;
 
+		/// <summary>
+		/// The owner of the change
+		/// </summary>
 		public string? Owner => Change.Owner;
 
+		/// <summary>
+		/// The payload, the geometry that changed serialized as string
+		/// </summary>
 		public string? Payload => Change.Payload;
 
+		/// <summary>
+		/// The action describing what changed
+		/// </summary>
 		public int Action { get; set; }
 
-
+		/// <summary>
+		/// Empty constructor
+		/// </summary>
 		public GeometryChange()
 		{
 			Draw = PerformDraw;
@@ -39,9 +63,15 @@ namespace Crash.Common.Changes
 			AddToDocument = PerformAddToDocument;
 		}
 
-		public GeometryChange(IChange cange) : this()
+		/// <summary>
+		/// Constructor of a geometry change from an IChange
+		/// </summary>
+		/// <param name="change">the IChange describing the change</param>
+		/// <exception cref="JsonException">If the geometry could not be De-serialized</exception>
+		public GeometryChange(IChange change) : this()
 		{
-			Change = cange;
+			Change = change;
+			Action = change.Action;
 			var options = new SerializationOptions();
 			GeometryBase? geometry = CommonObject.FromJSON(Change.Payload) as GeometryBase;
 			if (null == geometry)
@@ -56,6 +86,12 @@ namespace Crash.Common.Changes
 			AddToDocument = PerformAddToDocument;
 		}
 
+		/// <summary>
+		/// Method to generate a Geometry change from a GeometryBase object
+		/// </summary>
+		/// <param name="owner">the owner of the change</param>
+		/// <param name="geometry">the geometry that changed</param>
+		/// <returns></returns>
 		public static GeometryChange CreateNew(string owner, GeometryBase geometry)
 		{
 			var options = new SerializationOptions();

@@ -26,12 +26,6 @@ namespace Crash.Common.Changes
 			set => Change.Action = value;
 		}
 
-
-		public TransformChange()
-		{
-
-		}
-
 		public TransformChange(IChange change)
 		{
 			Change = change;

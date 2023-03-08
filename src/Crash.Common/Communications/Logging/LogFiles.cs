@@ -31,9 +31,9 @@ namespace Crash.Common.Communications.Logging
 				Directory.CreateDirectory(_logDirectory);
 			}
 
-			if (!File.Exists(_logFileName))
+			if (!File.Exists(_logFilePath))
 			{
-				File.Create(_logFileName);
+				File.Create(_logFilePath);
 			}
 		}
 
@@ -44,7 +44,14 @@ namespace Crash.Common.Communications.Logging
 
 		private void writeLogMessage(object sender, CrashLogger.LoggingEvent e)
 		{
-			File.AppendAllLines(_logFilePath, new string[] { e.Message });
+			try
+			{
+				File.AppendAllLines(_logFilePath, new string[] { e.Message });
+			}
+			catch (Exception ex)
+			{
+				;
+			}
 		}
 
 	}

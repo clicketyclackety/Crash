@@ -154,7 +154,7 @@ namespace Crash.UI
 
 			// Visible
 			var visibleCellBinding = Binding.Property<User, bool?>(u => u.Visible);
-			visibleCellBinding.Changed += RedrawView;
+			visibleCellBinding.Changed += VisibleCellBinding_Changed;
 			m_grid.Columns.Add(new GridColumn
 			{
 				DataCell = new CheckBoxCell
@@ -217,6 +217,12 @@ namespace Crash.UI
 				}
 			};
 
+		}
+
+		private void VisibleCellBinding_Changed(object sender, BindingChangedEventArgs e)
+		{
+			bool toggleValue = (bool)e.Value;
+			PropertyBinding<bool?> binding = (PropertyBinding<bool?>)sender;
 		}
 
 		private void RhinoDoc_ActiveDocumentChanged(object sender, DocumentEventArgs e)

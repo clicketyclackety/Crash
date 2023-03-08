@@ -57,7 +57,7 @@ namespace Crash.Common.Tables
 		/// Remove a Change for the cache
 		/// </summary>
 		/// <param name="Change">the Change to remove</param>
-		internal void RemoveChange(Guid ChangeId)
+		public void RemoveChange(Guid ChangeId)
 		{
 			_cache.TryRemove(ChangeId, out _);
 		}
@@ -66,7 +66,7 @@ namespace Crash.Common.Tables
 		/// Remove multiple Changes from the cache
 		/// </summary>
 		/// <param name="Changes">the Changes to remove</param>
-		internal void RemoveChanges(IEnumerable<IChange> Changes)
+		public void RemoveChanges(IEnumerable<IChange> Changes)
 		{
 			if (null == Changes) return;
 

@@ -99,6 +99,9 @@ namespace Crash.UI
 
 				GeometryChange Change = enumer.Current;
 
+				ChangeAction action = (ChangeAction)Change.Action;
+				if (!action.HasFlag(ChangeAction.Temporary)) continue;
+
 				User user = CrashDocRegistry.ActiveDoc.Users.Get(Change.Owner);
 				if (user.Visible != true) continue;
 

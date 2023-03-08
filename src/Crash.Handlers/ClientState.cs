@@ -118,7 +118,7 @@ namespace Crash.Utilities
 			}
 			else if (_action.HasFlag(ChangeAction.Add))
 			{
-				await _HandleAddsync(change);
+				await _HandleAddAsync(change);
 			}
 			else if (_action.HasFlag(ChangeAction.Remove))
 			{
@@ -204,15 +204,18 @@ namespace Crash.Utilities
 			Crash.Utils.ChangeUtils.SyncHost(rhinoObject, bakeArgs.Change);
 		}
 
-		private async Task _HandleAddsync(Change change)
+		private async Task _HandleAddAsync(Change change)
 		{
 			GeometryChange localChange = new GeometryChange(change);
+			_HandleAddAsync(localChange);
+		}
 
-			// TODO : What about AddToDocument?
-
-			BakeArgs bakeArgs = new BakeArgs(_crashDoc, localChange);
+		private async Task _HandleAddAsync(GeometryChange geomChange)
+		{
+			BakeArgs bakeArgs = new BakeArgs(_crashDoc, geomChange);
 			IdleAction bakeAction = new IdleAction(Bake, bakeArgs);
 			_crashDoc.Queue.AddAction(bakeAction);
+			_crashDoc.CacheTable.UpdateChangeAsync(geomChange);
 
 			await Task.CompletedTask;
 		}
@@ -248,7 +251,21 @@ namespace Crash.Utilities
 
 		private async Task _HandleDoneAsync(string user)
 		{
+			var changes = _crashDoc.CacheTable.GetChanges();
+			foreach (var change in changes)
+			{
+				ChangeAction action = (ChangeAction)change.Action;
+				if (!action.HasFlag(ChangeAction.Temporary)) continue;
 
+				// Not temporary anymore!
+				action &= ~ChangeAction.Temporary;
+				change.Action = (int)action;
+
+				if (change is GeometryChange geomChange)
+					await _HandleAddAsync(geomChange);
+
+				_crashDoc.CacheTable.RemoveChange(change.Id);
+			}
 		}
 
 		public void Dispose()

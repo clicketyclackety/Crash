@@ -168,9 +168,17 @@ namespace Crash.Utilities
 		{
 			GeometryChange geomChange = new GeometryChange(change);
 
-			_crashDoc.CacheTable.UpdateChangeAsync(geomChange);
+			BakeArgs bakeArgs = new BakeArgs(_crashDoc, geomChange);
+			IdleAction bakeAction = new IdleAction(AddToCache, bakeArgs);
+			_crashDoc.Queue.AddAction(bakeAction);
 
 			await Task.CompletedTask;
+		}
+
+		private void AddToCache(CrashEventArgs args)
+		{
+			if (args is not BakeArgs bakeArgs) return;
+			args.CrashDoc.CacheTable.UpdateChangeAsync(bakeArgs.Change);
 		}
 
 		private async Task _HandleTransformAsync(Change change)

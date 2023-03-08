@@ -74,6 +74,9 @@ namespace Crash.UI
 
 			ActiveForm.m_users = new ObservableCollection<User>(CrashDocRegistry.ActiveDoc.Users);
 			ActiveForm.Invalidate(true);
+
+			ActiveForm.m_grid.DataStore = ActiveForm.m_users.Cast<object>();
+			ActiveForm.m_grid.Invalidate(true);
 		}
 
 		/// <summary>
@@ -106,6 +109,7 @@ namespace Crash.UI
 			// Intentional
 			crashDoc.Users.OnUserAdded += ReDrawEvent;
 			crashDoc.Users.OnUserRemoved += ReDrawEvent;
+			crashDoc.Queue.OnCompletedQueue += ReDrawEvent;
 
 			Maximizable = false;
 			Minimizable = false;

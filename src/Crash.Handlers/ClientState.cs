@@ -233,6 +233,8 @@ namespace Crash.Utilities
 
 		private async Task _HandleRemoveAsync(Guid changeId)
 		{
+			_crashDoc.CacheTable.RemoveChange(changeId);
+
 			DeleteArgs removeArgs = new DeleteArgs(_crashDoc, changeId);
 			IdleAction deleteAction = new IdleAction(Remove, removeArgs);
 			_crashDoc.Queue.AddAction(deleteAction);

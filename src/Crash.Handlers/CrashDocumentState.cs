@@ -63,6 +63,8 @@ namespace Crash.Handlers
 
 			var serverChange = new Change(Change);
 			Document?.LocalClient?.AddAsync(serverChange);
+
+			Document.CacheTable.UpdateChangeAsync(Change);
 		}
 
 		internal void RemoveItemEvent(object sender, Rhino.DocObjects.RhinoObjectEventArgs e)
@@ -70,6 +72,7 @@ namespace Crash.Handlers
 			if (!ChangeUtils.TryGetChangeId(e.TheObject, out Guid id)) return;
 
 			Document.LocalClient.DeleteAsync(id);
+			Document.CacheTable.RemoveChange(id);
 		}
 
 		private void SelectItemEvent(object sender, Rhino.DocObjects.RhinoObjectSelectionEventArgs e)
@@ -80,12 +83,24 @@ namespace Crash.Handlers
 					continue;
 
 				if (!Utils.ChangeUtils.TryGetChangeId(rhinoObject, out Guid id)) continue;
+				if (IsTemporary(id)) continue;
 
 				if (e.Selected)
 					Document.LocalClient?.SelectAsync(id);
 				else
 					Document.LocalClient?.UnselectAsync(id);
 			}
+		}
+
+		private bool IsTemporary(Guid changeId)
+		{
+			if (Document.CacheTable.TryGetValue(changeId, out ICachedChange change))
+			{
+				ChangeAction action = (ChangeAction)change.Action;
+				if (action.HasFlag(ChangeAction.Temporary)) return true;
+			}
+
+			return false;
 		}
 
 		internal void SelectAllItemsEvent(object sender, Rhino.DocObjects.RhinoDeselectAllObjectsEventArgs e)
@@ -100,6 +115,8 @@ namespace Crash.Handlers
 				if (rhinoObject.IsLocked) continue;
 
 				if (!ChangeUtils.TryGetChangeId(rhinoObject, out Guid ChangeId)) continue;
+				if (IsTemporary(ChangeId)) continue;
+
 				Document.LocalClient.UnselectAsync(ChangeId);
 			}
 		}

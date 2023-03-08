@@ -29,7 +29,7 @@ namespace Crash.Common.Changes
 
 		public string? Payload => Change.Payload;
 
-		public int Action { get; set; }
+		public int Action { get => Change.Action; set => Change.Action = value; }
 
 
 		public GeometryChange()

@@ -3,7 +3,6 @@ using Crash.Handlers;
 
 using Rhino.PlugIns;
 
-
 namespace Crash
 {
 
@@ -45,4 +44,5 @@ namespace Crash
 		public static CrashPlugin Instance { get; private set; }
 
 	}
+
 }

@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 
-using Crash.Common.Events;
 using Crash.Handlers.Changes;
 
 using Rhino.FileIO;
@@ -13,7 +12,7 @@ namespace Crash.Common.Changes
 	/// <summary>
 	/// Local instance of a received Change.
 	/// </summary>
-	public sealed class GeometryChange : ICachedChange, IRhinoChange
+	public sealed class GeometryChange : IRhinoChange
 	{
 		IChange Change { get; set; }
 
@@ -32,10 +31,7 @@ namespace Crash.Common.Changes
 		public int Action { get => Change.Action; set => Change.Action = value; }
 
 
-		public GeometryChange()
-		{
-			Draw = PerformDraw;
-		}
+		public GeometryChange() { }
 
 		public GeometryChange(IChange cange) : this()
 		{
@@ -60,23 +56,6 @@ namespace Crash.Common.Changes
 			instance.Action = (int)(ChangeAction.Add | ChangeAction.Temporary);
 
 			return instance;
-		}
-
-
-		public Action<CrashEventArgs> Draw { get; set; }
-
-		public Action<CrashEventArgs> AddToDocument { get; set; }
-
-		public Action<CrashEventArgs> RemoveFromDocument { get; set; }
-
-		private void PerformAddToDocument(CrashEventArgs e)
-		{
-
-		}
-
-		private void PerformDraw(CrashEventArgs e)
-		{
-			// TODO : Implement this
 		}
 
 	}

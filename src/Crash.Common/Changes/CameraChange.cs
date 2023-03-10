@@ -1,12 +1,11 @@
 ﻿using System.Text.Json;
 
-using Crash.Common.Events;
 using Crash.Common.View;
 
 namespace Crash.Common.Changes
 {
 
-	public sealed class CameraChange : ICachedChange
+	public sealed class CameraChange : IChange
 	{
 		IChange Change { get; set; }
 
@@ -57,12 +56,6 @@ namespace Crash.Common.Changes
 			IChange cameraChange = new Change(Guid.NewGuid(), userName, json);
 			return new CameraChange(cameraChange);
 		}
-
-		public Action<CrashEventArgs> Draw { get; set; }
-
-		public Action<CrashEventArgs> AddToDocument { get; set; }
-
-		public Action<CrashEventArgs> RemoveFromDocument { get; set; }
 
 	}
 

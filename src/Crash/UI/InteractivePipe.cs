@@ -56,6 +56,9 @@ namespace Crash.UI
 			}
 		}
 
+		private Dictionary<Type, Action<DrawEventArgs, IChange, Color>> DrawRegistry;
+
+
 		internal static InteractivePipe Active;
 
 		/// <summary>
@@ -66,6 +69,10 @@ namespace Crash.UI
 			bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
 			PipeCameraCache = new Dictionary<Color, Line[]>();
 			Active = this;
+			DrawRegistry = new Dictionary<Type, Action<DrawEventArgs, IChange, Color>>();
+
+			DrawRegistry.Add(typeof(GeometryChange), DrawCrashChange);
+			// DrawRegistry.Add(typeof(CameraChange), DrawCameraChange);
 		}
 
 		/// <summary>
@@ -89,24 +96,26 @@ namespace Crash.UI
 			if (null == CrashDocRegistry.ActiveDoc?.Cameras) return;
 			if (null == CrashDocRegistry.ActiveDoc?.Users) return;
 
+			var doc = CrashDocRegistry.ActiveDoc;
+
 			// bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
+			string currentUser = doc.Users.CurrentUser.Name;
+			var caches = CrashDocRegistry.ActiveDoc.CacheTable.GetChanges()
+				.Where(c => c.Owner != currentUser)
+				.Where(c => ((ChangeAction)c.Action).HasFlag(ChangeAction.Temporary))
+				.OrderBy(c => doc.Users.Get(c.Owner).Color);
 
-			var enumer = CrashDocRegistry.ActiveDoc.CacheTable.GetEnumerator<GeometryChange>();
-
-			while (enumer.MoveNext())
+			foreach (ICachedChange Change in caches)
 			{
 				if (e.Display.InterruptDrawing()) return;
 
-				GeometryChange Change = enumer.Current;
+				if (!DrawRegistry.TryGetValue(Change.GetType(), out Action<DrawEventArgs, IChange, Color> func))
+					continue;
 
-				ChangeAction action = (ChangeAction)Change.Action;
-				if (!action.HasFlag(ChangeAction.Temporary)) continue;
+				User user = doc.Users.Get(Change.Owner);
 
-				User user = CrashDocRegistry.ActiveDoc.Users.Get(Change.Owner);
-				if (user.Visible != true) continue;
-
-				DrawChange(e, Change, user.Color);
-				UpdateBoundingBox(Change);
+				func.Invoke(e, Change, user.Color);
+				UpdateBoundingBox(Change as GeometryChange);
 			}
 
 			Dictionary<User, Camera> ActiveCameras = CrashDocRegistry.ActiveDoc.Cameras.GetActiveCameras();
@@ -118,46 +127,6 @@ namespace Crash.UI
 				if (user.Camera != CameraState.Visible) continue;
 
 				DrawCamera(e, activeCamera.Value, user.Color);
-			}
-		}
-
-		private Dictionary<Color, Line[]> PipeCameraCache;
-
-		const double width = 1000;
-		const double height = 500;
-		const int thickness = 4;
-		private void DrawCamera(DrawEventArgs e, Camera camera, Color userColor)
-		{
-			PipeCameraCache.Remove(userColor);
-			double ratio = 10;
-			double length = 5000 * ratio;
-
-			Point3d location = camera.Location.ToRhino();
-			Point3d target = camera.Target.ToRhino();
-			Vector3d viewAngle = target - location;
-
-			Line viewLine = new Line(camera.Location.ToRhino(), viewAngle, length);
-
-			Plane cameraFrustrum = new Plane(viewLine.To, viewAngle);
-			// Interval heightInterval = new Interval(-width * ratio / 2, width * ratio / 2);
-			Interval widthInterval = new Interval(-height * ratio / 2, height * ratio / 2);
-			Rectangle3d rectangle = new Rectangle3d(cameraFrustrum, widthInterval, widthInterval);
-
-			List<Line> lines = new List<Line>(8);
-			lines.AddRange(rectangle.ToPolyline().GetSegments());
-			lines.Add(new Line(location, rectangle.PointAt(0)));
-			lines.Add(new Line(location, rectangle.PointAt(1)));
-			lines.Add(new Line(location, rectangle.PointAt(2)));
-			lines.Add(new Line(location, rectangle.PointAt(3)));
-
-			Interval zInterval = new Interval(0, length);
-			BoundingBox cameraBox = new Box(cameraFrustrum, widthInterval, widthInterval, zInterval).BoundingBox;
-			bbox.Union(cameraBox);
-
-			foreach (Line line in lines)
-			{
-				// e.Display.DrawLines(lines, userColor, 3);
-				e.Display.DrawPatternedLine(line, userColor, 0x00001111, thickness);
 			}
 		}
 
@@ -185,20 +154,17 @@ namespace Crash.UI
 		/// <param name="e">The EventArgs from the DisplayConduit</param>
 		/// <param name="Change">The Change</param>
 		/// <param name="color">The colour for the Change, based on the user.</param>
-		private void DrawChange(DrawEventArgs e, GeometryChange Change, Color color)
+		private void DrawCrashChange(DrawEventArgs e, IChange Change, Color color)
 		{
-			GeometryBase? geom = Change.Geometry;
+			GeometryBase? geom = (Change as GeometryChange).Geometry;
 			if (geom == null) return;
-
-			User user = CrashDocRegistry.ActiveDoc.Users.Get(Change.Owner);
-			if (!user.Visible) return;
 
 			if (cachedMaterial.Diffuse != color)
 			{
 				cachedMaterial = new DisplayMaterial(color);
 			}
 
-			BoundingBox bbox = Change.Geometry.GetBoundingBox(false);
+			BoundingBox bbox = geom.GetBoundingBox(false);
 			double distanceTo = e.Viewport.CameraLocation.DistanceTo(bbox.Center);
 
 			// Over a certain size, no need to draw either. BBox relative to distance is important.
@@ -215,46 +181,7 @@ namespace Crash.UI
 
 			try
 			{
-				if (geom is Curve cv)
-				{
-					e.Display.DrawCurve(cv, color, 2);
-				}
-				else if (geom is Brep brep)
-				{
-					e.Display.DrawBrepShaded(brep, cachedMaterial);
-				}
-				else if (geom is Mesh mesh)
-				{
-					e.Display.DrawMeshShaded(mesh, cachedMaterial);
-				}
-				else if (geom is Extrusion ext)
-				{
-					e.Display.DrawExtrusionWires(ext, cachedMaterial.Diffuse);
-				}
-				else if (geom is TextEntity te)
-				{
-					e.Display.DrawText(te, cachedMaterial.Diffuse);
-				}
-				else if (geom is TextDot td)
-				{
-					e.Display.DrawDot(td, Color.White, cachedMaterial.Diffuse, cachedMaterial.Diffuse);
-				}
-				else if (geom is Surface srf)
-				{
-					e.Display.DrawSurface(srf, cachedMaterial.Diffuse, 1);
-				}
-				else if (geom is Rhino.Geometry.Point pnt)
-				{
-					e.Display.DrawPoint(pnt.Location, cachedMaterial.Diffuse);
-				}
-				else if (geom is AnnotationBase ab)
-				{
-					e.Display.DrawAnnotation(ab, cachedMaterial.Diffuse);
-				}
-				else
-				{
-					;
-				}
+				// Call Draw args
 			}
 			catch (Exception)
 			{

@@ -34,6 +34,7 @@ namespace Crash.Handlers
 
 
 		#region Events
+
 		public void RegisterEvents()
 		{
 			RhinoDoc.AddRhinoObject += AddItemEvent;

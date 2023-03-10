@@ -1,9 +1,6 @@
 ﻿using Crash.Client;
 using Crash.Common.Changes;
 using Crash.Common.Document;
-using Crash.Common.Events;
-using Crash.Events;
-using Crash.Events.Args;
 using Crash.Handlers;
 
 namespace Crash.Utilities
@@ -12,6 +9,7 @@ namespace Crash.Utilities
 	/// <summary>
 	/// The request manager
 	/// </summary>
+	// TODO : Improve all of this.
 	public sealed class ClientState : IDisposable
 	{
 
@@ -87,6 +85,8 @@ namespace Crash.Utilities
 			return 1;
 		}
 
+		Dictionary<int, Func<Task, IChange>> ChangeHandler;
+
 		public async Task _HandleChangesAsync(IEnumerable<Change> Changes)
 		{
 			var enumer = Changes.OrderBy(c => Sorter(c)).GetEnumerator();
@@ -100,85 +100,25 @@ namespace Crash.Utilities
 			}
 		}
 
-		private async Task _HandleChangeAsync(Change change)
+		private async Task _HandleChangeAsync(IChange change)
 		{
-			if (null == change || string.IsNullOrEmpty(change.Owner)) return;
+			ChangeAction action = (ChangeAction)change.Action;
+			action &= ~ChangeAction.Temporary;
 
-			_crashDoc.Users?.Add(change.Owner);
-			string currentUser = _crashDoc.Users.CurrentUser.Name;
-
-			ChangeAction _action = (ChangeAction)change.Action;
-			if (_action.HasFlag(ChangeAction.Camera))
+			Task task = action switch
 			{
-				await _HandleCameraAsync(change);
-			}
-			else if (_action.HasFlag(ChangeAction.Add) && _action.HasFlag(ChangeAction.Temporary) && change.Owner != currentUser)
-			{
-				await _HandleTemporaryAddAsync(change);
-			}
-			else if (_action.HasFlag(ChangeAction.Add))
-			{
-				await _HandleAddAsync(change);
-			}
-			else if (_action.HasFlag(ChangeAction.Remove))
-			{
-				await _HandleRemoveAsync(change.Id);
-			}
+				ChangeAction.Remove => _HandleRemoveAsync(change.Id),
+				ChangeAction.Add => _HandleAddAsync(change),
 
-			if (_action.HasFlag(ChangeAction.Lock))
-			{
-				await _HandleLockAsync(change.Id);
-			}
-			else if (_action.HasFlag(ChangeAction.Unlock))
-			{
-				await HandleUnlockAsync(change.Id);
-			}
+				ChangeAction.Lock => _HandleLockAsync(change.Id),
+				ChangeAction.Unlock => HandleUnlockAsync(change.Id),
 
-			if (_action.HasFlag(ChangeAction.Transform))
-			{
-				await _HandleTransformAsync(change);
-			}
+				ChangeAction.Camera => _HandleCameraAsync(change),
 
-			await Task.CompletedTask;
-		}
+				_ => Task.CompletedTask,
+			};
 
-		private async Task _HandleLockAsync(Guid changeId)
-		{
-			var rDoc = CrashDocRegistry.GetRelatedDocument(_crashDoc);
-			if (_crashDoc.CacheTable.TryGetValue(changeId, out GeometryChange cachedChange))
-			{
-				rDoc.Objects.Unlock(cachedChange.RhinoId, true);
-			}
-
-			await Task.CompletedTask;
-		}
-
-		private async Task HandleUnlockAsync(Guid changeId)
-		{
-			var rDoc = CrashDocRegistry.GetRelatedDocument(_crashDoc);
-			if (_crashDoc.CacheTable.TryGetValue(changeId, out GeometryChange cachedChange))
-			{
-				rDoc.Objects.Lock(cachedChange.RhinoId, true);
-			}
-
-			await Task.CompletedTask;
-		}
-
-		private async Task _HandleTemporaryAddAsync(Change change)
-		{
-			GeometryChange geomChange = new GeometryChange(change);
-
-			BakeArgs bakeArgs = new BakeArgs(_crashDoc, geomChange);
-			IdleAction bakeAction = new IdleAction(AddToCache, bakeArgs);
-			_crashDoc.Queue.AddAction(bakeAction);
-
-			await Task.CompletedTask;
-		}
-
-		private void AddToCache(CrashEventArgs args)
-		{
-			if (args is not BakeArgs bakeArgs) return;
-			args.CrashDoc.CacheTable.UpdateChangeAsync(bakeArgs.Change);
+			await task;
 		}
 
 		private async Task _HandleTransformAsync(Change change)
@@ -189,64 +129,6 @@ namespace Crash.Utilities
 				if (cachedChange is not GeometryChange geomChange) return;
 				geomChange.Geometry.Transform(transformChange.Transform.ToRhino());
 			}
-
-			await Task.CompletedTask;
-		}
-
-		private void Bake(CrashEventArgs args)
-		{
-			if (args is not BakeArgs bakeArgs) return;
-
-			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(bakeArgs.CrashDoc);
-
-			Guid rhinoId = rhinoDoc.Objects.Add(bakeArgs.Geometry);
-			var rhinoObject = rhinoDoc.Objects.FindId(rhinoId);
-			Crash.Utils.ChangeUtils.SyncHost(rhinoObject, bakeArgs.Change);
-		}
-
-		private async Task _HandleAddAsync(Change change)
-		{
-			GeometryChange localChange = new GeometryChange(change);
-			_HandleAddAsync(localChange);
-		}
-
-		private async Task _HandleAddAsync(GeometryChange geomChange)
-		{
-			BakeArgs bakeArgs = new BakeArgs(_crashDoc, geomChange);
-			IdleAction bakeAction = new IdleAction(Bake, bakeArgs);
-			_crashDoc.Queue.AddAction(bakeAction);
-			_crashDoc.CacheTable.UpdateChangeAsync(geomChange);
-
-			await Task.CompletedTask;
-		}
-
-		private void Remove(CrashEventArgs args)
-		{
-			if (args is not DeleteArgs deleteArgs) return;
-
-			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(deleteArgs.CrashDoc);
-			if (!_crashDoc.CacheTable.TryGetValue(deleteArgs.ChangeId, out GeometryChange change)) return;
-
-			var rhinoObject = rhinoDoc.Objects.FindId(change.RhinoId);
-			rhinoDoc.Objects.Delete(rhinoObject, true, true);
-		}
-
-		private async Task _HandleRemoveAsync(Guid changeId)
-		{
-			_crashDoc.CacheTable.RemoveChange(changeId);
-
-			DeleteArgs removeArgs = new DeleteArgs(_crashDoc, changeId);
-			IdleAction deleteAction = new IdleAction(Remove, removeArgs);
-			_crashDoc.Queue.AddAction(deleteAction);
-
-			await Task.CompletedTask;
-		}
-
-		// TODO : Add in order of Date?
-		private async Task _HandleCameraAsync(Change change)
-		{
-			CameraChange cameraChange = new CameraChange(change);
-			_crashDoc?.Cameras?.TryAddCamera(cameraChange);
 
 			await Task.CompletedTask;
 		}

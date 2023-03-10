@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Crash.Handlers.Changes
+﻿namespace Crash.Handlers.Changes
 {
 
 	public interface IRhinoChange : IChange

@@ -1,4 +1,4 @@
-﻿using Crash.Client;
+using Crash.Client;
 using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Events;
@@ -147,7 +147,7 @@ namespace Crash.Utilities
 			var rDoc = CrashDocRegistry.GetRelatedDocument(_crashDoc);
 			if (_crashDoc.CacheTable.TryGetValue(changeId, out GeometryChange cachedChange))
 			{
-				rDoc.Objects.Unlock(cachedChange.RhinoId, true);
+				rDoc.Objects.Lock(cachedChange.RhinoId, true);
 			}
 
 			await Task.CompletedTask;
@@ -158,7 +158,7 @@ namespace Crash.Utilities
 			var rDoc = CrashDocRegistry.GetRelatedDocument(_crashDoc);
 			if (_crashDoc.CacheTable.TryGetValue(changeId, out GeometryChange cachedChange))
 			{
-				rDoc.Objects.Lock(cachedChange.RhinoId, true);
+				rDoc.Objects.Unlock(cachedChange.RhinoId, true);
 			}
 
 			await Task.CompletedTask;

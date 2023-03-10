@@ -249,7 +249,7 @@ namespace Crash.UI
 
 		private void M_grid_ColumnHeaderClick(object sender, GridColumnEventArgs e)
 		{
-
+			;
 		}
 
 		private void cycleCameraSetting(object sender, GridCellMouseEventArgs e)
@@ -264,6 +264,7 @@ namespace Crash.UI
 			{
 				// TODO : Pass user out by ref?
 				CameraState state = CycleState(user.Camera);
+
 				if (state == CameraState.Follow)
 				{
 					var userEnumer = CrashDocRegistry.ActiveDoc.Users.GetEnumerator();
@@ -273,6 +274,7 @@ namespace Crash.UI
 						if (CameraState.Follow == currUser.Camera)
 						{
 							currUser.Camera = CameraState.Visible;
+							CrashDocRegistry.ActiveDoc.Users.Update(currUser);
 						}
 					}
 
@@ -280,9 +282,10 @@ namespace Crash.UI
 				}
 
 				user.Camera = state;
+				CrashDocRegistry.ActiveDoc.Users.Update(user);
 			}
 
-			m_grid.Invalidate(true);
+			ReDrawForm();
 
 			Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
 		}

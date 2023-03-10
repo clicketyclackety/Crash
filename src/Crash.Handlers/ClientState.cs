@@ -253,6 +253,8 @@ namespace Crash.Utilities
 
 		private async Task _HandleDoneAsync(string user)
 		{
+			_crashDoc.CacheTable.SomeoneIsDone = true;
+
 			var changes = _crashDoc.CacheTable.GetChanges();
 			foreach (var change in changes)
 			{
@@ -265,9 +267,9 @@ namespace Crash.Utilities
 
 				if (change is GeometryChange geomChange)
 					await _HandleAddAsync(geomChange);
-
-				_crashDoc.CacheTable.RemoveChange(change.Id);
 			}
+
+			_crashDoc.CacheTable.SomeoneIsDone = false;
 		}
 
 		public void Dispose()

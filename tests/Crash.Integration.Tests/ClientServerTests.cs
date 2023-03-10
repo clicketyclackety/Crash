@@ -2,8 +2,10 @@
 using System.Net;
 
 using Crash.Client;
+using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Communications;
+using Crash.Utilities;
 
 namespace Crash.Integration.Tests
 {
@@ -92,7 +94,72 @@ namespace Crash.Integration.Tests
 
 			await EnsureSiteIsUp();
 
-			CrashClient crashClient = await StartClientAsync(_crashDoc);
+			CrashClient crashClient = await StartClientAsync(_crashDoc, user);
+		}
+
+		[Test]
+		public async Task AddChange()
+		{
+			// Arrange
+
+			_crashDoc = new CrashDoc();
+			_crashDoc.Users.CurrentUser = user;
+			CrashServer crashServer = StartServer(_crashDoc);
+
+			await EnsureSiteIsUp();
+
+			CrashClient client1, client2;
+			CrashDoc doc1, doc2;
+			User user1, user2;
+
+			doc1 = new CrashDoc();
+			user1 = new User("Jack");
+			doc1.Users.CurrentUser = user1;
+			client1 = await StartClientWithStateAsync(doc1, user1);
+
+			doc2 = new CrashDoc();
+			user2 = new User("Andrew");
+			doc2.Users.CurrentUser = user2;
+			client2 = await StartClientWithStateAsync(doc2, user2);
+
+			// Act
+
+			Change change = new Change(Guid.NewGuid(), user1.Name, "payload")
+			{
+				Action = (int)ChangeAction.Add
+			};
+			await client1.AddAsync(change);
+
+			Wait(() => doc2.Queue.Count > 0);
+
+			doc2.Queue.RunNextAction();
+
+			// Assert
+			Assert.That(doc2.CacheTable.TryGetValue(change.Id, out ICachedChange changeOut), Is.True);
+			Assert.That(change.Id, Is.EqualTo(changeOut.Id));
+			Assert.That(change.Owner, Is.EqualTo(changeOut.Owner));
+			Assert.That(change.Payload, Is.EqualTo(changeOut.Payload));
+			Assert.That(change.Action, Is.EqualTo(changeOut.Action));
+
+		}
+
+		private async Task<CrashClient> StartClientWithStateAsync(CrashDoc crashDoc, User user)
+		{
+			bool initRan = false;
+			Action<IEnumerable<Change>> func = (changes) => initRan = true;
+
+			CrashClient crashClient = new CrashClient(crashDoc, user.Name, clientUri);
+			crashDoc.LocalClient = crashClient;
+			var clientState = new ClientState(crashDoc, crashClient);
+
+			await crashClient.StartLocalClient(func);
+
+			Assert.That(crashClient.IsConnected, Is.True, "Client is not connected");
+
+			Wait(() => initRan);
+			Assert.That(initRan, Is.True, "Init did not run!");
+
+			return crashClient;
 		}
 
 		private async Task EnsureSiteIsUp()
@@ -120,7 +187,7 @@ namespace Crash.Integration.Tests
 			return crashServer;
 		}
 
-		private async Task<CrashClient> StartClientAsync(CrashDoc crashDoc)
+		private async Task<CrashClient> StartClientAsync(CrashDoc crashDoc, User user)
 		{
 			bool initRan = false;
 			Action<IEnumerable<Change>> func = (changes) => initRan = true;

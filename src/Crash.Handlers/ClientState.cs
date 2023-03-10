@@ -1,4 +1,4 @@
-using Crash.Client;
+﻿using Crash.Client;
 using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Events;
@@ -147,6 +147,7 @@ namespace Crash.Utilities
 			var rDoc = CrashDocRegistry.GetRelatedDocument(_crashDoc);
 			if (_crashDoc.CacheTable.TryGetValue(changeId, out GeometryChange cachedChange))
 			{
+				// Update Cache Table
 				rDoc.Objects.Lock(cachedChange.RhinoId, true);
 			}
 
@@ -158,6 +159,7 @@ namespace Crash.Utilities
 			var rDoc = CrashDocRegistry.GetRelatedDocument(_crashDoc);
 			if (_crashDoc.CacheTable.TryGetValue(changeId, out GeometryChange cachedChange))
 			{
+				// Update Cache Table
 				rDoc.Objects.Unlock(cachedChange.RhinoId, true);
 			}
 
@@ -202,6 +204,8 @@ namespace Crash.Utilities
 			Guid rhinoId = rhinoDoc.Objects.Add(bakeArgs.Geometry);
 			var rhinoObject = rhinoDoc.Objects.FindId(rhinoId);
 			Crash.Utils.ChangeUtils.SyncHost(rhinoObject, bakeArgs.Change);
+
+			bakeArgs.CrashDoc.CacheTable.UpdateChangeAsync(bakeArgs.Change);
 		}
 
 		private async Task _HandleAddAsync(Change change)
@@ -215,7 +219,6 @@ namespace Crash.Utilities
 			BakeArgs bakeArgs = new BakeArgs(_crashDoc, geomChange);
 			IdleAction bakeAction = new IdleAction(Bake, bakeArgs);
 			_crashDoc.Queue.AddAction(bakeAction);
-			_crashDoc.CacheTable.UpdateChangeAsync(geomChange);
 
 			await Task.CompletedTask;
 		}
@@ -229,12 +232,11 @@ namespace Crash.Utilities
 
 			var rhinoObject = rhinoDoc.Objects.FindId(change.RhinoId);
 			rhinoDoc.Objects.Delete(rhinoObject, true, true);
+			_crashDoc.CacheTable.RemoveChange(change.Id);
 		}
 
 		private async Task _HandleRemoveAsync(Guid changeId)
 		{
-			_crashDoc.CacheTable.RemoveChange(changeId);
-
 			DeleteArgs removeArgs = new DeleteArgs(_crashDoc, changeId);
 			IdleAction deleteAction = new IdleAction(Remove, removeArgs);
 			_crashDoc.Queue.AddAction(deleteAction);
@@ -269,6 +271,12 @@ namespace Crash.Utilities
 					await _HandleAddAsync(geomChange);
 			}
 
+			_crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
+		}
+
+		private void Queue_OnCompletedQueue(object sender, EventArgs e)
+		{
+			_crashDoc.Queue.OnCompletedQueue -= Queue_OnCompletedQueue;
 			_crashDoc.CacheTable.SomeoneIsDone = false;
 		}
 

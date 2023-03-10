@@ -57,18 +57,35 @@ namespace Crash.Handlers
 				return;
 			}
 
-			var Change = GeometryChange.CreateNew(userName, e.TheObject.Geometry);
+			GeometryChange existingChange;
+			if (ChangeUtils.TryGetChangeId(e.TheObject, out Guid ExistingChangeId) &&
+				// TODO : Change to IRhInoChange
+				Document.CacheTable.TryGetValue(ExistingChangeId, out existingChange))
+			{
+				// Send Server a Transform?
+			}
+			else
+			{
+				existingChange = GeometryChange.CreateNew(userName, e.TheObject.Geometry);
+			}
 
-			ChangeUtils.SyncHost(e.TheObject, Change);
+			ChangeUtils.SyncHost(e.TheObject, existingChange);
+			Document.CacheTable.UpdateChangeAsync(existingChange);
 
-			var serverChange = new Change(Change);
-			Document?.LocalClient?.AddAsync(serverChange);
-
-			Document.CacheTable.UpdateChangeAsync(Change);
+			Change addChange = new Change(existingChange)
+			{
+				Action = (int)(ChangeAction.Add | ChangeAction.Temporary)
+			};
+			Document?.LocalClient?.AddAsync(addChange);
 		}
 
 		internal void RemoveItemEvent(object sender, Rhino.DocObjects.RhinoObjectEventArgs e)
 		{
+			if (null == Document?.CacheTable) return;
+			if (Document.CacheTable.IsInit) return;
+			if (Document.CacheTable.SomeoneIsDone) return;
+
+			// No need to alert if it wasn't a change anyway.
 			if (!ChangeUtils.TryGetChangeId(e.TheObject, out Guid id)) return;
 
 			Document.LocalClient.DeleteAsync(id);
@@ -77,6 +94,10 @@ namespace Crash.Handlers
 
 		private void SelectItemEvent(object sender, Rhino.DocObjects.RhinoObjectSelectionEventArgs e)
 		{
+			if (null == Document?.CacheTable) return;
+			if (Document.CacheTable.IsInit) return;
+			if (Document.CacheTable.SomeoneIsDone) return;
+
 			foreach (var rhinoObject in e.RhinoObjects)
 			{
 				if (rhinoObject.IsLocked)
@@ -105,6 +126,10 @@ namespace Crash.Handlers
 
 		internal void SelectAllItemsEvent(object sender, Rhino.DocObjects.RhinoDeselectAllObjectsEventArgs e)
 		{
+			if (null == Document?.CacheTable) return;
+			if (Document.CacheTable.IsInit) return;
+			if (Document.CacheTable.SomeoneIsDone) return;
+
 			var settings = new Rhino.DocObjects.ObjectEnumeratorSettings()
 			{
 				ActiveObjects = true

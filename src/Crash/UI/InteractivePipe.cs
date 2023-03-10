@@ -89,10 +89,9 @@ namespace Crash.UI
 			if (null == CrashDocRegistry.ActiveDoc?.Cameras) return;
 			if (null == CrashDocRegistry.ActiveDoc?.Users) return;
 
-			// bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
+			User curr = CrashDocRegistry.ActiveDoc.Users.CurrentUser;
 
 			var enumer = CrashDocRegistry.ActiveDoc.CacheTable.GetEnumerator<GeometryChange>();
-
 			while (enumer.MoveNext())
 			{
 				if (e.Display.InterruptDrawing()) return;
@@ -104,6 +103,7 @@ namespace Crash.UI
 
 				User user = CrashDocRegistry.ActiveDoc.Users.Get(Change.Owner);
 				if (user.Visible != true) continue;
+				if (user.Equals(curr)) continue;
 
 				DrawChange(e, Change, user.Color);
 				UpdateBoundingBox(Change);

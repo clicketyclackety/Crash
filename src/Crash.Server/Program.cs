@@ -1,4 +1,6 @@
-﻿using Crash.Server;
+﻿using System.Diagnostics;
+
+using Crash.Server;
 using Crash.Server.Model;
 
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +26,11 @@ var app = builder.Build();
 // TODO : Make a nice little webpage
 app.MapGet("/", () => "Welcome to Crash!");
 app.MapHub<CrashHub>("/Crash");
+
+if (Debugger.IsAttached)
+{
+	app.MapGet("/debug", () => "Debugging is enabled!");
+}
 
 app.MigrateDatabase<CrashContext>();
 app.Run();

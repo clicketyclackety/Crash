@@ -1,4 +1,5 @@
-﻿using Crash.Common.Changes;
+﻿using Crash.Changes.Extensions;
+using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Utils;
 
@@ -104,7 +105,8 @@ namespace Crash.Handlers
 					continue;
 
 				if (!Utils.ChangeUtils.TryGetChangeId(rhinoObject, out Guid id)) continue;
-				if (IsTemporary(id)) continue;
+				if (!Document.CacheTable.TryGetValue(id, out ICachedChange change)) continue;
+				if (change.IsTemporary()) continue;
 
 				if (e.Selected)
 					Document.LocalClient?.SelectAsync(id);
@@ -113,16 +115,6 @@ namespace Crash.Handlers
 			}
 		}
 
-		private bool IsTemporary(Guid changeId)
-		{
-			if (Document.CacheTable.TryGetValue(changeId, out ICachedChange change))
-			{
-				ChangeAction action = (ChangeAction)change.Action;
-				if (action.HasFlag(ChangeAction.Temporary)) return true;
-			}
-
-			return false;
-		}
 
 		internal void SelectAllItemsEvent(object sender, Rhino.DocObjects.RhinoDeselectAllObjectsEventArgs e)
 		{
@@ -140,7 +132,8 @@ namespace Crash.Handlers
 				if (rhinoObject.IsLocked) continue;
 
 				if (!ChangeUtils.TryGetChangeId(rhinoObject, out Guid ChangeId)) continue;
-				if (IsTemporary(ChangeId)) continue;
+				if (!Document.CacheTable.TryGetValue(ChangeId, out ICachedChange change)) continue;
+				if (change.IsTemporary()) continue;
 
 				Document.LocalClient.UnselectAsync(ChangeId);
 			}

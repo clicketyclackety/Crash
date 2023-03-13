@@ -12,7 +12,6 @@ namespace Crash.Common.Tables
 		// TODO : Should this be async? Or Concurrent?
 		private ConcurrentDictionary<Guid, IChange> _cache { get; set; }
 
-
 		public bool IsInit = false;
 		public bool SomeoneIsDone = false;
 
@@ -47,8 +46,6 @@ namespace Crash.Common.Tables
 			}
 
 			_cache.TryAdd(cache.Id, cache);
-			if (string.IsNullOrEmpty(cache.Owner))
-				return;
 		}
 
 		/// <summary>

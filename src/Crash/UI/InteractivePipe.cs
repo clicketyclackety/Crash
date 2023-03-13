@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 
 using Crash.Common.Changes;
 using Crash.Common.Document;
@@ -97,8 +97,6 @@ namespace Crash.UI
 			if (null == CrashDocRegistry.ActiveDoc?.Users) return;
 
 			var doc = CrashDocRegistry.ActiveDoc;
-
-			// bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
 			string currentUser = doc.Users.CurrentUser.Name;
 			var caches = CrashDocRegistry.ActiveDoc.CacheTable.GetChanges()
 				.Where(c => c.Owner != currentUser)

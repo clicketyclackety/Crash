@@ -70,6 +70,12 @@ namespace Crash.Common.Tables
 			return default;
 		}
 
+		public void Update(User user)
+		{
+			_users.Remove(user.Name);
+			_users.Add(user.Name, user);
+		}
+
 		public IEnumerator<User> GetEnumerator() => _users.Values.GetEnumerator();
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

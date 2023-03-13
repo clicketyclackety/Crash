@@ -1,4 +1,4 @@
-﻿using Crash.Client;
+using Crash.Client;
 using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Handlers;
@@ -135,6 +135,8 @@ namespace Crash.Utilities
 
 		private async Task _HandleDoneAsync(string user)
 		{
+			_crashDoc.CacheTable.SomeoneIsDone = true;
+
 			var changes = _crashDoc.CacheTable.GetChanges();
 			foreach (var change in changes)
 			{
@@ -147,9 +149,15 @@ namespace Crash.Utilities
 
 				if (change is GeometryChange geomChange)
 					await _HandleAddAsync(geomChange);
-
-				_crashDoc.CacheTable.RemoveChange(change.Id);
 			}
+
+			_crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
+		}
+
+		private void Queue_OnCompletedQueue(object sender, EventArgs e)
+		{
+			_crashDoc.Queue.OnCompletedQueue -= Queue_OnCompletedQueue;
+			_crashDoc.CacheTable.SomeoneIsDone = false;
 		}
 
 		public void Dispose()

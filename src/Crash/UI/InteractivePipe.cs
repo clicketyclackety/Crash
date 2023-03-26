@@ -1,9 +1,10 @@
-using System.Drawing;
+﻿using System.Drawing;
 
 using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.View;
 using Crash.Handlers;
+using Crash.Handlers.Plugins.Schemas;
 
 using Rhino.Display;
 using Rhino.Geometry;
@@ -24,6 +25,8 @@ namespace Crash.UI
 		double scale => RhinoDoc.ActiveDoc is object ? RhinoMath.UnitScale(UnitSystem.Meters, RhinoDoc.ActiveDoc.ModelUnitSystem) : 0;
 		private int FAR_AWAY => (int)scale * 1_5000;
 		private int VERY_FAR_AWAY => (int)scale * 7_5000;
+
+		private static Dictionary<Type, Action<IChange, DrawEventArgs, DisplayMaterial>> DrawRegistry;
 
 		// TODO : Does this ever get shrunk? It should do.
 		// TODO : Don't draw things not in the view port
@@ -56,8 +59,6 @@ namespace Crash.UI
 			}
 		}
 
-		private Dictionary<Type, Action<DrawEventArgs, IChange, Color>> DrawRegistry;
-
 
 		internal static InteractivePipe Active;
 
@@ -67,12 +68,8 @@ namespace Crash.UI
 		internal InteractivePipe()
 		{
 			bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
-			PipeCameraCache = new Dictionary<Color, Line[]>();
 			Active = this;
-			DrawRegistry = new Dictionary<Type, Action<DrawEventArgs, IChange, Color>>();
-
-			DrawRegistry.Add(typeof(GeometryChange), DrawCrashChange);
-			// DrawRegistry.Add(typeof(CameraChange), DrawCameraChange);
+			DrawRegistry = new Dictionary<Type, Action<IChange, DrawEventArgs, DisplayMaterial>>();
 		}
 
 		/// <summary>
@@ -85,6 +82,7 @@ namespace Crash.UI
 			e.IncludeBoundingBox(bbox);
 		}
 
+		DisplayMaterial cachedMaterial = new DisplayMaterial(Color.Blue);
 		/// <summary>
 		/// Post draw object events
 		/// </summary>
@@ -103,20 +101,23 @@ namespace Crash.UI
 				.Where(c => ((ChangeAction)c.Action).HasFlag(ChangeAction.Temporary))
 				.OrderBy(c => doc.Users.Get(c.Owner).Color);
 
-			foreach (ICachedChange Change in caches)
+			foreach (IChange Change in caches)
 			{
 				if (e.Display.InterruptDrawing()) return;
 
-				if (!DrawRegistry.TryGetValue(Change.GetType(), out Action<DrawEventArgs, IChange, Color> func))
+				if (!DrawRegistry.TryGetValue(Change.GetType(), out Action<IChange, DrawEventArgs, DisplayMaterial> func))
 					continue;
 
 				User user = doc.Users.Get(Change.Owner);
 
-				func.Invoke(e, Change, user.Color);
+				func.Invoke(Change, e, new DisplayMaterial(user.Color));
 				UpdateBoundingBox(Change as GeometryChange);
 			}
 
+
 			Dictionary<User, Camera> ActiveCameras = CrashDocRegistry.ActiveDoc.Cameras.GetActiveCameras();
+
+			if (!DrawRegistry.TryGetValue(typeof(CameraChange), out var drawFunc)) return;
 			foreach (var activeCamera in ActiveCameras)
 			{
 				if (e.Display.InterruptDrawing()) return;
@@ -124,7 +125,8 @@ namespace Crash.UI
 				User user = activeCamera.Key;
 				if (user.Camera != CameraState.Visible) continue;
 
-				DrawCamera(e, activeCamera.Value, user.Color);
+				// TODO : Re-enable
+				// drawFunc.Invoke(e, activeCamera, user.Color);
 			}
 		}
 
@@ -144,47 +146,9 @@ namespace Crash.UI
 
 		}
 
-		/// Re-using materials is much faster
-		DisplayMaterial cachedMaterial = new DisplayMaterial(Color.Blue);
-		/// <summary>
-		/// Draws a Change in the pipeline.
-		/// </summary>
-		/// <param name="e">The EventArgs from the DisplayConduit</param>
-		/// <param name="Change">The Change</param>
-		/// <param name="color">The colour for the Change, based on the user.</param>
-		private void DrawCrashChange(DrawEventArgs e, IChange Change, Color color)
+		internal static void RegisterDrawFunction(ChangeConverter<IChange> changeConverter)
 		{
-			GeometryBase? geom = (Change as GeometryChange).Geometry;
-			if (geom == null) return;
-
-			if (cachedMaterial.Diffuse != color)
-			{
-				cachedMaterial = new DisplayMaterial(color);
-			}
-
-			BoundingBox bbox = geom.GetBoundingBox(false);
-			double distanceTo = e.Viewport.CameraLocation.DistanceTo(bbox.Center);
-
-			// Over a certain size, no need to draw either. BBox relative to distance is important.
-
-			if (distanceTo > VERY_FAR_AWAY)
-			{
-				return;
-			}
-			if (distanceTo > FAR_AWAY)
-			{
-				e.Display.DrawBox(bbox, color, 1);
-				return;
-			}
-
-			try
-			{
-				// Call Draw args
-			}
-			catch (Exception)
-			{
-
-			}
+			DrawRegistry.Add(changeConverter.ChangeType, changeConverter.DrawChange);
 		}
 
 		public void Dispose()

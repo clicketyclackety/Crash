@@ -1,16 +1,32 @@
-﻿using Crash.Common.Document;
-
-using Rhino.Display;
+﻿using Rhino.Display;
 using Rhino.Geometry;
 
 namespace Crash.Handlers.Plugins
 {
-	public sealed class CustomChangeArgs<TChange> where TChange : IChange
+	public sealed class CustomChangeArgs
 	{
-		public Action<TChange, CrashDoc> AddAction;
-		public Action<TChange, CrashDoc> RemoveAction;
-		public Action<TChange, DrawEventArgs, DisplayMaterial> DrawArgs;
-		public Func<TChange, BoundingBox> GetBoundingBox;
+		public readonly Type ChangeType;
+
+		public Action<IChange, DrawEventArgs, DisplayMaterial> DrawArgs;
+		public Func<IChange, BoundingBox> GetBoundingBox;
+
+		private CustomChangeArgs(Type changeType)
+		{
+			this.ChangeType = changeType;
+		}
+
+		public static CustomChangeArgs Create<TChange>(
+			Action<IChange, DrawEventArgs, DisplayMaterial> drawChange = null,
+			Func<IChange, BoundingBox> getBoundingBox = null
+			) where TChange : IChange
+		{
+			return new CustomChangeArgs(typeof(TChange))
+			{
+				DrawArgs = drawChange,
+				GetBoundingBox = getBoundingBox
+			};
+		}
+
 	}
 
 }

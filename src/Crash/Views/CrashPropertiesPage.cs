@@ -7,11 +7,11 @@ using Rhino.UI;
 
 namespace Crash.Views
 {
-	class CrashOptionsPage : OptionsDialogPage
+	internal class CrashPropertiesPage : OptionsDialogPage
 	{
 		private CrashPageControl m_page_control;
 
-		public CrashOptionsPage()
+		public CrashPropertiesPage()
 		  : base("Sample")
 		{
 		}

@@ -5,11 +5,19 @@
 		<Platforms>AnyCPU;x64</Platforms>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>Crash.Changes</Title>
+		<Authors>Callum Sykes</Authors>
+		<Company>Crash</Company>
+		<Product>Crash</Product>
+		<Copyright>Crash</Copyright>
+		<PackageProjectUrl>https://github.com/crashcloud/changess</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/crashcloud/changes</RepositoryUrl>
+		<PackageTags>Crash, Changes</PackageTags>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>6.0-recommended</AnalysisLevel>
 	</PropertyGroup>
-	  
-  <ItemGroup>
-    <None Include="..\..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />

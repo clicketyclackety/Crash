@@ -2,75 +2,42 @@
 
 using Crash.Common.Changes;
 using Crash.Common.Document;
+using Crash.Common.Events;
 using Crash.Events;
-using Crash.Utils;
+using Crash.Handlers.Args;
 
+using Rhino;
 using Rhino.Display;
-using Rhino.DocObjects;
 using Rhino.Geometry;
 
 
-namespace Crash.Handlers.Plugins
+namespace Crash.Handlers.Plugins.Schemas
 {
-	public sealed class CrashGeometryChange : ChangeSchema<GeometryChange>
+	public sealed class GeometryChangeSchema : ChangeConverter<GeometryChange>
 	{
 
-		CrashGeometryChange()
+		public GeometryChangeSchema() : base(_getGeometryChangeArgs())
 		{
 			RegisterChangeAction((int)ChangeAction.Add, _addChangeAsync);
 			RegisterChangeAction((int)ChangeAction.Remove, _removeChangeAsync);
 
 			RegisterChangeAction((int)ChangeAction.Lock, _lockChangeAsync);
 			RegisterChangeAction((int)ChangeAction.Unlock, _unlockChangeAsync);
-
-			RegisterCustomChange(_getGeometryChangeArgs());
 		}
 
 		#region Custom Change Geometry Change
 
-		private CustomChangeArgs<GeometryChange> _getGeometryChangeArgs()
+		private static BoundingBox _getGeometryBounds(IChange change)
 		{
-			var changeArgs = new CustomChangeArgs<GeometryChange>()
-			{
-				AddAction = _addGeometryChange,
-				RemoveAction = _removeGeometryChange,
-				DrawArgs = _drawGeometryArgs,
-				GetBoundingBox = _getGeometryBounds
-			};
-
-			return changeArgs;
+			if (change is not GeometryChange geomChange) return BoundingBox.Empty;
+			return geomChange.Geometry.GetBoundingBox(false);
 		}
 
-		private BoundingBox _getGeometryBounds(GeometryChange change)
-			=> change.Geometry.GetBoundingBox(false);
 
-		private void _addGeometryChange(GeometryChange change, CrashDoc crashDoc)
+		private static void _drawGeometryArgs(IChange change, DrawEventArgs e, DisplayMaterial material)
 		{
-			ChangeAction changeAction = (ChangeAction)change.Action;
-
-			if (!changeAction.HasFlag(ChangeAction.Temporary))
-			{
-				var rhinoDoc = CrashDocRegistry.GetRelatedDocument(crashDoc);
-
-				Guid id = rhinoDoc.Objects.Add(change.Geometry);
-				RhinoObject rObj = rhinoDoc.Objects.FindId(id);
-				ChangeUtils.SyncHost(rObj, change);
-			}
-
-			crashDoc.CacheTable.UpdateChangeAsync(change);
-		}
-
-		private void _removeGeometryChange(GeometryChange change, CrashDoc crashDoc)
-		{
-			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(crashDoc);
-
-			rhinoDoc.Objects.Delete(change.RhinoId, true);
-			crashDoc.CacheTable.RemoveChange(change.Id);
-		}
-
-		private void _drawGeometryArgs(GeometryChange change, DrawEventArgs e, DisplayMaterial material)
-		{
-			var geom = change.Geometry;
+			if (change is not GeometryChange geomChange) return;
+			var geom = geomChange.Geometry;
 			if (geom is Curve cv)
 			{
 				e.Display.DrawCurve(cv, material.Diffuse, 2);
@@ -113,21 +80,42 @@ namespace Crash.Handlers.Plugins
 
 		#region ChangeAction Actions
 
+		private void AddToDocument(CrashEventArgs args)
+		{
+			if (args is not ChangeArgs changeArgs) return;
+			RhinoDoc rhinoDoc = CrashDocRegistry.GetRelatedDocument(changeArgs.CrashDoc);
+			rhinoDoc.Objects.Add(changeArgs.Change.Geometry);
+
+			var action = (ChangeAction)changeArgs.Change.Action;
+			if (action.HasFlag(ChangeAction.Temporary))
+			{
+				changeArgs.CrashDoc.CacheTable.UpdateChangeAsync(changeArgs.Change);
+			}
+		}
+
 		private async Task _addChangeAsync(CrashDoc crashDoc, IChange change)
 		{
-			GeometryChange geomChange = new GeometryChange(change);
-			ChangeArgs changeArgs = new ChangeArgs(crashDoc, geomChange);
-			IdleAction bakeAction = new IdleAction(geomChange.AddToDocument, changeArgs);
+			var geomChange = new GeometryChange(change);
+			var changeArgs = new ChangeArgs(crashDoc, geomChange);
+			var bakeAction = new IdleAction(AddToDocument, changeArgs);
 			crashDoc.Queue.AddAction(bakeAction);
 
 			await Task.CompletedTask;
 		}
 
+		private void RemoveFromDocument(CrashEventArgs args)
+		{
+			if (args is not ChangeArgs changeArgs) return;
+			RhinoDoc rhinoDoc = CrashDocRegistry.GetRelatedDocument(changeArgs.CrashDoc);
+			rhinoDoc.Objects.Delete(changeArgs.Change.RhinoId, true);
+			changeArgs.CrashDoc.CacheTable.RemoveChange(changeArgs.Change.Id);
+		}
+
 		private async Task _removeChangeAsync(CrashDoc crashDoc, IChange change)
 		{
-			GeometryChange geomChange = new GeometryChange(new Change(change.Id, null, null));
-			ChangeArgs changeArgs = new ChangeArgs(crashDoc, geomChange);
-			IdleAction bakeAction = new IdleAction(geomChange.RemoveFromDocument, changeArgs);
+			var geomChange = new GeometryChange(new Change(change.Id, null, null));
+			var changeArgs = new ChangeArgs(crashDoc, geomChange);
+			var bakeAction = new IdleAction(RemoveFromDocument, changeArgs);
 			crashDoc.Queue.AddAction(bakeAction);
 
 			await Task.CompletedTask;

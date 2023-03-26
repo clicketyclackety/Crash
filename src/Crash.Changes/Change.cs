@@ -1,7 +1,7 @@
 ﻿namespace Crash.Changes
 {
 
-	/// <summary>Provides a reliable class for communication</summary>
+	/// <summary>Provides a reliable, reusable class for communication</summary>
 	public sealed class Change : IChange, IEquatable<Change>
 	{
 
@@ -21,9 +21,12 @@
 		public int Action { get; set; }
 
 
-		// For Deserialization Only
+		#region Constructors
+
+		/// <summary>Empty Constructor</summary>
 		public Change() { }
 
+		/// <summary>Creates a new fresh Change</summary>
 		public Change(Guid id, string owner, string? payload)
 		{
 			Id = id;
@@ -32,6 +35,7 @@
 			Stamp = DateTime.UtcNow;
 		}
 
+		/// <summary>Creates a transmittable Change from an IChange</summary>
 		public Change(IChange speck)
 		{
 			Stamp = speck.Stamp;
@@ -41,25 +45,31 @@
 			Action = speck.Action;
 		}
 
-		public static Change CreateEmpty()
+		public static Change CreateEmpty(Guid id = default)
 		{
 			return new Change()
 			{
-				Id = Guid.NewGuid()
+				Id = id == Guid.Empty ? Guid.NewGuid() : id
 			};
 		}
 
+		#endregion
 
+
+		/// <inheritdoc/>
 		public override int GetHashCode() => HashCode.Combine(Id, Owner, Action, Payload);
 
+		/// <summary>Tests for equality of two changes</summary>
 		public bool Equals(Change other)
 			=> other?.GetHashCode() == GetHashCode();
 
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (obj is not Change change) return false;
 			return Equals(change);
 		}
+
 	}
 
 }

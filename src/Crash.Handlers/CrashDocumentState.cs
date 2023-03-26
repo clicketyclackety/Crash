@@ -36,6 +36,7 @@ namespace Crash.Handlers
 
 		#region Events
 
+		// This should be partof Schema too
 		public void RegisterEvents()
 		{
 			RhinoDoc.AddRhinoObject += AddItemEvent;
@@ -43,7 +44,7 @@ namespace Crash.Handlers
 			RhinoDoc.DeleteRhinoObject += RemoveItemEvent;
 			RhinoDoc.SelectObjects += SelectItemEvent;
 			RhinoDoc.DeselectObjects += SelectItemEvent;
-			RhinoDoc.DeselectAllObjects += SelectAllItemsEvent;
+			RhinoDoc.DeselectAllObjects += DeSelectAllItemsEvent;
 		}
 
 		private void AddItemEvent(object sender, Rhino.DocObjects.RhinoObjectEventArgs e)
@@ -106,7 +107,7 @@ namespace Crash.Handlers
 					continue;
 
 				if (!Utils.ChangeUtils.TryGetChangeId(rhinoObject, out Guid id)) continue;
-				if (!Document.CacheTable.TryGetValue(id, out ICachedChange change)) continue;
+				if (!Document.CacheTable.TryGetValue(id, out IChange change)) continue;
 				if (change.IsTemporary()) continue;
 
 				if (e.Selected)
@@ -116,8 +117,8 @@ namespace Crash.Handlers
 			}
 		}
 
-
-		internal void SelectAllItemsEvent(object sender, Rhino.DocObjects.RhinoDeselectAllObjectsEventArgs e)
+		// TODO : This is inefficient. Track selcted elements instead
+		internal void DeSelectAllItemsEvent(object sender, Rhino.DocObjects.RhinoDeselectAllObjectsEventArgs e)
 		{
 			if (null == Document?.CacheTable) return;
 			if (Document.CacheTable.IsInit) return;
@@ -133,7 +134,7 @@ namespace Crash.Handlers
 				if (rhinoObject.IsLocked) continue;
 
 				if (!ChangeUtils.TryGetChangeId(rhinoObject, out Guid ChangeId)) continue;
-				if (!Document.CacheTable.TryGetValue(ChangeId, out ICachedChange change)) continue;
+				if (!Document.CacheTable.TryGetValue(ChangeId, out IChange change)) continue;
 				if (change.IsTemporary()) continue;
 
 				Document.LocalClient.UnselectAsync(ChangeId);

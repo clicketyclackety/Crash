@@ -1,19 +1,16 @@
-﻿using System.Text.Json.Serialization;
-
-using Crash.Changes.Serialization;
-
-namespace Crash.Geometry
+﻿namespace Crash.Geometry
 {
 
-	/// <summary>
-	/// A 3 dimensional representation of a point.
-	/// </summary>
+	/// <summary>A 3 dimensional representation of a point.</summary>
 	[JsonConverter(typeof(CPointConverter))]
 	public struct CPoint
 	{
 
+		/// <summary>The X Coordinate</summary>
 		public double X { get; set; } = 0;
+		/// <summary>The Y Coordinate</summary>
 		public double Y { get; set; } = 0;
+		/// <summary>The Z Coordinate</summary>
 		public double Z { get; set; } = 0;
 
 
@@ -23,9 +20,10 @@ namespace Crash.Geometry
 		/// <summary>Returns a Point at 0,0,0.</summary>
 		public static CPoint Origin => new CPoint(0, 0, 0);
 
-
+		/// <summary>Empty Constructor</summary>
 		public CPoint() { }
 
+		/// <summary>Creates a new CPoint</summary>
 		public CPoint(double x = 0, double y = 0, double z = 0)
 		{
 			X = x;
@@ -33,31 +31,46 @@ namespace Crash.Geometry
 			Z = z;
 		}
 
-
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (obj is not CPoint cPoint) return false;
 			return this == cPoint;
 		}
 
+		/// <inheritdoc/>
 		public override int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode();
 
+		/// <inheritdoc/>
 		public override string ToString() => $"{X},{Y},{Z}";
 
+		/// <summary>Returns a Rounded CPoint</summary>
+		/// <param name="digits">the number</param>
+		/// <returns>The number of fractional digits in the return value</returns>
+		public CPoint Round(int digits = 0) => new(Math.Round(this.X, digits),
+												   Math.Round(this.Y, digits),
+												   Math.Round(this.Z, digits));
 
-		public static implicit operator CPoint(CVector v) => new CPoint(v.X, v.Y, v.Z);
+		/// <summary>Conperts a CVector to a Cpoint</summary>
+		public static implicit operator CPoint(CVector p) => new(p.X, p.Y, p.Z);
 
-		public static bool operator ==(CPoint v1, CPoint v2)
-			=> v1.X == v2.X &&
-			v1.Y == v2.Y &&
-			v1.Z == v2.Z;
-		public static bool operator !=(CPoint v1, CPoint v2) => !(v1 == v2);
+		/// <summary>Tests for mathmatic equality</summary>
+		public static bool operator ==(CPoint p1, CPoint p2)
+			=> p1.X == p2.X &&
+			p1.Y == p2.Y &&
+			p1.Z == p2.Z;
 
-		public static CPoint operator -(CPoint v1, CPoint v2)
-			=> new CPoint(v2.X - v1.X, v2.Y - v1.Y, v2.Z - v1.Z);
+		/// <summary>Tests for mathmatic inequality</summary>
+		public static bool operator !=(CPoint p1, CPoint p2) => !(p1 == p2);
 
-		public static CPoint operator +(CPoint v1, CPoint v2)
-			=> new CPoint(v2.X - v1.X, v2.Y - v1.Y, v2.Z - v1.Z);
+		/// <summary>Subtracts p2 from p1</summary>
+		public static CPoint operator -(CPoint p1, CPoint p2)
+			=> new(p2.X - p1.X, p2.Y - p1.Y, p2.Z - p1.Z);
+
+		/// <summary>Adds p2 and p1</summary>
+		public static CPoint operator +(CPoint p1, CPoint p2)
+			=> new(p2.X - p1.X, p2.Y - p1.Y, p2.Z - p1.Z);
+
 	}
 
 }

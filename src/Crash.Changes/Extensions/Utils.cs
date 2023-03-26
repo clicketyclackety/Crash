@@ -10,6 +10,9 @@
 		public static ChangeAction GetChangeAction(this IChange change)
 			=> (ChangeAction)change.Action;
 
+		public static bool HasFlag<T>(this IChange change, T flag) where T : Enum
+			=> change.GetChangeAction().HasFlag(flag);
+
 	}
 
 }

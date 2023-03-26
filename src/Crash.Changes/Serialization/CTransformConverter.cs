@@ -6,6 +6,7 @@ using Crash.Geometry;
 namespace Crash.Changes.Serialization
 {
 
+	/// <summary>Converts a CTransform into json efficiently</summary>
 	public sealed class CTransformConverter : JsonConverter<CTransform>
 	{
 
@@ -32,6 +33,7 @@ namespace Crash.Changes.Serialization
 			writer.WriteStringValue(numberValue);
 		}
 
+		/// <inheritdoc/>
 		public override CTransform Read(ref Utf8JsonReader reader, System.Type typeToConvert, JsonSerializerOptions options)
 		{
 			if (reader.TokenType != JsonTokenType.StartArray || !reader.Read())
@@ -65,6 +67,7 @@ namespace Crash.Changes.Serialization
 			return transform;
 		}
 
+		/// <inheritdoc/>
 		public override void Write(Utf8JsonWriter writer, CTransform value, JsonSerializerOptions options)
 		{
 			writer.WriteStartArray();

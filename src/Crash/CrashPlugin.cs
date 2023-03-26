@@ -1,7 +1,4 @@
-﻿using Crash.Common.Document;
-using Crash.Handlers;
-
-using Rhino.PlugIns;
+﻿using Rhino.PlugIns;
 
 namespace Crash
 {
@@ -9,8 +6,14 @@ namespace Crash
 	///<summary>
 	/// The crash plugin for multi user rhino collaboration
 	///</summary>
-	public sealed class CrashPlugin : PlugIn
+	public sealed class CrashPlugin : CrashPluginBase
 	{
+
+		/// <inheritdoc />
+		protected override string LocalPlugInName => "Crash";
+
+		///<summary>Gets the only instance of the CrashPlugin plug-in.</summary>
+		public static CrashPlugin Instance { get; private set; }
 
 		public CrashPlugin()
 		{
@@ -21,27 +24,22 @@ namespace Crash
 		protected override LoadReturnCode OnLoad(ref string errorMessage)
 		{
 			InteractivePipe.Active = new InteractivePipe() { Enabled = false };
+
+			LoadCrashPlugins();
+
 			return base.OnLoad(ref errorMessage);
 		}
 
-		/// <inheritdoc />
-		protected override void OnShutdown()
+		private void LoadCrashPlugins()
 		{
-			foreach (CrashDoc crashDoc in CrashDocRegistry.GetOpenDocuments())
+			IEnumerable<Guid> pluginIds = PlugIn.GetInstalledPlugIns().Keys;
+			foreach (Guid pluginId in pluginIds)
 			{
-				crashDoc?.LocalServer?.Stop();
-				crashDoc?.LocalClient?.StopAsync().RunSynchronously();
+				var plugin = PlugIn.Find(pluginId);
+				if (plugin is not CrashPluginBase pluginBase) continue;
+				PlugIn.LoadPlugIn(pluginId);
 			}
 		}
-
-		/// <inheritdoc />
-		public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
-
-		/// <inheritdoc />
-		protected override string LocalPlugInName => "Crash";
-
-		///<summary>Gets the only instance of the CrashPlugin plug-in.</summary>
-		public static CrashPlugin Instance { get; private set; }
 
 	}
 

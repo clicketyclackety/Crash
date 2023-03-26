@@ -1,5 +1,7 @@
 ﻿namespace Crash.Changes.Serialization
 {
+
+	/// <summary>Utility for converting strings to numbers</summary>
 	internal static class FloatingDoubleConverter
 	{
 
@@ -7,6 +9,7 @@
 		const string PositiveInfinity = "+∞";
 		const string NegativeInfinity = "-∞";
 
+		/// <summary>Converts the number to string</summary>
 		internal static string ToString(double number)
 		{
 			if (double.IsNaN(number))
@@ -21,6 +24,7 @@
 			return number.ToString();
 		}
 
+		/// <summary>Converts the number from string</summary>
 		internal static double FromString(string? number)
 		{
 			if (string.IsNullOrEmpty(number))
@@ -35,7 +39,7 @@
 			if (number.Equals(NegativeInfinity))
 				return double.NegativeInfinity;
 
-			if (double.TryParse(number, out double result))
+			if (double.TryParse(number, out var result))
 				return result;
 
 			return 0;

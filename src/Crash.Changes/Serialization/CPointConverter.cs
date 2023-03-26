@@ -6,13 +6,13 @@ using Crash.Geometry;
 namespace Crash.Changes.Serialization
 {
 
-	/// <summary>
-	/// Converts a CPoint into json efficiently
-	/// </summary>
+	/// <summary>Converts a CPoint into json efficiently</summary>
 	public sealed class CPointConverter : JsonConverter<CPoint>
 	{
 
-		public override CPoint Read(ref Utf8JsonReader reader, System.Type typeToConvert, JsonSerializerOptions options)
+		/// <inheritdoc/>
+		public override CPoint Read(ref Utf8JsonReader reader, Type typeToConvert,
+									JsonSerializerOptions options)
 		{
 			if (reader.TokenType != JsonTokenType.StartArray)
 			{
@@ -44,7 +44,9 @@ namespace Crash.Changes.Serialization
 			}
 		}
 
-		public override void Write(Utf8JsonWriter writer, CPoint value, JsonSerializerOptions options)
+		/// <inheritdoc/>
+		public override void Write(Utf8JsonWriter writer, CPoint value,
+									JsonSerializerOptions options)
 		{
 			writer.WriteStartArray();
 			writer.WriteStringValue(FloatingDoubleConverter.ToString(value.X));
@@ -52,5 +54,7 @@ namespace Crash.Changes.Serialization
 			writer.WriteStringValue(FloatingDoubleConverter.ToString(value.Z));
 			writer.WriteEndArray();
 		}
+
 	}
+
 }

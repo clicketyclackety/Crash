@@ -19,7 +19,9 @@ namespace Crash.Common.Changes
 
 		public string? Payload => Change.Payload;
 
-		public int Action
+		public string Type { get; } = nameof(TransformChange);
+
+		public ChangeAction Action
 		{
 			get => Change.Action;
 			[Obsolete("For Deserialization only", true)]

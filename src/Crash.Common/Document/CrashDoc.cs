@@ -11,7 +11,7 @@ namespace Crash.Common.Document
 
 	public sealed class CrashDoc : IEquatable<CrashDoc>, IDisposable
 	{
-		private readonly Guid id;
+		private readonly Guid _id;
 
 		#region Tables
 
@@ -42,7 +42,7 @@ namespace Crash.Common.Document
 
 		public CrashDoc()
 		{
-			id = Guid.NewGuid();
+			_id = Guid.NewGuid();
 
 			Users = new UserTable(this);
 			CacheTable = new ChangeTable(this);
@@ -69,7 +69,7 @@ namespace Crash.Common.Document
 			return Equals(other);
 		}
 
-		public override int GetHashCode() => id.GetHashCode();
+		public override int GetHashCode() => _id.GetHashCode();
 
 		#endregion
 

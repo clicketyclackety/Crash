@@ -27,7 +27,7 @@ namespace Crash.Common.View
 		}
 
 		/// <summary>A non-existant Camera</summary>
-		public static Camera None => new Camera(CPoint.None, CPoint.None);
+		public static Camera None => new(CPoint.None, CPoint.None);
 
 
 		public bool IsValid()

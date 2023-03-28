@@ -7,8 +7,8 @@ namespace Crash.Handlers.Plugins
 	{
 		public readonly Type ChangeType;
 
-		public Action<IChange, DrawEventArgs, DisplayMaterial> DrawArgs;
-		public Func<IChange, BoundingBox> GetBoundingBox;
+		public Action<IChange, DrawEventArgs, DisplayMaterial> DrawArgs { get; private set; }
+		public Func<IChange, BoundingBox> GetBoundingBox { get; private set; }
 
 		private CustomChangeArgs(Type changeType)
 		{

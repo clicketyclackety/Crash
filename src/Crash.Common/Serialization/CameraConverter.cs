@@ -10,8 +10,9 @@ namespace Crash.Common.Serialization
 	/// <summary>
 	/// Converts the Camera class to and from JSON efficiently
 	/// </summary>
-	public class CameraConverter : JsonConverter<Camera>
+	public sealed class CameraConverter : JsonConverter<Camera>
 	{
+
 		/// <inheritdoc/>
 		public override Camera Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{

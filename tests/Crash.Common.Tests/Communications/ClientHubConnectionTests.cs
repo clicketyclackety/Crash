@@ -13,7 +13,7 @@ namespace Crash.Common.Tests.Communications
 		{
 			// Arrange
 			Uri url = new Uri("https://example.com");
-			HubConnection connection = CrashClient.getHubConnection(url);
+			HubConnection connection = CrashClient.GetHubConnection(url);
 
 			// Assert
 			Assert.IsNotNull(connection);

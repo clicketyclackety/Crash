@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 using Crash.Handlers.Changes;
 
@@ -28,8 +28,9 @@ namespace Crash.Common.Changes
 
 		public string? Payload => Change.Payload;
 
-		public int Action { get => Change.Action; set => Change.Action = value; }
+		public string Type => nameof(GeometryChange);
 
+		public ChangeAction Action { get => Change.Action; set => Change.Action = value; }
 
 		public GeometryChange() { }
 

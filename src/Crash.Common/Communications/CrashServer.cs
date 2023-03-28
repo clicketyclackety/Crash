@@ -19,7 +19,7 @@ namespace Crash.Communications
 
 		public Process? process { get; set; }
 
-		public bool IsRunning => process is object && !process.HasExited;
+		public bool IsRunning => process is not null && !process.HasExited;
 		public bool Connected { get; private set; }
 
 		public const string ProcessName = "Crash.Server";
@@ -54,8 +54,7 @@ namespace Crash.Communications
 
 		internal void Start(ProcessStartInfo startInfo, int timeout = 3000)
 		{
-			string errorMessage = "Server Started Successfully";
-
+			string errorMessage;
 			if (checkForPreExistingServer())
 			{
 				errorMessage = "Server Process is already running!";
@@ -141,13 +140,11 @@ namespace Crash.Communications
 		// https://stackoverflow.com/questions/285760/how-to-spawn-a-process-and-capture-its-stdout-in-net
 		internal void createAndRegisterServerProcess(ProcessStartInfo startInfo)
 		{
-			if (null == startInfo)
-				throw new ArgumentNullException("Process Info is null");
-
-			process = new Process();
-			process.StartInfo = startInfo;
-			process.EnableRaisingEvents = true;
-			// process.Refresh(); // May be useful?
+			process = new Process
+			{
+				StartInfo = startInfo ?? throw new ArgumentNullException("Process Info is null"),
+				EnableRaisingEvents = true
+			};
 
 			// Register fresh
 			process.Disposed += Process_Exited;
@@ -172,8 +169,6 @@ namespace Crash.Communications
 			var data = e.Data;
 			if (string.IsNullOrEmpty(data)) return;
 			Messages.Add(data);
-
-			EventArgs args;
 
 			if (data.Contains("failed to bind") ||
 				data.Contains("AddressInUseException") ||
@@ -223,7 +218,7 @@ namespace Crash.Communications
 		{
 			try
 			{
-				if (process is object)
+				if (process is not null)
 				{
 					// De-Register first to avoid duplicate calls
 					process.Disposed -= Process_Exited;

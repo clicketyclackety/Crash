@@ -19,12 +19,14 @@ namespace Crash.Common.Changes
 
 		public string? Payload => Change.Payload;
 
-		public int Action
+		public ChangeAction Action
 		{
 			get => Change.Action;
 			[Obsolete("For Deserialization only", true)]
 			set => Change.Action = value;
 		}
+
+		public string Type { get; } = nameof(CameraChange);
 
 		public CameraChange()
 		{

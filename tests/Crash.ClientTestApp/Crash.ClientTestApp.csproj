@@ -11,12 +11,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Text.Json" Version="7.0.2" />
+    <PackageReference Include="Crash.Changes" Version="1.0.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="..\..\.editorconfig" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\..\src\Crash.Common\Crash.Common.csproj" />
   </ItemGroup>

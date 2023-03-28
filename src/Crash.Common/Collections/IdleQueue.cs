@@ -5,49 +5,49 @@ using Crash.Common.Document;
 namespace Crash.Events
 {
 
-	/// <summary>
-	/// A Queue for running during the Rhino Idle Event.
-	/// </summary>
-	public sealed class IdleQueue : IEnumerable<IdleAction>, IDisposable
+	/// <summary>A Queue for running during the Rhino Idle Event.</summary>
+	public sealed class IdleQueue : IEnumerable<IdleAction>
 	{
-		private ConcurrentQueue<IdleAction> idleQueue;
-		private CrashDoc hostDoc;
+		readonly ConcurrentQueue<IdleAction> _idleQueue;
+		readonly CrashDoc _hostDoc;
+
 
 		public IdleQueue(CrashDoc hostDoc)
 		{
-			this.hostDoc = hostDoc;
-			idleQueue = new ConcurrentQueue<IdleAction>();
+			this._hostDoc = hostDoc;
+			_idleQueue = new ConcurrentQueue<IdleAction>();
 		}
 
+		/// <summary>Adds an Action to the Queue</summary>
 		public void AddAction(IdleAction action)
 		{
-			idleQueue.Enqueue(action);
+			_idleQueue.Enqueue(action);
 		}
 
+		/// <summary>Attempts to run the next Action</summary>
 		public void RunNextAction()
 		{
-			if (idleQueue.Count == 0) return;
+			if (_idleQueue.Count == 0) return;
 
-			idleQueue.TryDequeue(out IdleAction action);
+			if (!_idleQueue.TryDequeue(out var action)) return;
 			action?.Invoke();
 
-			if (0 == idleQueue.Count)
+			if (0 == _idleQueue.Count)
 			{
 				OnCompletedQueue?.Invoke(this, null);
 			}
 		}
 
-		public int Count => idleQueue.Count;
+		/// <summary>The number of items in the Queue</summary>
+		public int Count => _idleQueue.Count;
 
-		public IEnumerator<IdleAction> GetEnumerator() => idleQueue.GetEnumerator();
+		/// <summary></summary>
+		public IEnumerator<IdleAction> GetEnumerator() => _idleQueue.GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator() => idleQueue.GetEnumerator();
+		/// <summary></summary>
+		IEnumerator IEnumerable.GetEnumerator() => _idleQueue.GetEnumerator();
 
-		public void Dispose()
-		{
-			// What to do with the events?
-		}
-
+		/// <summary>Fires when the queue has finished parsing more than 1 item.</summary>
 		public event EventHandler OnCompletedQueue;
 
 	}

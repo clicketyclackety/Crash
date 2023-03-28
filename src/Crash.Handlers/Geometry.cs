@@ -2,8 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Collections.Generic;
-
 using Crash.Geometry;
 
 using Rhino.Geometry;
@@ -17,11 +15,11 @@ namespace Crash.Handlers
 	public static class Geometry
 	{
 
-		public static Point3d ToRhino(this CPoint cPoint) => new Point3d(cPoint.X, cPoint.Y, cPoint.Z);
-		public static CPoint ToCrash(this Point3d cPoint) => new CPoint(cPoint.X, cPoint.Y, cPoint.Z);
+		public static Point3d ToRhino(this CPoint cPoint) => new(cPoint.X, cPoint.Y, cPoint.Z);
+		public static CPoint ToCrash(this Point3d cPoint) => new(cPoint.X, cPoint.Y, cPoint.Z);
 
-		public static Vector3d ToRhino(this CVector cVector) => new Vector3d(cVector.X, cVector.Y, cVector.Z);
-		public static CVector ToCrash(this Vector3d cVector) => new CVector(cVector.X, cVector.Y, cVector.Z);
+		public static Vector3d ToRhino(this CVector cVector) => new(cVector.X, cVector.Y, cVector.Z);
+		public static CVector ToCrash(this Vector3d cVector) => new(cVector.X, cVector.Y, cVector.Z);
 
 
 		public static IEnumerable<Point3d> ToRhino(this IEnumerable<CPoint> cPoints)

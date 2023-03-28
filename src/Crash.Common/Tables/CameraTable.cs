@@ -13,17 +13,17 @@ namespace Crash.Common.Tables
 	{
 		public const int MAX_CAMERAS_IN_QUEUE = 3;
 
-		public bool CameraIsInvalid = false;
+		public bool CameraIsInvalid { get; set; } = false;
 
-		private CrashDoc crashDoc;
+		private readonly CrashDoc _crashDoc;
 
-		private Dictionary<User, FixedSizedQueue<Camera>> cameraLocations;
+		private readonly Dictionary<User, FixedSizedQueue<Camera>> cameraLocations;
 
 
 		public CameraTable(CrashDoc hostDoc)
 		{
 			cameraLocations = new Dictionary<User, FixedSizedQueue<Camera>>();
-			crashDoc = hostDoc;
+			_crashDoc = hostDoc;
 		}
 
 
@@ -31,7 +31,7 @@ namespace Crash.Common.Tables
 		{
 			if (string.IsNullOrEmpty(userName)) return;
 
-			var user = crashDoc.Users.Get(userName);
+			var user = _crashDoc.Users.Get(userName);
 			if (!user.IsValid()) return;
 
 			var newCamera = JsonSerializer.Deserialize<Camera>(cameraChange.Payload);
@@ -59,7 +59,7 @@ namespace Crash.Common.Tables
 
 		public bool TryAddCamera(CameraChange cameraChange)
 		{
-			User user = new User(cameraChange.Owner);
+			var user = new User(cameraChange.Owner);
 			FixedSizedQueue<Camera> queue;
 
 			if (!cameraLocations.ContainsKey(user))
@@ -79,7 +79,7 @@ namespace Crash.Common.Tables
 
 		public void TryAddCamera(IEnumerable<CameraChange> cameraChanges)
 		{
-			foreach (CameraChange camaeraChange in cameraChanges.OrderBy(cam => cam.Stamp))
+			foreach (var camaeraChange in cameraChanges.OrderBy(cam => cam.Stamp))
 			{
 				TryAddCamera(camaeraChange);
 			}

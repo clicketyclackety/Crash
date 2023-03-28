@@ -5,12 +5,12 @@ namespace Crash.Common.Events
 
 	public class CrashEventArgs : EventArgs
 	{
-		public CrashDoc CrashDoc { get; set; }
 
+		public readonly CrashDoc CrashDoc;
 
-		public CrashEventArgs(CrashDoc _crashDoc)
+		public CrashEventArgs(CrashDoc crashDoc)
 		{
-			CrashDoc = _crashDoc;
+			CrashDoc = crashDoc;
 		}
 
 	}

@@ -128,7 +128,7 @@ namespace Crash.Integration.Tests
 			CrashClient crashClient = new CrashClient(crashDoc, user.Name, clientUri);
 			crashDoc.LocalClient = crashClient;
 
-			await crashClient.StartLocalClient(func);
+			await crashClient.StartLocalClientAsync(func);
 
 			// Wait(() => crashClient.IsConnected);
 			Assert.That(crashClient.IsConnected, Is.True, "Client is not connected");

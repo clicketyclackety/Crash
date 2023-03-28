@@ -7,13 +7,13 @@ namespace Crash.Common.Tables
 
 	public sealed class ChangeTable : IEnumerable<IChange>
 	{
-		private CrashDoc _crashDoc;
+		private readonly CrashDoc _crashDoc;
 
 		// TODO : Should this be async? Or Concurrent?
-		private ConcurrentDictionary<Guid, IChange> _cache { get; set; }
+		private readonly ConcurrentDictionary<Guid, IChange> _cache;
 
-		public bool IsInit = false;
-		public bool SomeoneIsDone = false;
+		public bool IsInit { get; set; } = false;
+		public bool SomeoneIsDone { get; set; } = false;
 
 		/// <summary>
 		/// Local cache constructor subscribing to RhinoApp_Idle

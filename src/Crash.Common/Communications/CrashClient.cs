@@ -29,9 +29,9 @@ namespace Crash.Client
 		public const string DefaultURL = "http://localhost";
 		#endregion
 
-		HubConnection _connection;
-		string _user;
-		CrashDoc _crashDoc;
+		readonly HubConnection _connection;
+		readonly string _user;
+		readonly CrashDoc _crashDoc;
 
 		public bool IsConnected => _connection.State != HubConnectionState.Disconnected;
 		public HubConnectionState State => _connection.State;
@@ -82,11 +82,11 @@ namespace Crash.Client
 
 			_crashDoc = crashDoc;
 			_user = userName;
-			_connection = getHubConnection(url);
+			_connection = GetHubConnection(url);
 			RegisterConnections();
 		}
 
-		internal static HubConnection getHubConnection(Uri url) => new HubConnectionBuilder()
+		internal static HubConnection GetHubConnection(Uri url) => new HubConnectionBuilder()
 			   .WithUrl(url).AddJsonProtocol()
 			   .AddJsonProtocol((opts) => JsonOptions())
 			   .ConfigureLogging(LoggingConfigurer)
@@ -130,7 +130,7 @@ namespace Crash.Client
 			_connection.Reconnecting += ConnectionReconnectingAsync;
 		}
 
-		public async Task StartLocalClient(Action<IEnumerable<Change>> onInit)
+		public async Task StartLocalClientAsync(Action<IEnumerable<Change>> onInit)
 		{
 			if (null == _crashDoc)
 			{
@@ -149,7 +149,7 @@ namespace Crash.Client
 			await this.StartAsync();
 		}
 
-		public static async Task CloseLocalServer(CrashDoc crashDoc)
+		public static async Task CloseLocalServerAsync(CrashDoc crashDoc)
 		{
 			crashDoc?.LocalServer?.Stop();
 			crashDoc?.LocalServer?.Dispose();

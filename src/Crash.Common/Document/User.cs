@@ -22,18 +22,14 @@ namespace Crash.Common.Document
 
 		public bool Visible { get; set; } = true;
 
-		/// <summary>
-		/// Name of the user
-		/// </summary>
+		/// <summary>Name of the user</summary>
 		public string Name
 		{
 			get => _name;
 			set => _name = CleanedUserName(value);
 		}
 
-		/// <summary>
-		/// Color of the user
-		/// </summary>
+		/// <summary>Color of the user</summary>
 		public Color Color { get; set; }
 
 		public CameraState Camera { get; set; } = CameraState.Visible;

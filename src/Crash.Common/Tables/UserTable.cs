@@ -13,7 +13,7 @@ namespace Crash.Common.Tables
 
 		private readonly Dictionary<string, User> _users;
 
-		private CrashDoc crashDoc;
+		private readonly CrashDoc _crashDoc;
 
 		// TODO : Remove set from _users
 		public User CurrentUser { get; set; }
@@ -21,7 +21,7 @@ namespace Crash.Common.Tables
 		public UserTable(CrashDoc hostDoc)
 		{
 			_users = new Dictionary<string, User>();
-			crashDoc = hostDoc;
+			_crashDoc = hostDoc;
 		}
 
 		/// <summary>Adds a User only if they are not the Current User</summary>

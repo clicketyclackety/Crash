@@ -181,7 +181,7 @@ namespace Crash.Utilities
 		private void AddToCache(IdleArgs args)
 		{
 			if (args is not BakeArgs bakeArgs) return;
-			args.CrashDoc.CacheTable.UpdateChangeAsync(bakeArgs.Change);
+			args.Doc.CacheTable.UpdateChangeAsync(bakeArgs.Change);
 		}
 
 		private async Task _HandleTransformAsync(Change change)
@@ -200,13 +200,13 @@ namespace Crash.Utilities
 		{
 			if (args is not BakeArgs bakeArgs) return;
 
-			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(bakeArgs.CrashDoc);
+			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(bakeArgs.Doc);
 
 			Guid rhinoId = rhinoDoc.Objects.Add(bakeArgs.Geometry);
 			var rhinoObject = rhinoDoc.Objects.FindId(rhinoId);
 			Crash.Utils.ChangeUtils.SyncHost(rhinoObject, bakeArgs.Change);
 
-			bakeArgs.CrashDoc.CacheTable.UpdateChangeAsync(bakeArgs.Change);
+			bakeArgs.Doc.CacheTable.UpdateChangeAsync(bakeArgs.Change);
 		}
 
 		private void _HandleAdd(Change change)
@@ -228,7 +228,7 @@ namespace Crash.Utilities
 		{
 			if (args is not DeleteArgs deleteArgs) return;
 
-			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(deleteArgs.CrashDoc);
+			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(deleteArgs.Doc);
 			if (!_crashDoc.CacheTable.TryGetValue(deleteArgs.ChangeId, out GeometryChange change)) return;
 
 			var rhinoObject = rhinoDoc.Objects.FindId(change.RhinoId);

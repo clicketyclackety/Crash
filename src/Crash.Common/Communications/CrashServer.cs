@@ -173,8 +173,6 @@ namespace Crash.Communications
 			if (string.IsNullOrEmpty(data)) return;
 			Messages.Add(data);
 
-			EventArgs args;
-
 			if (data.Contains("failed to bind") ||
 				data.Contains("AddressInUseException") ||
 				data.Contains("SocketException "))
@@ -188,7 +186,7 @@ namespace Crash.Communications
 			}
 
 			process.ErrorDataReceived -= Process_ErrorDataReceived;
-			OnFailure?.Invoke(this, new IdleArgs(_crashDoc));
+			OnFailure?.Invoke(this, null);
 			Stop();
 		}
 
@@ -203,7 +201,7 @@ namespace Crash.Communications
 			if (started)
 			{
 				Connected = true;
-				OnConnected?.Invoke(this, new IdleArgs(_crashDoc));
+				OnConnected?.Invoke(this, null);
 			}
 		}
 
@@ -262,8 +260,8 @@ namespace Crash.Communications
 		#endregion
 
 
-		public event EventHandler<IdleArgs>? OnConnected;
-		public event EventHandler<IdleArgs>? OnFailure;
+		public event EventHandler<CrashEventArgs>? OnConnected;
+		public event EventHandler<CrashEventArgs>? OnFailure;
 
 	}
 }

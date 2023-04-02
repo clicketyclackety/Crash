@@ -5,12 +5,16 @@ namespace Crash.Common.Events
 
 	public class IdleArgs : EventArgs
 	{
-		public CrashDoc CrashDoc { get; set; }
 
+		public readonly CrashDoc Doc;
+		public readonly IChange Change;
 
-		public IdleArgs(CrashDoc _crashDoc)
+		public IdleArgs(CrashDoc crashDoc, IChange change)
 		{
-			CrashDoc = _crashDoc;
+			Doc = crashDoc;
+			Change = change;
 		}
+
 	}
+
 }

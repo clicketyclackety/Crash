@@ -10,11 +10,11 @@ namespace Crash.Events.Args
 	internal sealed class BakeArgs : IdleArgs
 	{
 		internal GeometryBase? Geometry => Change.Geometry;
-		internal readonly GeometryChange Change;
+		internal new readonly GeometryChange Change;
 
 
 		public BakeArgs(CrashDoc crashDoc, GeometryChange change)
-			: base(crashDoc)
+			: base(crashDoc, change)
 		{
 			Change = change;
 		}

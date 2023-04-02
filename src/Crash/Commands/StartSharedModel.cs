@@ -155,7 +155,7 @@ namespace Crash.Commands
 		private bool _PreExistingGeometryCheck(RhinoDoc doc)
 			=> GetObjects(doc).Count() > 0;
 
-		private void Server_OnFailure(object sender, IdleArgs e)
+		private void Server_OnFailure(object sender, CrashEventArgs e)
 		{
 			if (e.CrashDoc.LocalServer is object)
 			{
@@ -167,7 +167,7 @@ namespace Crash.Commands
 			RhinoApp.WriteLine(message);
 		}
 
-		private void Server_OnConnected(object sender, IdleArgs e)
+		private void Server_OnConnected(object sender, CrashEventArgs e)
 		{
 			e.CrashDoc.LocalServer.OnConnected -= Server_OnConnected;
 

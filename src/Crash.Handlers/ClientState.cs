@@ -4,6 +4,7 @@ using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Events;
 using Crash.Events;
+using Crash.Events.Args;
 using Crash.Handlers;
 
 namespace Crash.Utilities

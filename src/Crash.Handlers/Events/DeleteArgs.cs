@@ -1,6 +1,4 @@
-﻿using System;
-
-using Crash.Common.Document;
+﻿using Crash.Common.Document;
 using Crash.Common.Events;
 
 namespace Crash.Events.Args
@@ -9,12 +7,11 @@ namespace Crash.Events.Args
 	internal sealed class DeleteArgs : IdleArgs
 	{
 
-		internal readonly Guid ChangeId;
+		internal Guid ChangeId => Change.Id;
 
 		public DeleteArgs(CrashDoc crashDoc, Guid changeId)
-			: base(crashDoc)
+			: base(crashDoc, new Change(changeId, null, null))
 		{
-			ChangeId = changeId;
 		}
 
 	}

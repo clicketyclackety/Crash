@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 
 using Crash.Common.Document;
+using Crash.Common.Events;
 
 namespace Crash.Communications
 {
@@ -259,8 +260,8 @@ namespace Crash.Communications
 		#endregion
 
 
-		public event EventHandler? OnConnected;
-		public event EventHandler? OnFailure;
+		public event EventHandler<CrashEventArgs>? OnConnected;
+		public event EventHandler<CrashEventArgs>? OnFailure;
 
 	}
 }

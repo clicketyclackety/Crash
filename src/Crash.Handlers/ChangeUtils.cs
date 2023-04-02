@@ -9,7 +9,7 @@ namespace Crash.Utils
 		private static string ChangeIdKey = "ChangeID";
 
 		/// <summary>Acquires the ChangeId from the Rhino Object</summary>
-		public static bool TryGetChangeId(Rhino.DocObjects.RhinoObject rObj, out Guid id)
+		public static bool TryGetChangeId(this Rhino.DocObjects.RhinoObject rObj, out Guid id)
 		{
 			id = Guid.Empty;
 			if (rObj == null) return false;
@@ -18,7 +18,7 @@ namespace Crash.Utils
 		}
 
 		/// <summary>Adds the ChangeId to the Rhino Object and vice Verse.</summary>
-		public static void SyncHost(Rhino.DocObjects.RhinoObject rObj, IRhinoChange Change)
+		public static void SyncHost(this Rhino.DocObjects.RhinoObject rObj, IRhinoChange Change)
 		{
 			if (null == Change || rObj == null) return;
 

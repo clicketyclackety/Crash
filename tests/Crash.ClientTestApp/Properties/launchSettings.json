@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Crash.ClientTestApp": {
-      "commandName": "Project",
-      "commandLineArgs": "CrashUser"
-    }
-  }
-}

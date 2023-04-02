@@ -1,4 +1,7 @@
 ﻿using Crash.Common.Changes;
+using Crash.Common.Document;
+using Crash.Common.Events;
+using Crash.Events;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {

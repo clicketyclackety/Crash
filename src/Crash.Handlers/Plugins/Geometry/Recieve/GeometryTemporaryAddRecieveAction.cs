@@ -2,7 +2,6 @@
 using Crash.Common.Document;
 using Crash.Common.Events;
 using Crash.Events;
-using Crash.Handlers.Args;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
@@ -15,7 +14,7 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 		{
 			var geomChange = new GeometryChange(recievedChange);
 
-			var changeArgs = new ChangeArgs(crashDoc, geomChange);
+			var changeArgs = new IdleArgs(crashDoc, geomChange);
 			var bakeAction = new IdleAction(AddToDocument, changeArgs);
 			crashDoc.Queue.AddAction(bakeAction);
 		}

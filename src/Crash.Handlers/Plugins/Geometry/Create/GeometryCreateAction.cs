@@ -1,5 +1,7 @@
 ﻿using Crash.Common.Changes;
 
+using Rhino.DocObjects;
+
 namespace Crash.Handlers.Plugins.Geometry.Create
 {
 	internal sealed class GeometryCreateAction : IChangeCreateAction

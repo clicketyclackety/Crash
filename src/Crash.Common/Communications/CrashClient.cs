@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 
 using Crash.Common.Document;
+using Crash.Common.Events;
 
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -147,9 +148,11 @@ namespace Crash.Client
 
 			// TODO : Check for successful connection
 			await this.StartAsync();
+
+			OnConnected?.Invoke(this, new CrashEventArgs(_crashDoc));
 		}
 
-		public static async Task CloseLocalServerAsync(CrashDoc crashDoc)
+		public static void CloseLocalServer(CrashDoc crashDoc)
 		{
 			crashDoc?.LocalServer?.Stop();
 			crashDoc?.LocalServer?.Dispose();
@@ -236,7 +239,9 @@ namespace Crash.Client
 		/// Start the async connection
 		/// </summary>
 		/// <returns></returns>
-		public Task StartAsync() => _connection.StartAsync();
+		private Task StartAsync() => _connection.StartAsync();
+
+		public static event EventHandler<CrashEventArgs> OnConnected;
 
 	}
 

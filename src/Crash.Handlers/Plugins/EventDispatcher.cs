@@ -1,4 +1,6 @@
-﻿using Crash.Common.Document;
+﻿using Crash.Common.Changes;
+using Crash.Common.Document;
+using Crash.Handlers.Plugins.Initializers;
 
 using Rhino;
 using Rhino.Display;
@@ -11,32 +13,51 @@ namespace Crash.Handlers.Plugins
 	{
 		private readonly CrashDoc Doc;
 
-		private readonly Dictionary<ChangeAction, List<IChangeCreateAction>> _registeredEvents;
-		private readonly Dictionary<string, IChangeDefinition> definitions;
+		private readonly Dictionary<ChangeAction, List<IChangeCreateAction>> _createActions;
+		private readonly Dictionary<string, List<IChangeRecieveAction>> _recieveActions;
 
-		public EventDispatcher()
+		public EventDispatcher(CrashDoc doc)
 		{
-			_registeredEvents = new();
-			definitions = new();
+			Doc = doc;
+
+			_createActions = new();
+			_recieveActions = new();
+
 			RegisterDefaultEvents();
+			RegisterDefaultServerCalls();
 		}
 
-		public void RegisterAction(IChangeCreateAction changeCreate)
+		public void RegisterDefinition(IChangeDefinition definition)
 		{
-			if (_registeredEvents.TryGetValue(changeCreate.Action, out var actions))
+			foreach (var create in definition.CreateActions)
 			{
-				actions.Add(changeCreate);
+				if (_createActions.TryGetValue(create.Action, out var actions))
+				{
+					actions.Add(create);
+				}
+				else
+				{
+					_createActions.Add(create.Action, new List<IChangeCreateAction> { create });
+				}
 			}
-			else
+
+			foreach (var recieve in definition.RecieveActions)
 			{
-				_registeredEvents.Add(changeCreate.Action, new List<IChangeCreateAction> { changeCreate });
+				if (_recieveActions.TryGetValue(definition.ChangeName, out var recievers))
+				{
+					recievers.Add(recieve);
+				}
+				else
+				{
+					_recieveActions.Add(definition.ChangeName, new List<IChangeRecieveAction> { recieve });
+				}
 			}
 		}
 
 		// How can we prevent the same events being subscribed multiple times
 		private void NotifyDispatcher(ChangeAction changeAction, object sender, EventArgs args, RhinoDoc doc)
 		{
-			if (!_registeredEvents.TryGetValue(changeAction, out var actionChain)) return;
+			if (!_createActions.TryGetValue(changeAction, out var actionChain)) return;
 			var crashArgs = new CreateRecieveArgs(changeAction, args, doc);
 			foreach (var action in actionChain)
 			{
@@ -86,8 +107,8 @@ namespace Crash.Handlers.Plugins
 
 		private void NotifyDispatcher(Change change)
 		{
-			if (!definitions.TryGetValue(change.Type, out IChangeDefinition definition)) return;
-			foreach (IChangeRecieveAction action in definition.RecieveActions)
+			if (!_recieveActions.TryGetValue(change.Type, out List<IChangeRecieveAction> recievers)) return;
+			foreach (IChangeRecieveAction action in recievers)
 			{
 				action.OnRecieve(Doc, change);
 			}
@@ -121,9 +142,9 @@ namespace Crash.Handlers.Plugins
 			Doc.LocalClient.OnAdd += (name, change) => NotifyDispatcher(change);
 
 			// These are all missing a Change Type! It will need explicitly mentioning!
-			Doc.LocalClient.OnDelete += (name, changeGuid) => NotifyDispatcher(new Change(changeGuid, name, null));
-			Doc.LocalClient.OnSelect += (name, changeGuid) => NotifyDispatcher(new Change(changeGuid, name, null));
-			Doc.LocalClient.OnUnselect += (name, changeGuid) => NotifyDispatcher(new Change(changeGuid, name, null));
+			Doc.LocalClient.OnDelete += (name, changeGuid) => NotifyDispatcher(DeleteChange(changeGuid, name));
+			Doc.LocalClient.OnSelect += (name, changeGuid) => NotifyDispatcher(SelectChange(changeGuid, name));
+			Doc.LocalClient.OnUnselect += (name, changeGuid) => NotifyDispatcher(UnSelectChange(changeGuid, name));
 
 			// How does this get handled?
 			Doc.LocalClient.OnDone += (name) => NotifyDispatcher(new Change(Guid.Empty, name, null));
@@ -137,6 +158,41 @@ namespace Crash.Handlers.Plugins
 				}
 			};
 		}
+
+		private Change DoneChange(string name)
+			=> new Change()
+			{
+				Owner = name,
+				Action = ChangeAction.None,
+				Type = new DoneDefinition().ChangeName
+			};
+
+		private Change DeleteChange(Guid id, string name)
+			=> new Change()
+			{
+				Id = id,
+				Owner = name,
+				Type = new GeometryChange().Type,
+				Action = ChangeAction.Remove
+			};
+
+		private Change SelectChange(Guid id, string name)
+			=> new Change()
+			{
+				Id = id,
+				Owner = name,
+				Type = new GeometryChange().Type,
+				Action = ChangeAction.Lock
+			};
+
+		private Change UnSelectChange(Guid id, string name)
+			=> new Change()
+			{
+				Id = id,
+				Owner = name,
+				Type = new GeometryChange().Type,
+				Action = ChangeAction.Unlock
+			};
 
 	}
 

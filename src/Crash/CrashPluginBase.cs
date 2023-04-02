@@ -1,4 +1,5 @@
-﻿using Crash.Handlers.Plugins;
+﻿using Crash.Client;
+using Crash.Handlers.Plugins;
 
 using Rhino.PlugIns;
 
@@ -11,15 +12,41 @@ namespace Crash
 	/// </summary>
 	public abstract class CrashPluginBase : PlugIn
 	{
+		private EventDispatcher Dispatcher;
+		private readonly Queue<IChangeDefinition> _changes;
+
+		protected CrashPluginBase()
+		{
+			_changes = new Queue<IChangeDefinition>();
+		}
 
 		protected virtual void RegisterChangeSchema(IChangeDefinition changeDefinition)
 		{
 			InteractivePipe.RegisterChangeDefinition(changeDefinition);
-			// changeDefinition.CreateActions
-			// changeDefinition.RecieveActions
-			foreach (var act in changeDefinition.RecieveActions)
+			_changes.Enqueue(changeDefinition);
+
+			if (Dispatcher is not null)
 			{
-				// act.OnRecieve(doc, change)
+				RegisterDefinitions();
+			}
+			else
+			{
+				CrashClient.OnConnected += CrashClient_OnConnected;
+			}
+		}
+
+		private void CrashClient_OnConnected(object sender, Common.Events.CrashEventArgs e)
+		{
+			Dispatcher = new EventDispatcher(e.CrashDoc);
+			RegisterDefinitions();
+		}
+
+		private void RegisterDefinitions()
+		{
+			while (_changes.Count > 0)
+			{
+				var changeDefinition = _changes.Dequeue();
+				Dispatcher.RegisterDefinition(changeDefinition);
 			}
 		}
 

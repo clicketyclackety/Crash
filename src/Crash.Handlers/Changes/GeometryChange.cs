@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 using Crash.Handlers.Changes;
 
@@ -14,37 +14,38 @@ namespace Crash.Common.Changes
 	/// </summary>
 	public sealed class GeometryChange : IRhinoChange
 	{
-		IChange Change { get; set; }
-
 		public GeometryBase Geometry { get; private set; }
 
 		public Guid RhinoId { get; set; }
 
-		public DateTime Stamp => Change.Stamp;
+		public DateTime Stamp { get; private set; }
 
-		public Guid Id => Change.Id;
+		public Guid Id { get; internal set; }
 
-		public string? Owner => Change.Owner;
+		public string? Owner { get; private set; }
 
-		public string? Payload => Change.Payload;
+		public string? Payload { get; private set; }
 
 		public string Type => nameof(GeometryChange);
 
-		public ChangeAction Action { get => Change.Action; set => Change.Action = value; }
+		public ChangeAction Action { get; set; }
 
 		public GeometryChange() { }
 
-		public GeometryChange(IChange cange) : this()
+		public GeometryChange(IChange change) : this()
 		{
-			Change = cange;
 			var options = new SerializationOptions();
-			GeometryBase? geometry = CommonObject.FromJSON(Change.Payload) as GeometryBase;
+			GeometryBase? geometry = CommonObject.FromJSON(change.Payload) as GeometryBase;
 			if (null == geometry)
 			{
 				throw new JsonException("Could not deserialize Geometry");
 			}
 
 			Geometry = geometry;
+			Stamp = change.Stamp;
+			Id = change.Id;
+			Owner = change.Owner;
+			Payload = change.Payload;
 		}
 
 		public static GeometryChange CreateNew(string owner, GeometryBase geometry)
@@ -52,8 +53,14 @@ namespace Crash.Common.Changes
 			var options = new SerializationOptions();
 			string? payload = geometry?.ToJSON(options);
 
-			var Change = new Change(Guid.NewGuid(), owner, payload);
-			var instance = new GeometryChange(Change) { Geometry = geometry };
+			var instance = new GeometryChange()
+			{
+				Geometry = geometry,
+				Stamp = DateTime.UtcNow,
+				Id = Guid.NewGuid(),
+				Owner = owner,
+				Payload = payload,
+			};
 			instance.Action = ChangeAction.Add;
 
 			return instance;

@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 
-using Crash.Common.Document;
-
-namespace Crash.Events
+namespace Crash.Common.Collections
 {
 
 	/// <summary>A Queue of a predetermined size</summary>

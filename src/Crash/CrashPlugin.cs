@@ -1,13 +1,11 @@
-using Crash.Common.Document;
+﻿using Crash.Common.Document;
 using Crash.Handlers;
 using Crash.Handlers.Plugins.Camera;
 using Crash.Handlers.Plugins.Geometry;
 using Crash.Handlers.Plugins.Initializers;
 using Crash.Handlers.Server;
-using Crash.Views;
 
 using Rhino.PlugIns;
-using Rhino.UI;
 
 namespace Crash
 {
@@ -77,13 +75,11 @@ namespace Crash
 			}
 		}
 
-		/// <inheritdoc />
-		public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
+		public void Dispose()
+		{
+			throw new NotImplementedException();
+		}
 
-		/// <inheritdoc />
-		protected override string LocalPlugInName => "Crash";
-
-		///<summary>Gets the only instance of the CrashPlugin plug-in.</summary>
-		public static CrashPlugin Instance { get; private set; }
 	}
+
 }

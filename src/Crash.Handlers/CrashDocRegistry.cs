@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-using Crash.Common.Document;
+﻿using Crash.Common.Document;
 
 using Rhino;
 
@@ -78,8 +75,6 @@ namespace Crash.Handlers
 									RhinoDoc rhinoDoc)
 		{
 			DocumentRelationship.Add(rhinoDoc, crashDocState);
-
-			crashDocState.RegisterEvents();
 		}
 
 	}

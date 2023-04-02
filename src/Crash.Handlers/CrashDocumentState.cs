@@ -1,4 +1,5 @@
-using Crash.Common.Document;
+﻿using Crash.Common.Document;
+using Crash.Handlers.Plugins;
 
 using Rhino;
 
@@ -9,12 +10,12 @@ namespace Crash.Handlers
 	{
 
 		public CrashDoc Document;
+		public EventDispatcher Dispatcher;
 
 		internal CrashDocumentState(CrashDoc document)
 		{
 			Document = document;
 			RhinoApp.Idle += CallIdle;
-			Document.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
 		}
 
 		public override int GetHashCode() => Document.GetHashCode();

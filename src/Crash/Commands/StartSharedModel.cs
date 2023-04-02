@@ -177,7 +177,7 @@ namespace Crash.Commands
 				var crashClient = new CrashClient(crashDoc, userName, new Uri(LastClientURLAndPort));
 
 				ClientState clientState = new ClientState(crashDoc, crashClient);
-				crashClient.StartLocalClient(clientState.Init);
+				crashClient.StartLocalClientAsync(clientState.Init);
 
 				if (includePreExistingGeometry)
 					AddPreExistingGeometry(e.CrashDoc);

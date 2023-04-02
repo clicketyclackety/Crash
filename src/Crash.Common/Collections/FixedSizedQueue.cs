@@ -1,54 +1,41 @@
 ﻿using System.Collections;
 
-using Crash.Common.Document;
-
-namespace Crash.Events
+namespace Crash.Common.Collections
 {
 
-	/// <summary>A Queue for running during the Rhino Idle Event.</summary>
-	public sealed class IdleQueue : IEnumerable<IdleAction>
+	/// <summary>A Queue of a predetermined size</summary>
+	public sealed class FixedSizedQueue<T> : IReadOnlyCollection<T>
 	{
-		readonly ConcurrentQueue<IdleAction> _idleQueue;
-		readonly CrashDoc _hostDoc;
+		private readonly Queue<T> _queue;
 
+		public readonly int Size;
 
-		public IdleQueue(CrashDoc hostDoc)
+		/// <summary></summary>
+		public FixedSizedQueue(int size)
 		{
-			this._hostDoc = hostDoc;
-			_idleQueue = new ConcurrentQueue<IdleAction>();
+			Size = size;
+			_queue = new Queue<T>();
 		}
 
-		/// <summary>Adds an Action to the Queue</summary>
-		public void AddAction(IdleAction action)
+		/// <summary>Adds an item to the Queue, removing the first item if adding would put it oversize.</summary>
+		public void Enqueue(T item)
 		{
-			_idleQueue.Enqueue(action);
-		}
-
-		/// <summary>Attempts to run the next Action</summary>
-		public void RunNextAction()
-		{
-			if (_idleQueue.Count == 0) return;
-
-			if (!_idleQueue.TryDequeue(out var action)) return;
-			action?.Invoke();
-
-			if (0 == _idleQueue.Count)
+			if (_queue.Count >= Size)
 			{
-				OnCompletedQueue?.Invoke(this, null);
+				_queue.Dequeue();
 			}
+
+			_queue.Enqueue(item);
 		}
 
-		/// <summary>The number of items in the Queue</summary>
-		public int Count => _idleQueue.Count;
+		/// <summary></summary>
+		public int Count => _queue.Count;
 
 		/// <summary></summary>
-		public IEnumerator<IdleAction> GetEnumerator() => _idleQueue.GetEnumerator();
+		public IEnumerator<T> GetEnumerator() => _queue.GetEnumerator();
 
 		/// <summary></summary>
-		IEnumerator IEnumerable.GetEnumerator() => _idleQueue.GetEnumerator();
-
-		/// <summary>Fires when the queue has finished parsing more than 1 item.</summary>
-		public event EventHandler OnCompletedQueue;
+		IEnumerator IEnumerable.GetEnumerator() => _queue.GetEnumerator();
 
 	}
 

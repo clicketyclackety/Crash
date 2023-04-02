@@ -76,7 +76,7 @@ namespace Crash.Commands
 			var crashClient = new CrashClient(crashDoc, userName, new Uri($"{LastURL}/Crash"));
 			crashDoc.LocalClient = crashClient;
 			ClientState clientState = new ClientState(crashDoc, crashClient);
-			crashClient.StartLocalClient(clientState.Init);
+			crashClient.StartLocalClientAsync(clientState.Init);
 
 			InteractivePipe.Active.Enabled = true;
 			UsersForm.ShowForm();

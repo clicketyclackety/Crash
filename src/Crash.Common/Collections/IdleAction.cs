@@ -13,10 +13,6 @@ namespace Crash.Events
 		readonly Action<IdleArgs> _action;
 		readonly IdleArgs _args;
 
-		Action<IdleArgs> _action;
-
-		IdleArgs _args;
-
 		public bool Invoked { get; private set; }
 
 		public IdleAction(Action<IdleArgs> action, IdleArgs args)

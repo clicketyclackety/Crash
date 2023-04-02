@@ -32,6 +32,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.5.22" />
     <PackageReference Include="RhinoCommon" Version="7.21.22208.13001" IncludeAssets="compile;build" />
     <PackageReference Include="System.Text.Json" Version="7.0.2" />
+    <PackageReference Include="Crash.Changes" Version="1.0.0" />
   </ItemGroup>
   
   <ItemGroup>
@@ -44,6 +45,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Icons.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\ServerSettings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ServerSettings.settings</DependentUpon>
     </Compile>
   </ItemGroup>
   
@@ -60,6 +66,10 @@
     </None>
     <None Update="manifest.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Properties\ServerSettings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>ServerSettings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
   

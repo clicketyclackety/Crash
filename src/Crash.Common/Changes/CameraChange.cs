@@ -1,16 +1,15 @@
 ﻿using System.Text.Json;
 
-using Crash.Common.Events;
 using Crash.Common.View;
 
 namespace Crash.Common.Changes
 {
 
-	public sealed class CameraChange : ICachedChange
+	public sealed class CameraChange : IChange
 	{
 		IChange Change { get; set; }
 
-		public Camera Camera { get; private set; }
+		public Camera Camera { get; set; }
 
 		public DateTime Stamp => Change.Stamp;
 
@@ -20,12 +19,14 @@ namespace Crash.Common.Changes
 
 		public string? Payload => Change.Payload;
 
-		public int Action
+		public ChangeAction Action
 		{
 			get => Change.Action;
 			[Obsolete("For Deserialization only", true)]
 			set => Change.Action = value;
 		}
+
+		public string Type { get; } = nameof(CameraChange);
 
 		public CameraChange()
 		{
@@ -57,12 +58,6 @@ namespace Crash.Common.Changes
 			IChange cameraChange = new Change(Guid.NewGuid(), userName, json);
 			return new CameraChange(cameraChange);
 		}
-
-		public Action<CrashEventArgs> Draw { get; set; }
-
-		public Action<CrashEventArgs> AddToDocument { get; set; }
-
-		public Action<CrashEventArgs> RemoveFromDocument { get; set; }
 
 	}
 

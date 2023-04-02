@@ -58,11 +58,11 @@ namespace Crash.Common.Changes
 			return new CameraChange(cameraChange);
 		}
 
-		public Action<CrashEventArgs> Draw { get; set; }
+		public Action<IdleArgs> Draw { get; set; }
 
-		public Action<CrashEventArgs> AddToDocument { get; set; }
+		public Action<IdleArgs> AddToDocument { get; set; }
 
-		public Action<CrashEventArgs> RemoveFromDocument { get; set; }
+		public Action<IdleArgs> RemoveFromDocument { get; set; }
 
 	}
 

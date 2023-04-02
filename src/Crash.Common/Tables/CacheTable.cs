@@ -96,7 +96,7 @@ namespace Crash.Common.Tables
 				throw new NotImplementedException("AddToDocument not implemented for Change");
 			}
 
-			var args = new CrashEventArgs(_crashDoc);
+			var args = new IdleArgs(_crashDoc);
 			cachedChange.AddToDocument.Invoke(args);
 		}
 
@@ -107,7 +107,7 @@ namespace Crash.Common.Tables
 				throw new NotImplementedException("AddToDocument not implemented for Change");
 			}
 
-			var args = new CrashEventArgs(_crashDoc);
+			var args = new IdleArgs(_crashDoc);
 			cachedChange.RemoveFromDocument.Invoke(args);
 		}
 

@@ -5,11 +5,11 @@ namespace Crash.Common.Changes
 	public interface ICachedChange : IChange
 	{
 
-		public Action<CrashEventArgs> Draw { get; }
+		public Action<IdleArgs> Draw { get; }
 
-		public Action<CrashEventArgs> AddToDocument { get; }
+		public Action<IdleArgs> AddToDocument { get; }
 
-		public Action<CrashEventArgs> RemoveFromDocument { get; }
+		public Action<IdleArgs> RemoveFromDocument { get; }
 
 	}
 

@@ -7,7 +7,7 @@ using Rhino.Geometry;
 namespace Crash.Events.Args
 {
 
-	internal sealed class BakeArgs : CrashEventArgs
+	internal sealed class BakeArgs : IdleArgs
 	{
 		internal GeometryBase? Geometry => Change.Geometry;
 		internal readonly GeometryChange Change;

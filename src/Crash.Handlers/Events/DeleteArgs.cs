@@ -6,7 +6,7 @@ using Crash.Common.Events;
 namespace Crash.Events.Args
 {
 
-	internal sealed class DeleteArgs : CrashEventArgs
+	internal sealed class DeleteArgs : IdleArgs
 	{
 
 		internal readonly Guid ChangeId;

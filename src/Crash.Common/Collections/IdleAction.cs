@@ -11,13 +11,13 @@ namespace Crash.Events
 	public class IdleAction : IDisposable
 	{
 
-		Action<CrashEventArgs> _action;
+		Action<IdleArgs> _action;
 
-		CrashEventArgs _args;
+		IdleArgs _args;
 
 		public bool Invoked { get; private set; }
 
-		public IdleAction(Action<CrashEventArgs> action, CrashEventArgs args)
+		public IdleAction(Action<IdleArgs> action, IdleArgs args)
 		{
 			_action = action;
 			_args = args;

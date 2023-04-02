@@ -1,4 +1,5 @@
-﻿using Crash.Client;
+﻿using Crash.Changes.Extensions;
+using Crash.Client;
 using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Events;
@@ -15,8 +16,8 @@ namespace Crash.Utilities
 	public sealed class ClientState : IDisposable
 	{
 
-		private CrashDoc _crashDoc;
-		private CrashClient _localClient;
+		private readonly CrashDoc _crashDoc;
+		private readonly CrashClient _localClient;
 
 		public ClientState(CrashDoc crashDoc, CrashClient crashClient)
 		{
@@ -118,7 +119,7 @@ namespace Crash.Utilities
 			}
 			else if (_action.HasFlag(ChangeAction.Add))
 			{
-				await _HandleAddAsync(change);
+				_HandleAdd(change);
 			}
 			else if (_action.HasFlag(ChangeAction.Remove))
 			{
@@ -186,7 +187,7 @@ namespace Crash.Utilities
 		private async Task _HandleTransformAsync(Change change)
 		{
 			TransformChange transformChange = new TransformChange(change);
-			if (!_crashDoc.CacheTable.TryGetValue(change.Id, out ICachedChange cachedChange))
+			if (!_crashDoc.CacheTable.TryGetValue(change.Id, out IChange cachedChange))
 			{
 				if (cachedChange is not GeometryChange geomChange) return;
 				geomChange.Geometry.Transform(transformChange.Transform.ToRhino());
@@ -208,7 +209,7 @@ namespace Crash.Utilities
 			bakeArgs.CrashDoc.CacheTable.UpdateChangeAsync(bakeArgs.Change);
 		}
 
-		private async Task _HandleAddAsync(Change change)
+		private void _HandleAdd(Change change)
 		{
 			GeometryChange localChange = new GeometryChange(change);
 			_HandleAddAsync(localChange);
@@ -260,12 +261,9 @@ namespace Crash.Utilities
 			var changes = _crashDoc.CacheTable.GetChanges();
 			foreach (var change in changes)
 			{
-				ChangeAction action = (ChangeAction)change.Action;
-				if (!action.HasFlag(ChangeAction.Temporary)) continue;
+				if (!change.IsTemporary()) continue;
 
-				// Not temporary anymore!
-				action &= ~ChangeAction.Temporary;
-				change.Action = (int)action;
+				change.RemoveAction(ChangeAction.Temporary);
 
 				if (change is GeometryChange geomChange)
 					await _HandleAddAsync(geomChange);
@@ -284,7 +282,5 @@ namespace Crash.Utilities
 		{
 			throw new NotImplementedException();
 		}
-
 	}
-
 }

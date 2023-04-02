@@ -75,7 +75,7 @@ namespace Crash.Handlers
 
 			Change addChange = new Change(existingChange)
 			{
-				Action = (int)(ChangeAction.Add | ChangeAction.Temporary)
+				Action = ChangeAction.Add | ChangeAction.Temporary
 			};
 			Document?.LocalClient?.AddAsync(addChange);
 		}
@@ -105,7 +105,7 @@ namespace Crash.Handlers
 					continue;
 
 				if (!Utils.ChangeUtils.TryGetChangeId(rhinoObject, out Guid id)) continue;
-				if (!Document.CacheTable.TryGetValue(id, out ICachedChange change)) continue;
+				if (!Document.CacheTable.TryGetValue(id, out IChange change)) continue;
 				if (change.IsTemporary()) continue;
 
 				if (e.Selected)
@@ -132,7 +132,7 @@ namespace Crash.Handlers
 				if (rhinoObject.IsLocked) continue;
 
 				if (!ChangeUtils.TryGetChangeId(rhinoObject, out Guid ChangeId)) continue;
-				if (!Document.CacheTable.TryGetValue(ChangeId, out ICachedChange change)) continue;
+				if (!Document.CacheTable.TryGetValue(ChangeId, out IChange change)) continue;
 				if (change.IsTemporary()) continue;
 
 				Document.LocalClient.UnselectAsync(ChangeId);
@@ -146,6 +146,5 @@ namespace Crash.Handlers
 			// TODO : What if there are still things in the Queue?
 			RhinoApp.Idle -= CallIdle;
 		}
-
 	}
 }

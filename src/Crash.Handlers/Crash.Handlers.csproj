@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <None Include="..\..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
 	  <PackageReference Include="BidirectionalMap" Version="1.0.0" />
 	  <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
 		  <PrivateAssets>all</PrivateAssets>
@@ -21,10 +17,10 @@
 	  <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.5.22" />
 	  <PackageReference Include="RhinoCommon" Version="7.21.22208.13001" IncludeAssets="compile;build" />
 	  <PackageReference Include="System.Text.Json" Version="7.0.2" />
+	  <PackageReference Include="Crash.Changes" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Crash.Changes\Crash.Changes.csproj" />
     <ProjectReference Include="..\Crash.Common\Crash.Common.csproj" />
   </ItemGroup>
 

@@ -7,41 +7,49 @@ namespace Crash.Common.Changes
 
 	public struct TransformChange : IChange
 	{
-		IChange Change { get; set; }
 
 		public CTransform Transform { get; private set; }
 
-		public DateTime Stamp => Change.Stamp;
+		public DateTime Stamp { get; private set; }
 
-		public Guid Id => Change.Id;
+		public Guid Id { get; private set; }
 
-		public string? Owner => Change.Owner;
+		public string? Owner { get; private set; }
 
-		public string? Payload => Change.Payload;
+		public string? Payload { get; private set; }
 
-		public int Action
-		{
-			get => Change.Action;
-			[Obsolete("For Deserialization only", true)]
-			set => Change.Action = value;
-		}
+		public string Type => $"{nameof(Crash)}.{nameof(TransformChange)}";
+
+		public ChangeAction Action { get; set; }
+
+
+		public TransformChange() { }
 
 		public TransformChange(IChange change)
 		{
-			Change = change;
-			if (string.IsNullOrEmpty(Change.Payload))
+			if (string.IsNullOrEmpty(change.Payload))
 			{
 				throw new ArgumentNullException($"Payload is invalid, {nameof(Change.Payload)}");
 			}
 
-			Transform = JsonSerializer.Deserialize<CTransform>(Change.Payload);
+			Transform = JsonSerializer.Deserialize<CTransform>(change.Payload);
+
+			Payload = change.Payload;
+			Owner = change.Owner;
+			Stamp = change.Stamp;
+			Id = change.Id;
 		}
 
-		public static TransformChange CreateNew(CTransform transform, string userName)
+		public static TransformChange CreateNew(CTransform transform, string userName, Guid id)
 		{
 			string json = JsonSerializer.Serialize(transform, Serialization.Options.Default);
-			IChange tempChange = new Change(Guid.NewGuid(), userName, json);
-			return new TransformChange(tempChange);
+			return new TransformChange()
+			{
+				Id = id,
+				Owner = userName,
+				Payload = json,
+				Stamp = DateTime.UtcNow,
+			};
 		}
 
 	}

@@ -1,18 +1,16 @@
-﻿using System.Collections;
+using System.Collections;
 
-using Crash.Common.Changes;
 using Crash.Common.Document;
-using Crash.Common.Events;
 
 namespace Crash.Common.Tables
 {
 
-	public sealed class ChangeTable : IEnumerable<ICachedChange>
+	public sealed class ChangeTable : IEnumerable<IChange>
 	{
-		private CrashDoc _crashDoc;
+		private readonly CrashDoc _crashDoc;
 
 		// TODO : Should this be async? Or Concurrent?
-		private ConcurrentDictionary<Guid, ICachedChange> _cache { get; set; }
+		private ConcurrentDictionary<Guid, IChange> _cache { get; set; }
 
 		public bool IsInit = false;
 		public bool SomeoneIsDone = false;
@@ -22,7 +20,7 @@ namespace Crash.Common.Tables
 		/// </summary>
 		public ChangeTable(CrashDoc hostDoc)
 		{
-			_cache = new ConcurrentDictionary<Guid, ICachedChange>();
+			_cache = new ConcurrentDictionary<Guid, IChange>();
 			_crashDoc = hostDoc;
 		}
 
@@ -38,7 +36,7 @@ namespace Crash.Common.Tables
 		/// </summary>
 		/// <param name="cache">the Changes</param>
 		/// <returns>returns the update task</returns>
-		public async Task UpdateChangeAsync(ICachedChange cache)
+		public async Task UpdateChangeAsync(IChange cache)
 		{
 			if (cache == null) return;
 
@@ -74,51 +72,28 @@ namespace Crash.Common.Tables
 			}
 		}
 
-		public bool TryGetValue<T>(Guid id, out T change) where T : ICachedChange
+		public bool TryGetValue<T>(Guid id, out T change) where T : IChange
 		{
-			if (_cache.TryGetValue(id, out ICachedChange cachedChange) &&
+			if (_cache.TryGetValue(id, out IChange cachedChange) &&
 				cachedChange is T changeConverted)
 			{
 				change = changeConverted;
 				return true;
 			}
 
-			change = default(T);
+			change = default;
 			return false;
 		}
 
 		#endregion
 
-		public void AddToDocument(ICachedChange cachedChange)
-		{
-			if (cachedChange.AddToDocument is not object)
-			{
-				throw new NotImplementedException("AddToDocument not implemented for Change");
-			}
-
-			var args = new IdleArgs(_crashDoc);
-			cachedChange.AddToDocument.Invoke(args);
-		}
-
-		public void RemoveFromDocument(ICachedChange cachedChange)
-		{
-			if (cachedChange.AddToDocument is not object)
-			{
-				throw new NotImplementedException("AddToDocument not implemented for Change");
-			}
-
-			var args = new IdleArgs(_crashDoc);
-			cachedChange.RemoveFromDocument.Invoke(args);
-		}
-
-
 		/// <summary>
 		/// Method to get Changes
 		/// </summary>
 		/// <returns>returns a list of the Changes</returns>
-		public IEnumerable<ICachedChange> GetChanges() => _cache.Values;
+		public IEnumerable<IChange> GetChanges() => _cache.Values;
 
-		public IEnumerator<ICachedChange> GetEnumerator() => _cache.Values.GetEnumerator();
+		public IEnumerator<IChange> GetEnumerator() => _cache.Values.GetEnumerator();
 
 		public IEnumerator<T> GetEnumerator<T>() => _cache.Values.Where(x => x is T).Cast<T>().GetEnumerator();
 

@@ -122,7 +122,7 @@ namespace Crash.Common.Tests
 		}
 
 
-		private void DisposableCrashEvent(CrashEventArgs args) { }
+		private void DisposableCrashEvent(IdleArgs args) { }
 	}
 
 }

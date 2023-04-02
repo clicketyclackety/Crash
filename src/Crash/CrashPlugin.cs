@@ -1,5 +1,6 @@
 ﻿using Crash.Common.Document;
 using Crash.Handlers;
+using Crash.Handlers.Server;
 
 using Rhino.PlugIns;
 
@@ -21,8 +22,21 @@ namespace Crash
 		/// <inheritdoc />
 		protected override LoadReturnCode OnLoad(ref string errorMessage)
 		{
+			// Add feature flags as advanced settings here!
 			InteractivePipe.Active = new InteractivePipe() { Enabled = false };
+
+			RhinoApp.Idle += RhinoApp_Idle;
+
 			return base.OnLoad(ref errorMessage);
+		}
+
+		private void RhinoApp_Idle(object sender, EventArgs e)
+		{
+			RhinoApp.Idle -= RhinoApp_Idle;
+			if (!ServerInstaller.ServerExecutableExists)
+			{
+				ServerInstaller.DownloadAsync();
+			}
 		}
 
 		/// <inheritdoc />
@@ -43,6 +57,5 @@ namespace Crash
 
 		///<summary>Gets the only instance of the CrashPlugin plug-in.</summary>
 		public static CrashPlugin Instance { get; private set; }
-
 	}
 }

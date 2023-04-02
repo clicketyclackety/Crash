@@ -188,7 +188,7 @@ namespace Crash.Communications
 			}
 
 			process.ErrorDataReceived -= Process_ErrorDataReceived;
-			OnFailure?.Invoke(this, new CrashEventArgs(_crashDoc));
+			OnFailure?.Invoke(this, new IdleArgs(_crashDoc));
 			Stop();
 		}
 
@@ -203,7 +203,7 @@ namespace Crash.Communications
 			if (started)
 			{
 				Connected = true;
-				OnConnected?.Invoke(this, new CrashEventArgs(_crashDoc));
+				OnConnected?.Invoke(this, new IdleArgs(_crashDoc));
 			}
 		}
 
@@ -262,8 +262,8 @@ namespace Crash.Communications
 		#endregion
 
 
-		public event EventHandler<CrashEventArgs>? OnConnected;
-		public event EventHandler<CrashEventArgs>? OnFailure;
+		public event EventHandler<IdleArgs>? OnConnected;
+		public event EventHandler<IdleArgs>? OnFailure;
 
 	}
 }

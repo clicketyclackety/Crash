@@ -3,16 +3,14 @@
 namespace Crash.Common.Events
 {
 
-	public class CrashEventArgs : EventArgs
+	public class IdleArgs : EventArgs
 	{
 		public CrashDoc CrashDoc { get; set; }
 
 
-		public CrashEventArgs(CrashDoc _crashDoc)
+		public IdleArgs(CrashDoc _crashDoc)
 		{
 			CrashDoc = _crashDoc;
 		}
-
 	}
-
 }

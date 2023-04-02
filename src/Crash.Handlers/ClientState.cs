@@ -178,7 +178,7 @@ namespace Crash.Utilities
 			await Task.CompletedTask;
 		}
 
-		private void AddToCache(CrashEventArgs args)
+		private void AddToCache(IdleArgs args)
 		{
 			if (args is not BakeArgs bakeArgs) return;
 			args.CrashDoc.CacheTable.UpdateChangeAsync(bakeArgs.Change);
@@ -196,7 +196,7 @@ namespace Crash.Utilities
 			await Task.CompletedTask;
 		}
 
-		private void Bake(CrashEventArgs args)
+		private void Bake(IdleArgs args)
 		{
 			if (args is not BakeArgs bakeArgs) return;
 
@@ -224,7 +224,7 @@ namespace Crash.Utilities
 			await Task.CompletedTask;
 		}
 
-		private void Remove(CrashEventArgs args)
+		private void Remove(IdleArgs args)
 		{
 			if (args is not DeleteArgs deleteArgs) return;
 

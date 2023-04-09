@@ -113,6 +113,8 @@ namespace Crash.Handlers.Plugins
 		public void NotifyDispatcher(CrashDoc Doc, Change change)
 		{
 			if (!_recieveActions.TryGetValue(change.Type, out List<IChangeRecieveAction> recievers)) return;
+			RegisterUser(Doc, change);
+
 			foreach (IChangeRecieveAction action in recievers)
 			{
 				if (action.Action != change.Action) continue;
@@ -120,6 +122,11 @@ namespace Crash.Handlers.Plugins
 				action.OnRecieve(Doc, change);
 				return;
 			}
+		}
+
+		private void RegisterUser(CrashDoc doc, Change change)
+		{
+			doc.Users.Add(change.Owner);
 		}
 
 		private void RegisterDefaultEvents()

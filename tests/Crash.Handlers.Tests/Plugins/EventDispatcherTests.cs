@@ -219,6 +219,7 @@ namespace Crash.Handlers.Tests.Plugins
 		[TestCaseSource(nameof(TestServerChanges))]
 		public void TestRecieve(Change serverChange)
 		{
+			CrashDoc crashDoc = new CrashDoc();
 			bool recieved = false;
 			Change recievedChange = null;
 
@@ -236,7 +237,7 @@ namespace Crash.Handlers.Tests.Plugins
 
 			// Assert
 			Assert.That(recieved, Is.False);
-			Dispatcher.NotifyDispatcher(serverChange);
+			Dispatcher.NotifyDispatcher(crashDoc, serverChange);
 			Assert.That(recieved, Is.True);
 
 			Assert.That(serverChange.Id, Is.EqualTo(recievedChange.Id));
@@ -264,7 +265,7 @@ namespace Crash.Handlers.Tests.Plugins
 
 			// Assert
 			Assert.That(recieved, Is.False);
-			CustomEvent.Invoke(this, args);
+			CustomEvent?.Invoke(this, args);
 			Assert.That(recieved, Is.True);
 
 			Assert.That(recievedArgs.Value, Is.EqualTo(args.Value));

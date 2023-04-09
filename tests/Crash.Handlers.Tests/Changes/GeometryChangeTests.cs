@@ -32,7 +32,7 @@ namespace Crash.Handlers.Tests.Changes
 		{
 			get
 			{
-				yield return NRhino.Random.Geometry.NPoint3d.Any();
+				yield return new Point(NRhino.Random.Geometry.NPoint3d.Any());
 				yield return NRhino.Random.Geometry.NLineCurve.Any();
 				yield return new TextDot("Test", Point3d.Origin);
 				yield return new LinearDimension(Plane.WorldXY, new Point2d(-100, -100), new Point2d(100, 100), new Point2d(10, 20));

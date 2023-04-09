@@ -1,15 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 using Crash.Changes;
 using Crash.Common.Changes;
 using Crash.Common.Document;
+using Crash.Handlers.InternalEvents;
 using Crash.Handlers.Plugins;
 using Crash.Handlers.Plugins.Geometry.Create;
 
 using Rhino;
-using Rhino.DocObjects;
 using Rhino.Geometry;
 
 namespace Crash.Handlers.Tests.Plugins
@@ -22,7 +21,7 @@ namespace Crash.Handlers.Tests.Plugins
 		private readonly CrashDoc _cdoc;
 
 		[TestCaseSource(nameof(GeometryCreateArgs))]
-		public void GeometryCreateAction_CanConvert(object sender, RhinoObjectEventArgs createRecieveArgs)
+		public void GeometryCreateAction_CanConvert(object sender, CrashObjectEventArgs createRecieveArgs)
 		{
 			var createArgs = new CreateRecieveArgs(ChangeAction.Add, createRecieveArgs, _cdoc);
 			var createAction = new GeometryCreateAction();
@@ -30,7 +29,7 @@ namespace Crash.Handlers.Tests.Plugins
 		}
 
 		[TestCaseSource(nameof(GeometryCreateArgs))]
-		public void GeometryCreateAction_TryConvert(object sender, RhinoObjectEventArgs createRecieveArgs)
+		public void GeometryCreateAction_TryConvert(object sender, CrashObjectEventArgs createRecieveArgs)
 		{
 			var createArgs = new CreateRecieveArgs(ChangeAction.Add, createRecieveArgs, _cdoc);
 			var createAction = new GeometryCreateAction();
@@ -44,7 +43,7 @@ namespace Crash.Handlers.Tests.Plugins
 		}
 
 		[TestCaseSource(nameof(GeometryRemoveArgs))]
-		public void GeometryRemoveAction_CanConvert(object sender, RhinoObjectEventArgs createRecieveArgs)
+		public void GeometryRemoveAction_CanConvert(object sender, CrashObjectEventArgs createRecieveArgs)
 		{
 			var createArgs = new CreateRecieveArgs(ChangeAction.Remove, createRecieveArgs, _cdoc);
 			var createAction = new GeometryRemoveAction();
@@ -52,54 +51,44 @@ namespace Crash.Handlers.Tests.Plugins
 		}
 
 		[TestCaseSource(nameof(GeometryRemoveArgs))]
-		public void GeometryRemoveAction_TryConvert(object sender, RhinoObjectEventArgs createRecieveArgs)
+		public void GeometryRemoveAction_TryConvert(object sender, CrashObjectEventArgs createRecieveArgs)
 		{
 			var createArgs = new CreateRecieveArgs(ChangeAction.Remove, createRecieveArgs, _cdoc);
 			var createAction = new GeometryRemoveAction();
+
 			Assert.That(createAction.TryConvert(sender, createArgs, out IEnumerable<IChange> changes), Is.True);
 			Assert.That(changes, Is.Not.Empty);
 			foreach (var change in changes)
 			{
 				Assert.That(change.Action, Is.EqualTo(createArgs.Action));
-				Assert.That(change is GeometryChange, Is.True);
+				Assert.That(change is Change, Is.True);
 			}
 		}
 
 
-		public GeometryCreateRemoveActionTests()
+		public static IEnumerable GeometryCreateArgs
 		{
-			//  Use the existing open docs
-			_doc = RhinoDoc.CreateHeadless(null);
-			_cdoc = new CrashDoc();
-
-			RhinoDoc.AddRhinoObject += RhinoDoc_AddRhinoObject;
-			RhinoDoc.DeleteRhinoObject += RhinoDoc_DeleteRhinoObject;
-			for (int i = 0; i < 100; i++)
+			get
 			{
-				LineCurve lineCurve = new LineCurve(RandomPoint(), RandomPoint());
-				_doc.Objects.Add(lineCurve);
+				for (int i = 0; i < 10; i++)
+				{
+					LineCurve geom = NRhino.Random.Geometry.NLineCurve.Any();
+					yield return new CrashObjectEventArgs(geom);
+				}
 			}
-
-			RhinoDoc.AddRhinoObject -= RhinoDoc_AddRhinoObject;
-			RhinoDoc.DeleteRhinoObject -= RhinoDoc_DeleteRhinoObject;
 		}
 
-
-		private void RhinoDoc_DeleteRhinoObject(object sender, RhinoObjectEventArgs e)
+		public static IEnumerable GeometryRemoveArgs
 		{
-			RemoveEventArgs.Add((sender, e));
+			get
+			{
+				for (int i = 0; i < 10; i++)
+				{
+					LineCurve geom = NRhino.Random.Geometry.NLineCurve.Any();
+					yield return new CrashObjectEventArgs(geom, Guid.NewGuid());
+				}
+			}
 		}
-
-		private void RhinoDoc_AddRhinoObject(object sender, RhinoObjectEventArgs e)
-		{
-			CreateEventArgs.Add((sender, e));
-		}
-
-		private static List<(object, RhinoObjectEventArgs)> CreateEventArgs = new List<(object, RhinoObjectEventArgs)>();
-		public static IEnumerable GeometryCreateArgs => CreateEventArgs.Select(ea => new TestCaseData(ea.Item1, ea.Item2));
-
-		private static List<(object, RhinoObjectEventArgs)> RemoveEventArgs = new List<(object, RhinoObjectEventArgs)>();
-		public static IEnumerable GeometryRemoveArgs => RemoveEventArgs.Select(ea => new TestCaseData(ea.Item1, ea.Item2));
 
 		private static Point3d RandomPoint()
 		{

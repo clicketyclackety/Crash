@@ -6,8 +6,10 @@ using Rhino.Geometry;
 
 namespace Crash.Handlers.Plugins.Geometry.Create
 {
+
 	internal sealed class GeometryCreateAction : IChangeCreateAction
 	{
+
 		public ChangeAction Action => ChangeAction.Add;
 
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)

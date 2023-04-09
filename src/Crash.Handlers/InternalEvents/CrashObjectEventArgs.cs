@@ -1,19 +1,19 @@
-﻿using Rhino;
-using Rhino.Geometry;
+﻿using Rhino.Geometry;
 
 namespace Crash.Handlers.InternalEvents
 {
 
 	public sealed class CrashObjectEventArgs : EventArgs
 	{
+
+		public Guid ChangeId;
+
 		public readonly GeometryBase Geometry;
 
-		public readonly RhinoDoc Document;
-
-		public CrashObjectEventArgs(RhinoDoc doc, GeometryBase geometry)
+		public CrashObjectEventArgs(GeometryBase geometry, Guid changeId = default)
 		{
 			Geometry = geometry;
-			Document = doc;
+			ChangeId = changeId;
 		}
 
 	}

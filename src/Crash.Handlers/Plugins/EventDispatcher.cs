@@ -2,6 +2,7 @@
 using Crash.Common.Document;
 using Crash.Handlers.InternalEvents;
 using Crash.Handlers.Plugins.Initializers;
+using Crash.Utils;
 
 using Rhino;
 using Rhino.Display;
@@ -12,20 +13,20 @@ namespace Crash.Handlers.Plugins
 	// This needs updating
 	public sealed class EventDispatcher
 	{
-		private readonly CrashDoc Doc;
 
 		private readonly Dictionary<ChangeAction, List<IChangeCreateAction>> _createActions;
 		private readonly Dictionary<string, List<IChangeRecieveAction>> _recieveActions;
 
-		public EventDispatcher(CrashDoc doc)
+		public static EventDispatcher Instance;
+
+		public EventDispatcher()
 		{
-			Doc = doc;
+			Instance = this;
 
 			_createActions = new();
 			_recieveActions = new();
 
 			RegisterDefaultEvents();
-			RegisterDefaultServerCalls();
 		}
 
 		public void RegisterDefinition(IChangeDefinition definition)
@@ -60,6 +61,9 @@ namespace Crash.Handlers.Plugins
 		{
 			if (!_createActions.TryGetValue(changeAction, out var actionChain)) return;
 			var crashArgs = new CreateRecieveArgs(changeAction, args, doc);
+
+			CrashDoc Doc = CrashDocRegistry.GetRelatedDocument(doc);
+
 			foreach (var action in actionChain)
 			{
 				if (!action.CanConvert(sender, crashArgs)) continue;
@@ -106,7 +110,7 @@ namespace Crash.Handlers.Plugins
 			}
 		}
 
-		public void NotifyDispatcher(Change change)
+		public void NotifyDispatcher(CrashDoc Doc, Change change)
 		{
 			if (!_recieveActions.TryGetValue(change.Type, out List<IChangeRecieveAction> recievers)) return;
 			foreach (IChangeRecieveAction action in recievers)
@@ -120,19 +124,20 @@ namespace Crash.Handlers.Plugins
 			// Object Events
 			RhinoDoc.AddRhinoObject += (sender, args) =>
 			{
-				var crashArgs = new CrashObjectEventArgs(args.TheObject.Document, args.TheObject.Geometry);
+				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry);
 				NotifyDispatcher(ChangeAction.Add, sender, crashArgs, args.TheObject.Document);
 			};
 
 			RhinoDoc.UndeleteRhinoObject += (sender, args) =>
 			{
-				var crashArgs = new CrashObjectEventArgs(args.TheObject.Document, args.TheObject.Geometry);
+				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry);
 				NotifyDispatcher(ChangeAction.Add, sender, crashArgs, args.TheObject.Document);
 			};
 
 			RhinoDoc.DeleteRhinoObject += (sender, args) =>
 			{
-				var crashArgs = new CrashObjectEventArgs(args.TheObject.Document, args.TheObject.Geometry);
+				args.TheObject.TryGetChangeId(out Guid changeId);
+				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry, changeId);
 				NotifyDispatcher(ChangeAction.Remove, sender, crashArgs, args.TheObject.Document);
 			};
 
@@ -183,24 +188,24 @@ namespace Crash.Handlers.Plugins
 			};
 		}
 
-		private void RegisterDefaultServerCalls()
+		public void RegisterDefaultServerCalls(CrashDoc Doc)
 		{
-			Doc.LocalClient.OnAdd += (name, change) => NotifyDispatcher(change);
+			Doc.LocalClient.OnAdd += (name, change) => NotifyDispatcher(Doc, change);
 
 			// These are all missing a Change Type! It will need explicitly mentioning!
-			Doc.LocalClient.OnDelete += (name, changeGuid) => NotifyDispatcher(DeleteChange(changeGuid, name));
-			Doc.LocalClient.OnSelect += (name, changeGuid) => NotifyDispatcher(SelectChange(changeGuid, name));
-			Doc.LocalClient.OnUnselect += (name, changeGuid) => NotifyDispatcher(UnSelectChange(changeGuid, name));
+			Doc.LocalClient.OnDelete += (name, changeGuid) => NotifyDispatcher(Doc, DeleteChange(changeGuid, name));
+			Doc.LocalClient.OnSelect += (name, changeGuid) => NotifyDispatcher(Doc, SelectChange(changeGuid, name));
+			Doc.LocalClient.OnUnselect += (name, changeGuid) => NotifyDispatcher(Doc, UnSelectChange(changeGuid, name));
 
 			// How does this get handled?
-			Doc.LocalClient.OnDone += (name) => NotifyDispatcher(new Change(Guid.Empty, name, null));
+			Doc.LocalClient.OnDone += (name) => NotifyDispatcher(Doc, new Change(Guid.Empty, name, null));
 
 			// This works better than I expected
 			Doc.LocalClient.OnInitialize += (changes) =>
 			{
 				foreach (var change in changes)
 				{
-					NotifyDispatcher(change);
+					NotifyDispatcher(Doc, change);
 				}
 			};
 		}

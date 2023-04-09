@@ -27,7 +27,8 @@ namespace Crash
 
 			if (Dispatcher is null)
 			{
-				Dispatcher = new EventDispatcher(e.CrashDoc);
+				Dispatcher = new EventDispatcher();
+				Dispatcher.RegisterDefaultServerCalls(e.CrashDoc);
 			}
 
 			if (Dispatcher is not null)
@@ -38,7 +39,7 @@ namespace Crash
 
 				foreach (Change change in e.Changes)
 				{
-					Dispatcher.NotifyDispatcher(change);
+					Dispatcher.NotifyDispatcher(e.CrashDoc, change);
 				}
 
 				e.CrashDoc.CacheTable.IsInit = false;

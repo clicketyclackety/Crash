@@ -43,7 +43,7 @@ namespace Crash.Handlers.Tests.Plugins.Geometry
 				for (int i = 0; i < 100; i++)
 				{
 					string owner = Path.GetRandomFileName().Replace(".", "");
-					LineCurve lineCurve = new LineCurve(RandomPoint(), RandomPoint());
+					LineCurve lineCurve = NRhino.Random.Geometry.NLineCurve.Any();
 					IChange change = GeometryChange.CreateNew(owner, lineCurve);
 
 					yield return new Change(change);

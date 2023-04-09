@@ -14,6 +14,8 @@ namespace Crash.Common.Changes
 	/// </summary>
 	public sealed class GeometryChange : IRhinoChange
 	{
+		public const string ChangeType = $"{nameof(Crash)}.{nameof(GeometryChange)}";
+
 		public GeometryBase Geometry { get; private set; }
 
 		public Guid RhinoId { get; set; }
@@ -26,7 +28,7 @@ namespace Crash.Common.Changes
 
 		public string? Payload { get; private set; }
 
-		public string Type => $"{nameof(Crash)}.{nameof(GeometryChange)}";
+		public string Type => ChangeType;
 
 		public ChangeAction Action { get; set; }
 

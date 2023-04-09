@@ -75,7 +75,7 @@ namespace Crash.Handlers.Plugins
 						Change change = new Change(ichange);
 						switch (change.Action)
 						{
-							case ChangeAction.Add:
+							case ChangeAction.Add | ChangeAction.Temporary:
 								tasks.Add(Doc.LocalClient.AddAsync(change));
 								break;
 							case ChangeAction.Remove:
@@ -115,6 +115,8 @@ namespace Crash.Handlers.Plugins
 			if (!_recieveActions.TryGetValue(change.Type, out List<IChangeRecieveAction> recievers)) return;
 			foreach (IChangeRecieveAction action in recievers)
 			{
+				if (action.Action != change.Action) continue;
+
 				action.OnRecieve(Doc, change);
 			}
 		}
@@ -124,8 +126,10 @@ namespace Crash.Handlers.Plugins
 			// Object Events
 			RhinoDoc.AddRhinoObject += (sender, args) =>
 			{
+				//TODO: Is Init? Where is that checked for?
+
 				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry);
-				NotifyDispatcher(ChangeAction.Add, sender, crashArgs, args.TheObject.Document);
+				NotifyDispatcher(ChangeAction.Add | ChangeAction.Temporary, sender, crashArgs, args.TheObject.Document);
 			};
 
 			RhinoDoc.UndeleteRhinoObject += (sender, args) =>

@@ -16,7 +16,7 @@ namespace Crash.Handlers.Plugins.Geometry
 	{
 		public Type ChangeType => typeof(GeometryChange);
 
-		public string ChangeName => $"{nameof(Crash)}.{nameof(GeometryChange)}";
+		public string ChangeName => GeometryChange.ChangeType;
 
 		public IEnumerable<IChangeCreateAction> CreateActions { get; }
 

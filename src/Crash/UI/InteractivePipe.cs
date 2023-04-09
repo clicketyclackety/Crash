@@ -98,14 +98,9 @@ namespace Crash.UI
 			if (null == CrashDocRegistry.ActiveDoc?.Cameras) return;
 			if (null == CrashDocRegistry.ActiveDoc?.Users) return;
 
-			var doc = CrashDocRegistry.ActiveDoc;
-			string currentUser = doc.Users.CurrentUser.Name;
-			var caches = CrashDocRegistry.ActiveDoc.CacheTable.GetChanges()
-				.Where(c => c.Owner != currentUser)
-				.Where(c => ((ChangeAction)c.Action).HasFlag(ChangeAction.Temporary))
-				.OrderBy(c => doc.Users.Get(c.Owner).Color);
+			var caches = CrashDocRegistry.ActiveDoc.CacheTable.GetChanges().ToList();
 
-			foreach (IChange Change in caches)
+			foreach (var Change in caches)
 			{
 				if (e.Display.InterruptDrawing()) return;
 				if (!definitionRegistry.TryGetValue(Change.Type, out IChangeDefinition definition)) continue;

@@ -1,7 +1,5 @@
 ﻿using Crash.Common.Changes;
 using Crash.Common.Document;
-using Crash.Common.Events;
-using Crash.Events;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
@@ -13,18 +11,7 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 		public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
 		{
 			var geomChange = new GeometryChange(recievedChange);
-
-			var changeArgs = new IdleArgs(crashDoc, geomChange);
-			var bakeAction = new IdleAction(AddToDocument, changeArgs);
-			crashDoc.Queue.AddAction(bakeAction);
-		}
-
-		private void AddToDocument(IdleArgs args)
-		{
-			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(args.Doc);
-			if (args.Change is not GeometryChange geomChange) return;
-
-			args.Doc.CacheTable.UpdateChangeAsync(geomChange);
+			crashDoc.CacheTable.UpdateChangeAsync(geomChange);
 		}
 
 	}

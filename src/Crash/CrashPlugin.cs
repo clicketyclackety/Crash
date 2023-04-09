@@ -1,4 +1,5 @@
-﻿using Crash.Common.Document;
+﻿using Crash.Client;
+using Crash.Common.Document;
 using Crash.Handlers;
 using Crash.Handlers.Plugins.Camera;
 using Crash.Handlers.Plugins.Geometry;
@@ -39,10 +40,17 @@ namespace Crash
 		{
 			// Add feature flags as advanced settings here!
 			InteractivePipe.Active = new InteractivePipe() { Enabled = false };
+			CrashClient.OnInit += CrashClient_OnInit;
 
 			RhinoApp.Idle += RhinoApp_Idle;
 
 			return base.OnLoad(ref errorMessage);
+		}
+
+		private void CrashClient_OnInit(object sender, CrashClient.CrashInitArgs e)
+		{
+			CrashClient.OnInit -= CrashClient_OnInit;
+			InteractivePipe.Active.Enabled = true;
 		}
 
 		private void RhinoApp_Idle(object sender, EventArgs e)

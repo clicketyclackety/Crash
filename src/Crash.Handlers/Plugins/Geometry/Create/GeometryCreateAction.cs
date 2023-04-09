@@ -10,7 +10,7 @@ namespace Crash.Handlers.Plugins.Geometry.Create
 	internal sealed class GeometryCreateAction : IChangeCreateAction
 	{
 
-		public ChangeAction Action => ChangeAction.Add;
+		public ChangeAction Action => ChangeAction.Add | ChangeAction.Temporary;
 
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)
 			=> crashArgs.Args is CrashObjectEventArgs rargs &&
@@ -31,7 +31,10 @@ namespace Crash.Handlers.Plugins.Geometry.Create
 		private IEnumerable<IChange> CreateChangesFromArgs(CrashDoc crashDoc, GeometryBase geometry)
 		{
 			var _user = crashDoc.Users.CurrentUser.Name;
-			yield return GeometryChange.CreateNew(_user, geometry);
+			var change = GeometryChange.CreateNew(_user, geometry);
+			change.Action = Action;
+
+			yield return change;
 		}
 
 	}

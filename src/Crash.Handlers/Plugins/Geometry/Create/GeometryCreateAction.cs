@@ -1,6 +1,7 @@
 ﻿using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Handlers.InternalEvents;
+using Crash.Utils;
 
 using Rhino.Geometry;
 
@@ -20,7 +21,7 @@ namespace Crash.Handlers.Plugins.Geometry.Create
 		{
 			if (crashArgs.Args is CrashObjectEventArgs cargs)
 			{
-				changes = CreateChangesFromArgs(crashArgs.Doc, cargs.Geometry);
+				changes = CreateChangesFromArgs(crashArgs.Doc, cargs.RhinoId, cargs.Geometry);
 				return true;
 			}
 
@@ -28,10 +29,15 @@ namespace Crash.Handlers.Plugins.Geometry.Create
 			return false;
 		}
 
-		private IEnumerable<IChange> CreateChangesFromArgs(CrashDoc crashDoc, GeometryBase geometry)
+		private IEnumerable<IChange> CreateChangesFromArgs(CrashDoc crashDoc, Guid rhinoId, GeometryBase geometry)
 		{
 			var _user = crashDoc.Users.CurrentUser.Name;
 			var change = GeometryChange.CreateNew(_user, geometry);
+
+			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(crashDoc);
+			var rhinoObject = rhinoDoc.Objects.FindId(rhinoId);
+			ChangeUtils.SyncHost(rhinoObject, change);
+
 			change.Action = Action;
 
 			yield return change;

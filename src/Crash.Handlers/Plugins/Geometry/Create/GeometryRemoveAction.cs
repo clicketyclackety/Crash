@@ -16,15 +16,14 @@ namespace Crash.Handlers.Plugins.Geometry.Create
 			changes = Array.Empty<IChange>();
 			if (crashArgs.Args is not CrashObjectEventArgs rargs) return false;
 
-			if (!crashArgs.Doc.CacheTable.TryGetValue(rargs.ChangeId,
-													  out GeometryChange geomChange)) return false;
+			if (rargs.ChangeId == Guid.Empty) return false;
 
 			var _user = crashArgs.Doc.Users.CurrentUser.Name;
 
 			var removeChange = new Change(rargs.ChangeId, _user, null)
 			{
 				Type = GeometryChange.ChangeType,
-				Action = ChangeAction.Remove
+				Action = ChangeAction.Remove,
 			};
 
 			changes = new List<IChange> { removeChange };

@@ -1,5 +1,4 @@
-﻿using Crash.Common.Changes;
-using Crash.Handlers.InternalEvents;
+﻿using Crash.Handlers.InternalEvents;
 
 namespace Crash.Handlers.Plugins.Geometry.Create
 {
@@ -8,8 +7,10 @@ namespace Crash.Handlers.Plugins.Geometry.Create
 		public ChangeAction Action => ChangeAction.Lock;
 
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)
-			=> crashArgs.Args is CrashSelectionEventArgs cargs &&
-			   cargs.Selected;
+		{
+			if (crashArgs.Args is not CrashSelectionEventArgs cargs) return false;
+			return cargs.Selected;
+		}
 
 		public bool TryConvert(object sender, CreateRecieveArgs crashArgs, out IEnumerable<IChange> changes)
 		{
@@ -29,8 +30,8 @@ namespace Crash.Handlers.Plugins.Geometry.Create
 		{
 			foreach (var crashObject in crashObjects)
 			{
-				if (!crashArgs.Doc.CacheTable.TryGetValue(crashObject.ChangeId,
-														  out GeometryChange geomChange)) continue;
+				if (crashObject.ChangeId == Guid.Empty) continue;
+
 
 				IChange change = new Change(crashObject.ChangeId, userName, null)
 				{

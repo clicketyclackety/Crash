@@ -128,7 +128,7 @@ namespace Crash.Commands
 			var enumer = GetObjects(rhinoDoc).GetEnumerator();
 			while (enumer.MoveNext())
 			{
-				var args = new CrashObjectEventArgs(enumer.Current.Geometry);
+				var args = new CrashObjectEventArgs(enumer.Current);
 				EventDispatcher.Instance.NotifyDispatcher(ChangeAction.Add, this, args, rhinoDoc);
 			}
 		}

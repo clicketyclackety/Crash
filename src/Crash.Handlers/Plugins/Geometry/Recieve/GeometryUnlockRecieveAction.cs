@@ -1,5 +1,7 @@
-﻿using Crash.Common.Changes;
-using Crash.Common.Document;
+﻿using Crash.Common.Document;
+using Crash.Utils;
+
+using Rhino.DocObjects;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
@@ -10,9 +12,10 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 
 		public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
 		{
-			if (!crashDoc.CacheTable.TryGetValue(recievedChange.Id, out GeometryChange geomChange)) return;
+			if (!ChangeUtils.TryGetRhinoObject(recievedChange, out RhinoObject rhinoObject)) return;
+
 			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(crashDoc);
-			rhinoDoc.Objects.Unlock(geomChange.RhinoId, true);
+			rhinoDoc.Objects.Unlock(rhinoObject, true);
 		}
 	}
 

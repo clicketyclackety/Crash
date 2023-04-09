@@ -270,10 +270,10 @@ namespace Crash.UI
 
 				if (state == CameraState.Follow)
 				{
-					var userEnumer = CrashDocRegistry.ActiveDoc.Users.GetEnumerator();
-					while (userEnumer.MoveNext())
+					var users = CrashDocRegistry.ActiveDoc.Users.ToArray();
+					for (int i = 0; i < users.Length; i++)
 					{
-						User currUser = userEnumer.Current;
+						User currUser = users[i];
 						if (CameraState.Follow == currUser.Camera)
 						{
 							currUser.Camera = CameraState.Visible;

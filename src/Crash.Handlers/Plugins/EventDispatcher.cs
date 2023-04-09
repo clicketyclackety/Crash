@@ -142,13 +142,13 @@ namespace Crash.Handlers.Plugins
 					if (crashDoc.CacheTable.SomeoneIsDone) return;
 				}
 
-				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry);
+				var crashArgs = new CrashObjectEventArgs(args.TheObject);
 				NotifyDispatcher(ChangeAction.Add | ChangeAction.Temporary, sender, crashArgs, args.TheObject.Document);
 			};
 
 			RhinoDoc.UndeleteRhinoObject += (sender, args) =>
 			{
-				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry);
+				var crashArgs = new CrashObjectEventArgs(args.TheObject);
 				NotifyDispatcher(ChangeAction.Add, sender, crashArgs, args.TheObject.Document);
 			};
 
@@ -180,7 +180,7 @@ namespace Crash.Handlers.Plugins
 			RhinoDoc.SelectObjects += (sender, args) =>
 			{
 				var crashArgs = new CrashSelectionEventArgs(args.Selected, args.RhinoObjects.Select(o => new CrashObject(o)));
-				NotifyDispatcher(ChangeAction.Lock, sender, args, args.Document);
+				NotifyDispatcher(ChangeAction.Lock, sender, crashArgs, args.Document);
 			};
 
 			RhinoDoc.ModifyObjectAttributes += (sender, args) =>

@@ -105,6 +105,10 @@ namespace Crash.UI
 				if (e.Display.InterruptDrawing()) return;
 				if (!definitionRegistry.TryGetValue(Change.Type, out IChangeDefinition definition)) continue;
 
+				if (CrashDocRegistry.ActiveDoc.Users.Get(Change.Owner).Camera == CameraState.None) continue;
+
+				UpdateCachedMaterial(Change);
+
 				definition.Draw(e, cachedMaterial, Change);
 				BoundingBox box = definition.GetBoundingBox(Change);
 				UpdateBoundingBox(box);
@@ -124,11 +128,21 @@ namespace Crash.UI
 				if (!definitionRegistry.TryGetValue(cameraChange.Type,
 					out IChangeDefinition definition)) continue;
 
+				UpdateCachedMaterial(activeCamera.Key);
 				definition.Draw(e, cachedMaterial, cameraChange);
 				BoundingBox box = definition.GetBoundingBox(cameraChange);
 				UpdateBoundingBox(box);
 			}
 		}
+
+		private void UpdateCachedMaterial(User user)
+		{
+			if (cachedMaterial.Diffuse.Equals(user.Color)) return;
+			cachedMaterial.Diffuse = user.Color;
+		}
+
+		private void UpdateCachedMaterial(IChange change)
+			=> UpdateCachedMaterial(new User(change.Owner));
 
 		/// <summary>
 		/// Updates the BoundingBox of the Pipeline

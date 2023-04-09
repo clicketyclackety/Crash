@@ -1,5 +1,7 @@
 ﻿using Crash.Handlers.Changes;
 
+using Rhino.DocObjects;
+
 namespace Crash.Utils
 {
 
@@ -8,8 +10,15 @@ namespace Crash.Utils
 	{
 		private static string ChangeIdKey = "ChangeID";
 
+		private static Dictionary<Guid, RhinoObject> RhinoChangeKeys;
+
+		static ChangeUtils()
+		{
+			RhinoChangeKeys = new();
+		}
+
 		/// <summary>Acquires the ChangeId from the Rhino Object</summary>
-		public static bool TryGetChangeId(this Rhino.DocObjects.RhinoObject rObj, out Guid id)
+		public static bool TryGetChangeId(this RhinoObject rObj, out Guid id)
 		{
 			id = Guid.Empty;
 			if (rObj == null) return false;
@@ -17,8 +26,17 @@ namespace Crash.Utils
 			return rObj.UserDictionary.TryGetGuid(ChangeIdKey, out id);
 		}
 
+		/// <summary>Acquires the Rhino Object given the RhinoId from an IRhinoChange</summary>
+		public static bool TryGetRhinoObject(this IChange change, out RhinoObject rhinoObject)
+		{
+			rhinoObject = default;
+			if (change == null) return false;
+
+			return RhinoChangeKeys.TryGetValue(change.Id, out rhinoObject);
+		}
+
 		/// <summary>Adds the ChangeId to the Rhino Object and vice Verse.</summary>
-		public static void SyncHost(this Rhino.DocObjects.RhinoObject rObj, IRhinoChange Change)
+		public static void SyncHost(this RhinoObject rObj, IRhinoChange Change)
 		{
 			if (null == Change || rObj == null) return;
 
@@ -28,6 +46,7 @@ namespace Crash.Utils
 			}
 
 			rObj.UserDictionary.Set(ChangeIdKey, (Change as IChange).Id);
+			RhinoChangeKeys[Change.Id] = rObj;
 
 			Change.RhinoId = rObj.Id;
 		}

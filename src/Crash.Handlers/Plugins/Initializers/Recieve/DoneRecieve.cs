@@ -21,9 +21,9 @@ namespace Crash.Handlers.Plugins.Initializers.Recieve
 					out GeometryChange geomChange)) continue;
 
 				geomChange.RemoveAction(ChangeAction.Temporary);
-				// geomChange.AddAction(ChangeAction.Add);
 
 				add.OnRecieve(crashDoc, geomChange);
+				crashDoc.CacheTable.RemoveChange(change.Id);
 			}
 		}
 

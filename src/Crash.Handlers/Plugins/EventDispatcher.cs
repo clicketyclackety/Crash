@@ -118,6 +118,7 @@ namespace Crash.Handlers.Plugins
 				if (action.Action != change.Action) continue;
 
 				action.OnRecieve(Doc, change);
+				return;
 			}
 		}
 
@@ -202,7 +203,7 @@ namespace Crash.Handlers.Plugins
 			Doc.LocalClient.OnUnselect += (name, changeGuid) => NotifyDispatcher(Doc, UnSelectChange(changeGuid, name));
 
 			// How does this get handled?
-			Doc.LocalClient.OnDone += (name) => NotifyDispatcher(Doc, new Change(Guid.Empty, name, null));
+			Doc.LocalClient.OnDone += (name) => NotifyDispatcher(Doc, DoneChange(name));
 
 			// This works better than I expected
 			Doc.LocalClient.OnInitialize += (changes) =>
@@ -219,7 +220,9 @@ namespace Crash.Handlers.Plugins
 			{
 				Owner = name,
 				Action = ChangeAction.None,
-				Type = new DoneDefinition().ChangeName
+				Type = new DoneDefinition().ChangeName,
+				Id = Guid.NewGuid(),
+				Stamp = DateTime.UtcNow,
 			};
 
 		private Change DeleteChange(Guid id, string name)

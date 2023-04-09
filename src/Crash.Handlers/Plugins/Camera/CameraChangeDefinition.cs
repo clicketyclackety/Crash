@@ -22,11 +22,11 @@ namespace Crash.Handlers.Plugins.Camera
 
 		public CameraChangeDefinition()
 		{
-			var createActions = new List<IChangeCreateAction>
+			CreateActions = new List<IChangeCreateAction>
 			{
 				new CameraCreateAction()
 			};
-			var receveActions = new List<IChangeRecieveAction>
+			RecieveActions = new List<IChangeRecieveAction>
 			{
 				new CameraRecieveAction()
 			};

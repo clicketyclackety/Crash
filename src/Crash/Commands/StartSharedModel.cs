@@ -169,6 +169,8 @@ namespace Crash.Commands
 
 		private void Server_OnConnected(object sender, CrashEventArgs e)
 		{
+			if (null == e) return;
+
 			e.CrashDoc.LocalServer.OnConnected -= Server_OnConnected;
 
 			try

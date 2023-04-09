@@ -22,13 +22,12 @@ namespace Crash.Utils
 		{
 			if (null == Change || rObj == null) return;
 
-			// Data
 			if (rObj.UserDictionary.TryGetGuid(ChangeIdKey, out _))
 			{
 				rObj.UserDictionary.Remove(ChangeIdKey);
 			}
 
-			rObj.UserDictionary.Set(ChangeIdKey, Change.Id);
+			rObj.UserDictionary.Set(ChangeIdKey, (Change as IChange).Id);
 
 			Change.RhinoId = rObj.Id;
 		}

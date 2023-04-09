@@ -37,9 +37,6 @@ namespace Crash.Common.Collections
 		/// <summary></summary>
 		IEnumerator IEnumerable.GetEnumerator() => _idleQueue.GetEnumerator();
 
-		/// <summary>Fires when the queue has finished parsing more than 1 item.</summary>
-		public event EventHandler OnCompletedQueue;
-
 	}
 
 }

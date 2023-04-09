@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
@@ -30,6 +30,17 @@ namespace Crash.Communications
 		public CrashServer(CrashDoc crashDoc)
 		{
 			_crashDoc = crashDoc;
+		}
+
+		public const string EXTRACTED_SERVER_FILENAME = $"{CrashServer.ProcessName}.exe";
+		public static string BASE_DIRECTORY;
+		public static string SERVER_DIRECTORY => Path.Combine(BASE_DIRECTORY, "Server");
+		public static string SERVER_FILEPATH => Path.Combine(SERVER_DIRECTORY, EXTRACTED_SERVER_FILENAME);
+
+		static CrashServer()
+		{
+			var app_data = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create);
+			BASE_DIRECTORY = Path.Combine(app_data, "Crash");
 		}
 
 		~CrashServer()
@@ -108,17 +119,12 @@ namespace Crash.Communications
 
 		internal string getServerExecutablePath()
 		{
-			string currentDirectory = typeof(CrashServer).Assembly.Location;
-			string[] serverExes = Array.Empty<string>();
-			do
+			if (!File.Exists(SERVER_FILEPATH))
 			{
-				currentDirectory = Path.GetDirectoryName(currentDirectory);
-				serverExes = Directory.GetFiles(currentDirectory, $"{ProcessName}.exe", SearchOption.AllDirectories);
+				throw new DirectoryNotFoundException("Could not find server executable directory!");
 			}
-			while (null == serverExes || serverExes.Length == 0);
 
-			var serverExecutable = serverExes.FirstOrDefault();
-			return serverExecutable;
+			return SERVER_FILEPATH;
 		}
 
 		// https://stackoverflow.com/questions/4291912/process-start-how-to-get-the-output

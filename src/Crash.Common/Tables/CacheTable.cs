@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 
 using Crash.Common.Document;
 
@@ -72,9 +72,9 @@ namespace Crash.Common.Tables
 			}
 		}
 
-		public bool TryGetValue<T>(Guid id, out T change) where T : IChange
+		public bool TryGetValue<T>(Guid id, out T? change) where T : IChange
 		{
-			if (_cache.TryGetValue(id, out IChange cachedChange) &&
+			if (_cache.TryGetValue(id, out IChange? cachedChange) &&
 				cachedChange is T changeConverted)
 			{
 				change = changeConverted;

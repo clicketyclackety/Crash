@@ -30,7 +30,7 @@ namespace Crash.Handlers
 		// Reverse
 
 
-		public static IEnumerable<CPoint> ToRhino(this IEnumerable<Point3d> rhinoPoints)
+		public static IEnumerable<CPoint> ToCrash(this IEnumerable<Point3d> rhinoPoints)
 		{
 			foreach (var point3d in rhinoPoints)
 				yield return point3d.ToCrash();

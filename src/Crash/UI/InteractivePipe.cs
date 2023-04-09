@@ -62,6 +62,11 @@ namespace Crash.UI
 
 		internal static InteractivePipe Active;
 
+		static InteractivePipe()
+		{
+			definitionRegistry = new();
+		}
+
 		/// <summary>
 		/// Empty constructor
 		/// </summary>
@@ -69,7 +74,6 @@ namespace Crash.UI
 		{
 			bbox = new BoundingBox(-100, -100, -100, 100, 100, 100);
 			Active = this;
-			definitionRegistry = new Dictionary<string, IChangeDefinition>();
 		}
 
 		/// <summary>

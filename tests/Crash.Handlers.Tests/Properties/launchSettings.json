@@ -1,0 +1,14 @@
+﻿{
+	"profiles": {
+		"Run": {
+			"commandName": "Executable",
+			"executablePath": "C:\\Program Files\\Rhino 7\\System\\Rhino.exe",
+			"commandLineArgs": "/nosplash /notemplate /runscript=\"_-NUnitTestRunner $(MSBuildProjectDirectory)\\\\bin\\\\$(Configuration)/net48\\\\Crash.Handlers.tests.dll\""
+		},
+		"Debug": {
+			"commandName": "Executable",
+			"executablePath": "C:\\Program Files\\Rhino 7\\System\\Rhino.exe",
+			"commandLineArgs": "/nosplash /notemplate /runscript=\"NUnitTestRunner"
+		}
+	}
+}

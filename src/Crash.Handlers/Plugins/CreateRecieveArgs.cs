@@ -20,16 +20,16 @@ namespace Crash.Handlers.Plugins
 		public CreateRecieveArgs(ChangeAction action, EventArgs args, CrashDoc doc)
 		{
 			Action = action;
-			Args = args;
-			Doc = doc;
+			Args = args ?? throw new ArgumentNullException(nameof(EventArgs));
+			Doc = doc ?? throw new ArgumentNullException(nameof(CrashDoc));
 		}
 
 		/// <summary></summary>
 		public CreateRecieveArgs(ChangeAction action, EventArgs args, RhinoDoc doc)
 		{
 			Action = action;
-			Args = args;
-			Doc = CrashDocRegistry.GetRelatedDocument(doc);
+			Args = args ?? throw new ArgumentNullException(nameof(EventArgs));
+			Doc = CrashDocRegistry.GetRelatedDocument(doc) ?? throw new ArgumentNullException(nameof(CrashDoc));
 		}
 
 	}

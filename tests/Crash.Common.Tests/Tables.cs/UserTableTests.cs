@@ -119,7 +119,7 @@ namespace Crash.Common.Tests.Tables
 			User result = userTable.Get("user1");
 
 			// Assert
-			Assert.AreEqual(user, result);
+			Assert.That(result, Is.EqualTo(user));
 		}
 
 		[Test]

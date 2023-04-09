@@ -50,7 +50,7 @@ namespace Crash
 			RhinoApp.Idle -= RhinoApp_Idle;
 			if (!ServerInstaller.ServerExecutableExists)
 			{
-				ServerInstaller.DownloadAsync();
+				ServerInstaller.EnsureServerExecutableExists();
 			}
 		}
 

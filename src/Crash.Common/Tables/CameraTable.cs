@@ -60,7 +60,7 @@ namespace Crash.Common.Tables
 		public bool TryAddCamera(CameraChange cameraChange)
 		{
 			var user = new User(cameraChange.Owner);
-			FixedSizedQueue<Camera> queue;
+			FixedSizedQueue<Camera>? queue;
 
 			if (!cameraLocations.ContainsKey(user))
 			{

@@ -55,7 +55,7 @@ namespace Crash.Handlers.Plugins
 		}
 
 		// How can we prevent the same events being subscribed multiple times
-		private void NotifyDispatcher(ChangeAction changeAction, object sender, EventArgs args, RhinoDoc doc)
+		public void NotifyDispatcher(ChangeAction changeAction, object sender, EventArgs args, RhinoDoc doc)
 		{
 			if (!_createActions.TryGetValue(changeAction, out var actionChain)) return;
 			var crashArgs = new CreateRecieveArgs(changeAction, args, doc);
@@ -105,7 +105,7 @@ namespace Crash.Handlers.Plugins
 			}
 		}
 
-		private void NotifyDispatcher(Change change)
+		public void NotifyDispatcher(Change change)
 		{
 			if (!_recieveActions.TryGetValue(change.Type, out List<IChangeRecieveAction> recievers)) return;
 			foreach (IChangeRecieveAction action in recievers)
@@ -139,6 +139,8 @@ namespace Crash.Handlers.Plugins
 
 		private void RegisterDefaultServerCalls()
 		{
+			if (null == Doc?.LocalClient) return;
+
 			Doc.LocalClient.OnAdd += (name, change) => NotifyDispatcher(change);
 
 			// These are all missing a Change Type! It will need explicitly mentioning!

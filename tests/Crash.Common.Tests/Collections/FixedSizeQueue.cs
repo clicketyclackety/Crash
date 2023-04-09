@@ -18,7 +18,7 @@ namespace Crash.Tests.Collections
 			queue.Enqueue(2);
 
 			// Assert
-			Assert.AreEqual(2, queue.Count);
+			Assert.That(queue.Count, Is.EqualTo(2));
 			CollectionAssert.AreEqual(new[] { 1, 2 }, queue);
 		}
 
@@ -35,7 +35,7 @@ namespace Crash.Tests.Collections
 			queue.Enqueue(4);
 
 			// Assert
-			Assert.AreEqual(3, queue.Count);
+			Assert.That(queue.Count, Is.EqualTo(3));
 			CollectionAssert.AreEqual(new[] { 2, 3, 4 }, queue);
 		}
 

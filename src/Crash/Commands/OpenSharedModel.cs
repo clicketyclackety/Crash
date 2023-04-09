@@ -1,4 +1,4 @@
-using Crash.Client;
+﻿using Crash.Client;
 using Crash.Common.Document;
 using Crash.Communications;
 using Crash.Handlers;
@@ -71,6 +71,7 @@ namespace Crash.Commands
 			string userName = crashDoc.Users.CurrentUser.Name;
 			var crashClient = new CrashClient(crashDoc, userName, new Uri($"{LastURL}/Crash"));
 			crashDoc.LocalClient = crashClient;
+			crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
 
 			crashClient.StartLocalClientAsync();
 
@@ -78,6 +79,12 @@ namespace Crash.Commands
 			UsersForm.ShowForm();
 
 			return Result.Success;
+		}
+
+		private void Queue_OnCompletedQueue(object sender, EventArgs e)
+		{
+			UsersForm.ReDrawForm();
+			rhinoDoc.Views.Redraw();
 		}
 
 		private bool _GetUsersName(ref string name)

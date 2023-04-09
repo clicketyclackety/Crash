@@ -1,5 +1,7 @@
 ﻿using Crash.Common.Changes;
 using Crash.Common.Document;
+using Crash.Common.Events;
+using Crash.Events;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
@@ -18,8 +20,17 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 			else
 			{
 				var geomChange = new GeometryChange(recievedChange);
-				crashDoc.CacheTable.UpdateChangeAsync(geomChange);
+				var changeArgs = new IdleArgs(crashDoc, geomChange);
+				var displayAction = new IdleAction(AddToDocument, changeArgs);
+				crashDoc.Queue.AddAction(displayAction);
 			}
+		}
+
+		private void AddToDocument(IdleArgs args)
+		{
+			if (args.Change is not GeometryChange geomChange) return;
+
+			args.Doc.CacheTable.UpdateChangeAsync(geomChange);
 		}
 
 	}

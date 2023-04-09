@@ -110,9 +110,8 @@ namespace Crash.Commands
 
 		private void Queue_OnCompletedQueue(object sender, EventArgs e)
 		{
-			crashDoc.Queue.OnCompletedQueue -= Queue_OnCompletedQueue;
-
-			UsersForm.ToggleFormVisibility();
+			UsersForm.ReDrawForm();
+			rhinoDoc.Views.Redraw();
 		}
 
 		private void AddPreExistingGeometry(CrashDoc crashDoc)

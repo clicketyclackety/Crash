@@ -70,7 +70,10 @@ namespace Crash.UI
 
 		internal static void ReDrawForm()
 		{
-			if (null == ActiveForm) return;
+			if (null == ActiveForm)
+			{
+				ActiveForm = new UsersForm();
+			}
 
 			ActiveForm.m_users = new ObservableCollection<User>(CrashDocRegistry.ActiveDoc.Users);
 			ActiveForm.Invalidate(true);

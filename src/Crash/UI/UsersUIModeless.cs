@@ -74,12 +74,15 @@ namespace Crash.UI
 			{
 				ActiveForm = new UsersForm();
 			}
+			try
+			{
+				ActiveForm.m_users = new ObservableCollection<User>(CrashDocRegistry.ActiveDoc.Users);
+				ActiveForm.Invalidate(true);
 
-			ActiveForm.m_users = new ObservableCollection<User>(CrashDocRegistry.ActiveDoc.Users);
-			ActiveForm.Invalidate(true);
-
-			ActiveForm.m_grid.DataStore = ActiveForm.m_users.Cast<object>();
-			ActiveForm.m_grid.Invalidate(true);
+				ActiveForm.m_grid.DataStore = ActiveForm.m_users.Cast<object>();
+				ActiveForm.m_grid.Invalidate(true);
+			}
+			catch { }
 		}
 
 		/// <summary>

@@ -10,8 +10,16 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 
 		public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
 		{
-			var geomChange = new GeometryChange(recievedChange);
-			crashDoc.CacheTable.UpdateChangeAsync(geomChange);
+			if (recievedChange.Owner.Equals(crashDoc.Users.CurrentUser.Name))
+			{
+				var add = new GeometryAddRecieveAction();
+				add.OnRecieve(crashDoc, recievedChange);
+			}
+			else
+			{
+				var geomChange = new GeometryChange(recievedChange);
+				crashDoc.CacheTable.UpdateChangeAsync(geomChange);
+			}
 		}
 
 	}

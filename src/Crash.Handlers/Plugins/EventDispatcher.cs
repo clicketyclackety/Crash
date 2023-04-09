@@ -128,6 +128,12 @@ namespace Crash.Handlers.Plugins
 			RhinoDoc.AddRhinoObject += (sender, args) =>
 			{
 				//TODO: Is Init? Where is that checked for?
+				CrashDoc crashDoc = CrashDocRegistry.GetRelatedDocument(args.TheObject.Document);
+				if (crashDoc is not null)
+				{
+					if (crashDoc.CacheTable.IsInit) return;
+					if (crashDoc.CacheTable.SomeoneIsDone) return;
+				}
 
 				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry);
 				NotifyDispatcher(ChangeAction.Add | ChangeAction.Temporary, sender, crashArgs, args.TheObject.Document);

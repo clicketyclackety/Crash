@@ -33,7 +33,7 @@
 	  <PackageReference Include="RhinoCommon" Version="7.21.22208.13001" IncludeAssets="compile;build" Condition="'$(TargetFramework)' == 'net48'" />
 	  <PackageReference Include="RhinoCommon" Version="8.0.23094.11475-wip" IncludeAssets="compile;build" Condition="'$(TargetFramework)' == 'net7.0'" />
     <PackageReference Include="System.Text.Json" Version="7.0.2" />
-    <PackageReference Include="Crash.Changes" Version="1.0.1" />
+    <PackageReference Include="Crash.Changes" Version="1.0.2" />
   </ItemGroup>
   
   <ItemGroup>

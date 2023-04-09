@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Crash.Changes" Version="1.0.2" />
     <PackageReference Include="Docker.DotNet" Version="3.125.13" />
     <PackageReference Include="NRhinoGenerator" Version="0.1.1" />
     <PackageReference Include="NUnit" Version="3.13.3" />

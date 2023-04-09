@@ -13,39 +13,40 @@ namespace Crash
 	public abstract class CrashPluginBase : PlugIn
 	{
 		private EventDispatcher Dispatcher;
-		private readonly Queue<IChangeDefinition> _changes;
+		private readonly Stack<IChangeDefinition> _changes;
 
 		protected CrashPluginBase()
 		{
-			_changes = new Queue<IChangeDefinition>();
+			_changes = new Stack<IChangeDefinition>();
+			CrashClient.OnConnected += CrashClient_OnConnected;
 		}
 
 		protected virtual void RegisterChangeSchema(IChangeDefinition changeDefinition)
 		{
 			InteractivePipe.RegisterChangeDefinition(changeDefinition);
-			_changes.Enqueue(changeDefinition);
+			_changes.Push(changeDefinition);
+		}
+
+		private void CrashClient_OnConnected(object sender, Common.Events.CrashEventArgs e)
+		{
+			RhinoApp.WriteLine("Loading Changes ...");
+
+			if (Dispatcher is null)
+			{
+				Dispatcher = new EventDispatcher(e.CrashDoc);
+			}
 
 			if (Dispatcher is not null)
 			{
 				RegisterDefinitions();
 			}
-			else
-			{
-				CrashClient.OnConnected += CrashClient_OnConnected;
-			}
-		}
-
-		private void CrashClient_OnConnected(object sender, Common.Events.CrashEventArgs e)
-		{
-			Dispatcher = new EventDispatcher(e.CrashDoc);
-			RegisterDefinitions();
 		}
 
 		private void RegisterDefinitions()
 		{
 			while (_changes.Count > 0)
 			{
-				var changeDefinition = _changes.Dequeue();
+				var changeDefinition = _changes.Pop();
 				Dispatcher.RegisterDefinition(changeDefinition);
 			}
 		}

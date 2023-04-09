@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-using Crash.Client;
+﻿using Crash.Client;
 using Crash.Common.Document;
 using Crash.Communications;
 using Crash.Handlers;
@@ -78,37 +76,12 @@ namespace Crash.Commands
 			var crashClient = new CrashClient(crashDoc, userName, new Uri($"{LastURL}/Crash"));
 			crashDoc.LocalClient = crashClient;
 
-			crashClient.StartLocalClientAsync(Init);
+			crashClient.StartLocalClientAsync();
 
 			InteractivePipe.Active.Enabled = true;
 			UsersForm.ShowForm();
 
 			return Result.Success;
-		}
-		public void Init(IEnumerable<Change> Changes)
-		{
-			Rhino.RhinoApp.WriteLine("Loading Changes ...");
-
-			crashDoc.CacheTable.IsInit = true;
-			try
-			{
-				_HandleChangesAsync(Changes);
-			}
-			catch
-			{
-
-			}
-			finally
-			{
-				crashDoc.CacheTable.IsInit = false;
-			}
-		}
-
-		public async Task _HandleChangesAsync(IEnumerable<Change> Changes)
-		{
-			;
-
-
 		}
 
 		private bool _GetUsersName(ref string name)

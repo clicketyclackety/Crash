@@ -139,8 +139,6 @@ namespace Crash.Handlers.Plugins
 
 		private void RegisterDefaultServerCalls()
 		{
-			if (null == Doc?.LocalClient) return;
-
 			Doc.LocalClient.OnAdd += (name, change) => NotifyDispatcher(change);
 
 			// These are all missing a Change Type! It will need explicitly mentioning!

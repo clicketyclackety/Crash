@@ -131,7 +131,7 @@ namespace Crash.Client
 			_connection.Reconnecting += ConnectionReconnectingAsync;
 		}
 
-		public async Task StartLocalClientAsync(Action<IEnumerable<Change>> onInit)
+		public async Task StartLocalClientAsync()
 		{
 			if (null == _crashDoc)
 			{
@@ -144,12 +144,18 @@ namespace Crash.Client
 				throw new Exception("A User has not been assigned!");
 			}
 
-			this.OnInitialize += onInit;
+			this.OnInitialize += Init;
 
 			// TODO : Check for successful connection
 			await this.StartAsync();
+		}
 
+		// This isn't calling, and needs to call the Event Dispatcher
+		private void Init(IEnumerable<Change> changes)
+		{
+			_crashDoc.CacheTable.IsInit = true;
 			OnConnected?.Invoke(this, new CrashEventArgs(_crashDoc));
+			_crashDoc.CacheTable.IsInit = false;
 		}
 
 		public static void CloseLocalServer(CrashDoc crashDoc)

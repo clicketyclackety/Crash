@@ -1,5 +1,6 @@
 ﻿using Crash.Common.Changes;
 using Crash.Common.Document;
+using Crash.Handlers.InternalEvents;
 using Crash.Handlers.Plugins.Initializers;
 
 using Rhino;
@@ -117,24 +118,69 @@ namespace Crash.Handlers.Plugins
 		private void RegisterDefaultEvents()
 		{
 			// Object Events
-			RhinoDoc.AddRhinoObject += (sender, args) => NotifyDispatcher(ChangeAction.Add, sender, args, args.TheObject.Document);
-			RhinoDoc.UndeleteRhinoObject += (sender, args) => NotifyDispatcher(ChangeAction.Add, sender, args, args.TheObject.Document);
-			RhinoDoc.DeleteRhinoObject += (sender, args) => NotifyDispatcher(ChangeAction.Remove, sender, args, args.TheObject.Document);
+			RhinoDoc.AddRhinoObject += (sender, args) =>
+			{
+				var crashArgs = new CrashObjectEventArgs(args.TheObject.Document, args.TheObject.Geometry);
+				NotifyDispatcher(ChangeAction.Add, sender, crashArgs, args.TheObject.Document);
+			};
 
-			RhinoDoc.BeforeTransformObjects += (sender, args) => NotifyDispatcher(ChangeAction.Transform, sender, args, args.Objects.First(o => o is not null).Document);
+			RhinoDoc.UndeleteRhinoObject += (sender, args) =>
+			{
+				var crashArgs = new CrashObjectEventArgs(args.TheObject.Document, args.TheObject.Geometry);
+				NotifyDispatcher(ChangeAction.Add, sender, crashArgs, args.TheObject.Document);
+			};
 
-			RhinoDoc.DeselectObjects += (sender, args) => NotifyDispatcher(ChangeAction.Unlock, sender, args, args.Document);
-			RhinoDoc.DeselectAllObjects += (sender, args) => NotifyDispatcher(ChangeAction.Unlock, sender, args, args.Document);
-			RhinoDoc.SelectObjects += (sender, args) => NotifyDispatcher(ChangeAction.Lock, sender, args, args.Document);
+			RhinoDoc.DeleteRhinoObject += (sender, args) =>
+			{
+				var crashArgs = new CrashObjectEventArgs(args.TheObject.Document, args.TheObject.Geometry);
+				NotifyDispatcher(ChangeAction.Remove, sender, crashArgs, args.TheObject.Document);
+			};
 
-			RhinoDoc.ModifyObjectAttributes += (sender, args) => NotifyDispatcher(ChangeAction.Update, sender, args, args.Document);
-			RhinoDoc.UserStringChanged += (sender, args) => NotifyDispatcher(ChangeAction.Update, sender, args, args.Document);
+			RhinoDoc.BeforeTransformObjects += (sender, args) =>
+			{
+				var crashArgs = new CrashTransformEventArgs(args.Transform.ToCrash(), args.Objects.Select(o => new CrashObject(o)), args.ObjectsWillBeCopied);
+				RhinoDoc rhinoDoc = args.Objects.FirstOrDefault(o => o.Document is not null).Document;
+				NotifyDispatcher(ChangeAction.Transform, sender, crashArgs, rhinoDoc);
+			};
+
+			RhinoDoc.DeselectObjects += (sender, args) =>
+			{
+				var crashArgs = new CrashSelectionEventArgs(args.Selected, args.RhinoObjects.Select(o => new CrashObject(o)));
+				NotifyDispatcher(ChangeAction.Unlock, sender, crashArgs, args.Document);
+			};
+
+			RhinoDoc.DeselectAllObjects += (sender, args) =>
+			{
+				var crashArgs = new CrashSelectionEventArgs(false);
+				NotifyDispatcher(ChangeAction.Unlock, sender, crashArgs, args.Document);
+			};
+			RhinoDoc.SelectObjects += (sender, args) =>
+			{
+				var crashArgs = new CrashSelectionEventArgs(args.Selected, args.RhinoObjects.Select(o => new CrashObject(o)));
+				NotifyDispatcher(ChangeAction.Lock, sender, args, args.Document);
+			};
+
+			RhinoDoc.ModifyObjectAttributes += (sender, args) =>
+			{
+				// TODO : Create Wrapper
+				NotifyDispatcher(ChangeAction.Update, sender, args, args.Document);
+			};
+
+			RhinoDoc.UserStringChanged += (sender, args) =>
+			{
+				// TODO : Create Wrapper
+				NotifyDispatcher(ChangeAction.Update, sender, args, args.Document);
+			};
 
 			// Doc Events
 			// RhinoDoc.UnitsChangedWithScaling += 
 
 			// View Events
-			RhinoView.Modified += (sender, args) => NotifyDispatcher(ChangeAction.Camera, sender, args, args.View.Document);
+			RhinoView.Modified += (sender, args) =>
+			{
+				var crashArgs = new CrashViewArgs(args.View);
+				NotifyDispatcher(ChangeAction.Camera, sender, crashArgs, args.View.Document);
+			};
 		}
 
 		private void RegisterDefaultServerCalls()

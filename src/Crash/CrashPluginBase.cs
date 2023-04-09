@@ -12,7 +12,7 @@ namespace Crash
 	/// </summary>
 	public abstract class CrashPluginBase : PlugIn
 	{
-		private EventDispatcher Dispatcher;
+		internal EventDispatcher Dispatcher;
 		private readonly Stack<IChangeDefinition> _changes;
 
 		protected CrashPluginBase()

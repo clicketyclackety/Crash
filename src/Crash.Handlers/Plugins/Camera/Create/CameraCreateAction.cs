@@ -1,7 +1,6 @@
 ﻿using Crash.Common.Changes;
-
-using Rhino.Display;
-using Rhino.Geometry;
+using Crash.Geometry;
+using Crash.Handlers.InternalEvents;
 
 namespace Crash.Handlers.Plugins.Camera.Create
 {
@@ -10,20 +9,32 @@ namespace Crash.Handlers.Plugins.Camera.Create
 		public ChangeAction Action => ChangeAction.Camera;
 
 		DateTime lastSentTime;
-		Point3d lastLocation;
-		Point3d lastTarget;
+		CPoint lastLocation;
+		CPoint lastTarget;
 		static TimeSpan maxPerSecond = TimeSpan.FromMilliseconds(250);
 
 		public CameraCreateAction()
 		{
 			lastSentTime = DateTime.MinValue;
-			lastLocation = Point3d.Unset;
-			lastTarget = Point3d.Unset;
+			lastLocation = CPoint.None;
+			lastTarget = CPoint.None;
+		}
+
+		public double DistanceBetween(CPoint p1, CPoint p2)
+		{
+			// https://www.mathsisfun.com/algebra/distance-2-points.html
+			double dist = Math.Sqrt(
+							Math.Pow(p1.X - p2.X, 2) +
+							Math.Pow(p1.Y - p2.Y, 2) +
+							Math.Pow(p1.Z - p2.Z, 2)
+						  );
+
+			return dist;
 		}
 
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)
 		{
-			if (crashArgs.Args is not ViewEventArgs viewArgs) return false;
+			if (crashArgs.Args is not CrashViewArgs viewArgs) return false;
 			DateTime now = DateTime.UtcNow;
 			TimeSpan timeSinceLastSent = now - lastSentTime;
 			if (timeSinceLastSent < maxPerSecond)
@@ -31,14 +42,14 @@ namespace Crash.Handlers.Plugins.Camera.Create
 				return false;
 			}
 
-			if (viewArgs.View.ActiveViewport.CameraLocation.DistanceTo(lastLocation) < 10 &&
-				viewArgs.View.ActiveViewport.CameraTarget.DistanceTo(lastTarget) < 10)
+			if (DistanceBetween(viewArgs.Location, lastLocation) < 10 &&
+				DistanceBetween(viewArgs.Target, lastTarget) < 10)
 			{
 				return false;
 			}
 
-			lastLocation = viewArgs.View.ActiveViewport.CameraLocation;
-			lastTarget = viewArgs.View.ActiveViewport.CameraTarget;
+			lastLocation = viewArgs.Location;
+			lastTarget = viewArgs.Target;
 			lastSentTime = DateTime.UtcNow;
 
 			return true;
@@ -47,7 +58,7 @@ namespace Crash.Handlers.Plugins.Camera.Create
 		public bool TryConvert(object sender, CreateRecieveArgs crashArgs, out IEnumerable<IChange> changes)
 		{
 			changes = Array.Empty<IChange>();
-			if (crashArgs.Args is not ViewEventArgs viewArgs)
+			if (crashArgs.Args is not CrashViewArgs viewArgs)
 			{
 				changes = null;
 				return false;
@@ -55,12 +66,7 @@ namespace Crash.Handlers.Plugins.Camera.Create
 
 			var userName = crashArgs.Doc.Users.CurrentUser.Name;
 
-			var cLoc = viewArgs.View.ActiveViewport.CameraLocation;
-			var cTarg = viewArgs.View.ActiveViewport.CameraTarget;
-
-			var location = cLoc.ToCrash();
-			var target = cTarg.ToCrash();
-			var camera = new Common.View.Camera(location, target);
+			var camera = new Common.View.Camera(viewArgs.Location, viewArgs.Target);
 
 			changes = new List<IChange> { CameraChange.CreateNew(camera, userName) };
 

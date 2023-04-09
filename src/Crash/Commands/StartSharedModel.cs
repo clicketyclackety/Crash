@@ -1,13 +1,13 @@
 ﻿using Crash.Client;
-using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Events;
 using Crash.Communications;
 using Crash.Handlers;
+using Crash.Handlers.InternalEvents;
+using Crash.Handlers.Plugins;
 
 using Rhino.Commands;
 using Rhino.DocObjects;
-using Rhino.Geometry;
 using Rhino.Input;
 using Rhino.Input.Custom;
 
@@ -55,7 +55,7 @@ namespace Crash.Commands
 			{
 				string closeCommand = CloseSharedModel.Instance.EnglishName;
 				RhinoApp.WriteLine("You are currently part of a Shared Model Session. " +
-					$"Please restart Rhino to create or join a new session using the {closeCommand}.");
+					$"Please use the {closeCommand} command.");
 
 				return Result.Success;
 			}
@@ -80,10 +80,12 @@ namespace Crash.Commands
 
 			_CreateCurrentUser(name);
 
+#if DEBUG
 			if (_PreExistingGeometryCheck(doc))
 			{
 				includePreExistingGeometry = _ContinueOrQuit() == true;
 			}
+#endif
 
 			try
 			{
@@ -122,12 +124,14 @@ namespace Crash.Commands
 				return;
 			}
 
-			var enumer = GetObjects(RhinoDoc.ActiveDoc).GetEnumerator();
+			RhinoDoc rhinoDoc = CrashDocRegistry.GetRelatedDocument(crashDoc);
+
+			var enumer = GetObjects(rhinoDoc).GetEnumerator();
 			while (enumer.MoveNext())
 			{
-				GeometryBase geom = enumer.Current.Geometry;
-				GeometryChange Change = GeometryChange.CreateNew(user, geom);
-				crashDoc.CacheTable?.UpdateChangeAsync(Change);
+				EventDispatcher disp;
+				var args = new CrashObjectEventArgs(rhinoDoc, enumer.Current.Geometry);
+				disp.NotifyDispatcher(ChangeAction.Add, this, args, rhinoDoc);
 			}
 		}
 

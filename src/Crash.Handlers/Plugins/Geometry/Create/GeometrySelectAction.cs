@@ -1,7 +1,5 @@
 ﻿using Crash.Common.Changes;
-using Crash.Utils;
-
-using Rhino.DocObjects;
+using Crash.Handlers.InternalEvents;
 
 namespace Crash.Handlers.Plugins.Geometry.Create
 {
@@ -10,31 +8,31 @@ namespace Crash.Handlers.Plugins.Geometry.Create
 		public ChangeAction Action => ChangeAction.Lock;
 
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)
-			=> crashArgs.Args is RhinoObjectSelectionEventArgs rargs &&
-			   rargs.Selected;
+			=> crashArgs.Args is CrashSelectionEventArgs cargs &&
+			   cargs.Selected;
 
 		public bool TryConvert(object sender, CreateRecieveArgs crashArgs, out IEnumerable<IChange> changes)
 		{
 			changes = Array.Empty<IChange>();
-			if (crashArgs.Args is not RhinoObjectSelectionEventArgs rargs) return false;
+			if (crashArgs.Args is not CrashSelectionEventArgs cargs) return false;
 
 			var userName = crashArgs.Doc.Users.CurrentUser.Name;
 
-			changes = getChanges(rargs.RhinoObjects, crashArgs, userName);
+			changes = getChanges(cargs.CrashObjects, crashArgs, userName);
 
 			return true;
 		}
 
-		private IEnumerable<IChange> getChanges(IEnumerable<RhinoObject> rhinoObjects,
+		private IEnumerable<IChange> getChanges(IEnumerable<CrashObject> crashObjects,
 												CreateRecieveArgs crashArgs,
 												string userName)
 		{
-			foreach (var rhinoObject in rhinoObjects)
+			foreach (var crashObject in crashObjects)
 			{
-				if (!rhinoObject.TryGetChangeId(out Guid rhinoId)) continue;
-				if (!crashArgs.Doc.CacheTable.TryGetValue(rhinoId, out GeometryChange geomChange)) continue;
+				if (!crashArgs.Doc.CacheTable.TryGetValue(crashObject.ChangeId,
+														  out GeometryChange geomChange)) continue;
 
-				IChange change = new Change(geomChange.Id, userName, null)
+				IChange change = new Change(crashObject.ChangeId, userName, null)
 				{
 					Action = ChangeAction.Lock,
 				};

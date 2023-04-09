@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 using Crash.Common.View;
 
@@ -36,6 +36,7 @@ namespace Crash.Common.Changes
 		public CameraChange(IChange change)
 		{
 			Change = change;
+			Change.Action = ChangeAction.Camera;
 
 			if (string.IsNullOrEmpty(Change.Payload))
 			{

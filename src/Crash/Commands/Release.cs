@@ -7,16 +7,12 @@ using Rhino.Commands;
 namespace Crash.Commands
 {
 
-	/// <summary>
-	/// Command to Release Changes
-	/// </summary>
+	/// <summary>Command to Release Changes</summary>
 	[CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
 	public sealed class ReleaseCommand : Command
 	{
 
-		/// <summary>
-		/// Default Constructor
-		/// </summary>
+		/// <summary>Default Constructor</summary>
 		public ReleaseCommand()
 		{
 			Instance = this;

@@ -1,4 +1,4 @@
-﻿using Crash.Client;
+using Crash.Client;
 using Crash.Common.Document;
 using Crash.Communications;
 using Crash.Handlers;
@@ -8,9 +8,7 @@ using Rhino.Commands;
 namespace Crash.Commands
 {
 
-	/// <summary>
-	/// Command to Open a Shared Model
-	/// </summary>
+	/// <summary>Command to Open a Shared Model</summary>
 	[CommandStyle(Style.ScriptRunner)]
 	public sealed class OpenSharedModel : Command
 	{
@@ -21,9 +19,7 @@ namespace Crash.Commands
 		private string LastURL = $"{CrashClient.DefaultURL}:{CrashServer.DefaultPort}";
 
 
-		/// <summary>
-		/// Default Constructor
-		/// </summary>
+		/// <summary>Default Constructor</summary>
 		public OpenSharedModel()
 		{
 			Instance = this;

@@ -12,7 +12,6 @@ namespace Crash.Handlers.Server
 	// https://github.com/crashcloud/crash.server/releases/latest/download/crash.server.zip
 	public static class ServerInstaller
 	{
-		#region SERVER URIS
 		private const string ARCHIVED_SERVER_FILENAME = "crash.server.zip";
 		private const string VERSION = "latest";
 		private const string ARCHIVED_SERVER_DOWNLOAD_URL = $"https://github.com/crashcloud/crash.server/releases/{VERSION}/download/{ARCHIVED_SERVER_FILENAME}";

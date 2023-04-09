@@ -18,16 +18,10 @@ namespace Crash
 		protected CrashPluginBase()
 		{
 			_changes = new Stack<IChangeDefinition>();
-			CrashClient.OnConnected += CrashClient_OnConnected;
+			CrashClient.OnInit += CrashClient_OnInit;
 		}
 
-		protected virtual void RegisterChangeSchema(IChangeDefinition changeDefinition)
-		{
-			InteractivePipe.RegisterChangeDefinition(changeDefinition);
-			_changes.Push(changeDefinition);
-		}
-
-		private void CrashClient_OnConnected(object sender, Common.Events.CrashEventArgs e)
+		private void CrashClient_OnInit(object sender, CrashClient.CrashInitArgs e)
 		{
 			RhinoApp.WriteLine("Loading Changes ...");
 
@@ -39,7 +33,22 @@ namespace Crash
 			if (Dispatcher is not null)
 			{
 				RegisterDefinitions();
+
+				e.CrashDoc.CacheTable.IsInit = true;
+
+				foreach (Change change in e.Changes)
+				{
+					Dispatcher.NotifyDispatcher(change);
+				}
+
+				e.CrashDoc.CacheTable.IsInit = false;
 			}
+		}
+
+		protected virtual void RegisterChangeSchema(IChangeDefinition changeDefinition)
+		{
+			InteractivePipe.RegisterChangeDefinition(changeDefinition);
+			_changes.Push(changeDefinition);
 		}
 
 		private void RegisterDefinitions()

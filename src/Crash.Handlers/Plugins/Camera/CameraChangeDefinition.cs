@@ -13,7 +13,7 @@ namespace Crash.Handlers.Plugins.Camera
 
 		public Type ChangeType => typeof(CameraChange);
 
-		public string ChangeName => $"{nameof(Crash)}{nameof(CameraChange)}";
+		public string ChangeName => $"{nameof(Crash)}.{nameof(CameraChange)}";
 
 		public IEnumerable<IChangeCreateAction> CreateActions { get; }
 

@@ -153,9 +153,7 @@ namespace Crash.Client
 		// This isn't calling, and needs to call the Event Dispatcher
 		private void Init(IEnumerable<Change> changes)
 		{
-			_crashDoc.CacheTable.IsInit = true;
-			OnConnected?.Invoke(this, new CrashEventArgs(_crashDoc));
-			_crashDoc.CacheTable.IsInit = false;
+			OnInit?.Invoke(this, new CrashInitArgs(_crashDoc, changes));
 		}
 
 		public static void CloseLocalServer(CrashDoc crashDoc)
@@ -247,7 +245,18 @@ namespace Crash.Client
 		/// <returns></returns>
 		private Task StartAsync() => _connection.StartAsync();
 
-		public static event EventHandler<CrashEventArgs> OnConnected;
+		public static event EventHandler<CrashInitArgs> OnInit;
+
+		public sealed class CrashInitArgs : CrashEventArgs
+		{
+			public readonly IEnumerable<Change> Changes;
+
+			public CrashInitArgs(CrashDoc crashDoc, IEnumerable<Change> changes)
+				: base(crashDoc)
+			{
+				Changes = changes;
+			}
+		}
 
 	}
 

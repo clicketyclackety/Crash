@@ -26,7 +26,7 @@ namespace Crash.Common.Changes
 			set => Change.Action = value;
 		}
 
-		public string Type { get; } = nameof(CameraChange);
+		public string Type => $"{nameof(Crash)}.{nameof(CameraChange)}";
 
 		public CameraChange()
 		{

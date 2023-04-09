@@ -26,7 +26,7 @@ namespace Crash.Common.Changes
 
 		public string? Payload { get; private set; }
 
-		public string Type => nameof(GeometryChange);
+		public string Type => $"{nameof(Crash)}.{nameof(GeometryChange)}";
 
 		public ChangeAction Action { get; set; }
 

@@ -40,13 +40,14 @@ namespace Crash.Utils
 		{
 			if (null == Change || rObj == null) return;
 
-			if (rObj.UserDictionary.TryGetGuid(ChangeIdKey, out _))
+			if (rObj.UserDictionary.TryGetGuid(ChangeIdKey, out Guid changeId))
 			{
 				rObj.UserDictionary.Remove(ChangeIdKey);
+				RhinoChangeKeys.Remove(changeId);
 			}
 
 			rObj.UserDictionary.Set(ChangeIdKey, (Change as IChange).Id);
-			RhinoChangeKeys[Change.Id] = rObj;
+			RhinoChangeKeys.Add(Change.Id, rObj);
 
 			Change.RhinoId = rObj.Id;
 		}

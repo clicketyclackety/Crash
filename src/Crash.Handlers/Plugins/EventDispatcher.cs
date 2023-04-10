@@ -165,7 +165,7 @@ namespace Crash.Handlers.Plugins
 				args.TheObject.TryGetChangeId(out Guid changeId);
 				if (changeId == Guid.Empty) return;
 
-				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry, Guid.Empty, changeId);
+				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry, args.TheObject.Id, changeId);
 				NotifyDispatcher(ChangeAction.Remove, sender, crashArgs, args.TheObject.Document);
 			};
 

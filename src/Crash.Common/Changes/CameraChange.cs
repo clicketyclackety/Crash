@@ -7,6 +7,9 @@ namespace Crash.Common.Changes
 
 	public sealed class CameraChange : IChange
 	{
+
+		public const string ChangeName = $"{nameof(Crash)}.{nameof(CameraChange)}";
+
 		IChange Change { get; set; }
 
 		public Camera Camera { get; set; }
@@ -26,7 +29,7 @@ namespace Crash.Common.Changes
 			set => Change.Action = value;
 		}
 
-		public string Type => $"{nameof(Crash)}.{nameof(CameraChange)}";
+		public string Type => ChangeName;
 
 		public CameraChange()
 		{

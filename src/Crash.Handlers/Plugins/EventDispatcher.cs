@@ -148,14 +148,24 @@ namespace Crash.Handlers.Plugins
 
 			RhinoDoc.UndeleteRhinoObject += (sender, args) =>
 			{
+				//TODO: Is Init? Where is that checked for?
+				CrashDoc crashDoc = CrashDocRegistry.GetRelatedDocument(args.TheObject.Document);
+				if (crashDoc is not null)
+				{
+					if (crashDoc.CacheTable.IsInit) return;
+					if (crashDoc.CacheTable.SomeoneIsDone) return;
+				}
+
 				var crashArgs = new CrashObjectEventArgs(args.TheObject);
-				NotifyDispatcher(ChangeAction.Add, sender, crashArgs, args.TheObject.Document);
+				NotifyDispatcher(ChangeAction.Add | ChangeAction.Temporary, sender, crashArgs, args.TheObject.Document);
 			};
 
 			RhinoDoc.DeleteRhinoObject += (sender, args) =>
 			{
 				args.TheObject.TryGetChangeId(out Guid changeId);
-				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry, changeId);
+				if (changeId == Guid.Empty) return;
+
+				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry, Guid.Empty, changeId);
 				NotifyDispatcher(ChangeAction.Remove, sender, crashArgs, args.TheObject.Document);
 			};
 
@@ -243,8 +253,10 @@ namespace Crash.Handlers.Plugins
 			{
 				Id = id,
 				Owner = name,
-				Type = new GeometryChange().Type,
-				Action = ChangeAction.Remove
+				Type = GeometryChange.ChangeType,
+				Action = ChangeAction.Remove,
+				Stamp = DateTime.Now,
+				Payload = null,
 			};
 
 		private Change SelectChange(Guid id, string name)
@@ -252,8 +264,10 @@ namespace Crash.Handlers.Plugins
 			{
 				Id = id,
 				Owner = name,
-				Type = new GeometryChange().Type,
-				Action = ChangeAction.Lock
+				Type = GeometryChange.ChangeType,
+				Action = ChangeAction.Lock,
+				Stamp = DateTime.Now,
+				Payload = null,
 			};
 
 		private Change UnSelectChange(Guid id, string name)
@@ -261,8 +275,10 @@ namespace Crash.Handlers.Plugins
 			{
 				Id = id,
 				Owner = name,
-				Type = new GeometryChange().Type,
-				Action = ChangeAction.Unlock
+				Type = GeometryChange.ChangeType,
+				Action = ChangeAction.Unlock,
+				Stamp = DateTime.Now,
+				Payload = null,
 			};
 
 	}

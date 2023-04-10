@@ -83,8 +83,12 @@ namespace Crash.UI
 
 		private void UserTable_OnUserChanged(object sender, UserEventArgs e)
 		{
-			SetUsers();
-			UsersForm.ReDraw();
+			try
+			{
+				SetUsers();
+				UsersForm.ReDraw();
+			}
+			catch { }
 		}
 
 		private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)

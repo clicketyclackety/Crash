@@ -79,7 +79,7 @@ namespace Crash.Handlers.Tests.Plugins
 				for (int i = 0; i < 10; i++)
 				{
 					LineCurve geom = NRhino.Random.Geometry.NLineCurve.Any();
-					yield return new TestCaseData(new object(), new CrashObjectEventArgs(geom));
+					yield return new TestCaseData(new object(), new CrashObjectEventArgs(geom, Guid.Empty));
 				}
 			}
 		}

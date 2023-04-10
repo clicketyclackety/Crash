@@ -32,7 +32,13 @@ namespace Crash.Common.Tables
 			if (!_users.ContainsKey(user.Name))
 			{
 				_users.Add(user.Name, user);
-				OnUserAdded?.Invoke(this, new UserEventArgs(user));
+
+				try
+				{
+					OnUserAdded?.Invoke(this, new UserEventArgs(user));
+				}
+				catch { }
+
 				return true;
 			}
 

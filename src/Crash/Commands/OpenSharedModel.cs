@@ -83,7 +83,7 @@ namespace Crash.Commands
 
 		private void Queue_OnCompletedQueue(object sender, EventArgs e)
 		{
-			UsersForm.ReDrawForm();
+			UsersForm.ReDraw();
 			rhinoDoc.Views.Redraw();
 		}
 

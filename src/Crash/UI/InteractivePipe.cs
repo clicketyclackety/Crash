@@ -105,7 +105,7 @@ namespace Crash.UI
 				if (e.Display.InterruptDrawing()) return;
 				if (!definitionRegistry.TryGetValue(Change.Type, out IChangeDefinition definition)) continue;
 
-				if (CrashDocRegistry.ActiveDoc.Users.Get(Change.Owner).Camera == CameraState.None) continue;
+				if (!CrashDocRegistry.ActiveDoc.Users.Get(Change.Owner).Visible) continue;
 
 				UpdateCachedMaterial(Change);
 

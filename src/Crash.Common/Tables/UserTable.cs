@@ -81,9 +81,9 @@ namespace Crash.Common.Tables
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 		/// <summary>Fires each time a User is successfully added via Add</summary>
-		public event EventHandler<UserEventArgs> OnUserAdded;
+		public static event EventHandler<UserEventArgs> OnUserAdded;
 		/// <summary>Fires each time a User is successfuly removed via Remove</summary>
-		public event EventHandler<UserEventArgs> OnUserRemoved;
+		public static event EventHandler<UserEventArgs> OnUserRemoved;
 
 	}
 

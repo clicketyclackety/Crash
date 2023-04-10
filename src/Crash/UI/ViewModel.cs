@@ -143,7 +143,6 @@ namespace Crash.UI
 
 					user.Camera = state;
 					UpdateCrashUserTable();
-					CameraOperator.FollowCamera();
 				}
 
 				user.Camera = state;

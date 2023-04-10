@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 
 using Crash.Common.Document;
+using Crash.Common.Events;
 
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -130,7 +131,7 @@ namespace Crash.Client
 			_connection.Reconnecting += ConnectionReconnectingAsync;
 		}
 
-		public async Task StartLocalClientAsync(Action<IEnumerable<Change>> onInit)
+		public async Task StartLocalClientAsync()
 		{
 			if (null == _crashDoc)
 			{
@@ -143,13 +144,19 @@ namespace Crash.Client
 				throw new Exception("A User has not been assigned!");
 			}
 
-			this.OnInitialize += onInit;
+			this.OnInitialize += Init;
 
 			// TODO : Check for successful connection
 			await this.StartAsync();
 		}
 
-		public static async Task CloseLocalServerAsync(CrashDoc crashDoc)
+		// This isn't calling, and needs to call the Event Dispatcher
+		private void Init(IEnumerable<Change> changes)
+		{
+			OnInit?.Invoke(this, new CrashInitArgs(_crashDoc, changes));
+		}
+
+		public static void CloseLocalServer(CrashDoc crashDoc)
 		{
 			crashDoc?.LocalServer?.Stop();
 			crashDoc?.LocalServer?.Dispose();
@@ -236,7 +243,20 @@ namespace Crash.Client
 		/// Start the async connection
 		/// </summary>
 		/// <returns></returns>
-		public Task StartAsync() => _connection.StartAsync();
+		private Task StartAsync() => _connection.StartAsync();
+
+		public static event EventHandler<CrashInitArgs> OnInit;
+
+		public sealed class CrashInitArgs : CrashEventArgs
+		{
+			public readonly IEnumerable<Change> Changes;
+
+			public CrashInitArgs(CrashDoc crashDoc, IEnumerable<Change> changes)
+				: base(crashDoc)
+			{
+				Changes = changes;
+			}
+		}
 
 	}
 

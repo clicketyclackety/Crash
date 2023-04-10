@@ -19,7 +19,7 @@ namespace Crash.Communications
 
 		public Process? process { get; set; }
 
-		public bool IsRunning => process is object && !process.HasExited;
+		public bool IsRunning => process is not null && !process.HasExited;
 		public bool Connected { get; private set; }
 
 		public const string ProcessName = "Crash.Server";
@@ -30,6 +30,17 @@ namespace Crash.Communications
 		public CrashServer(CrashDoc crashDoc)
 		{
 			_crashDoc = crashDoc;
+		}
+
+		public const string EXTRACTED_SERVER_FILENAME = $"{CrashServer.ProcessName}.exe";
+		public static string BASE_DIRECTORY;
+		public static string SERVER_DIRECTORY => Path.Combine(BASE_DIRECTORY, "Server");
+		public static string SERVER_FILEPATH => Path.Combine(SERVER_DIRECTORY, EXTRACTED_SERVER_FILENAME);
+
+		static CrashServer()
+		{
+			var app_data = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create);
+			BASE_DIRECTORY = Path.Combine(app_data, "Crash");
 		}
 
 		~CrashServer()
@@ -54,8 +65,7 @@ namespace Crash.Communications
 
 		internal void Start(ProcessStartInfo startInfo, int timeout = 3000)
 		{
-			string errorMessage = "Server Started Successfully";
-
+			string errorMessage;
 			if (checkForPreExistingServer())
 			{
 				errorMessage = "Server Process is already running!";
@@ -109,17 +119,12 @@ namespace Crash.Communications
 
 		internal string getServerExecutablePath()
 		{
-			string currentDirectory = typeof(CrashServer).Assembly.Location;
-			string[] serverExes = Array.Empty<string>();
-			do
+			if (!File.Exists(SERVER_FILEPATH))
 			{
-				currentDirectory = Path.GetDirectoryName(currentDirectory);
-				serverExes = Directory.GetFiles(currentDirectory, $"{ProcessName}.exe", SearchOption.AllDirectories);
+				throw new DirectoryNotFoundException("Could not find server executable directory!");
 			}
-			while (null == serverExes || serverExes.Length == 0);
 
-			var serverExecutable = serverExes.FirstOrDefault();
-			return serverExecutable;
+			return SERVER_FILEPATH;
 		}
 
 		// https://stackoverflow.com/questions/4291912/process-start-how-to-get-the-output
@@ -141,13 +146,11 @@ namespace Crash.Communications
 		// https://stackoverflow.com/questions/285760/how-to-spawn-a-process-and-capture-its-stdout-in-net
 		internal void createAndRegisterServerProcess(ProcessStartInfo startInfo)
 		{
-			if (null == startInfo)
-				throw new ArgumentNullException("Process Info is null");
-
-			process = new Process();
-			process.StartInfo = startInfo;
-			process.EnableRaisingEvents = true;
-			// process.Refresh(); // May be useful?
+			process = new Process
+			{
+				StartInfo = startInfo ?? throw new ArgumentNullException("Process Info is null"),
+				EnableRaisingEvents = true
+			};
 
 			// Register fresh
 			process.Disposed += Process_Exited;
@@ -221,7 +224,7 @@ namespace Crash.Communications
 		{
 			try
 			{
-				if (process is object)
+				if (process is not null)
 				{
 					// De-Register first to avoid duplicate calls
 					process.Disposed -= Process_Exited;

@@ -48,9 +48,9 @@ namespace Crash.Common.Communications.Logging
 			{
 				File.AppendAllLines(_logFilePath, new string[] { e.Message });
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				;
+
 			}
 		}
 

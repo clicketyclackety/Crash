@@ -1,63 +1,113 @@
 ﻿using System.IO;
+using System.IO.Compression;
 using System.Net;
 
 using Crash.Communications;
+
+using Microsoft.VisualStudio.Threading;
 
 using Rhino;
 
 namespace Crash.Handlers.Server
 {
 
+	/// <summary>Class for handling Server Install</summary>
 	public static class ServerInstaller
 	{
-		// Put these into an application setting somewhere? // Move from Crash.rhp
-		static string CRASH_SERVER_FILENAME = $"{CrashServer.ProcessName}.exe";
-		const string CRASH_NAME = nameof(Crash);
-		const string SERVER_DIR = "Server";
-		static readonly string CRASH_SERVER_FILEPATH;
+		private const string ARCHIVED_SERVER_FILENAME = "crash.server.zip";
+		private const string VERSION = "latest";
+		private const string ARCHIVED_SERVER_DOWNLOAD_URL = $"https://github.com/crashcloud/crash.server/releases/{VERSION}/download/{ARCHIVED_SERVER_FILENAME}";
+		private static string DOWNLOADED_FILEPATH => Path.Combine(CrashServer.BASE_DIRECTORY, ARCHIVED_SERVER_FILENAME);
 
-		public static bool ServerExecutableExists => File.Exists(CRASH_SERVER_FILEPATH);
+		public static bool ServerExecutableExists => File.Exists(CrashServer.SERVER_FILEPATH) &&
+			new FileInfo(CrashServer.SERVER_FILEPATH).Length > 10_000;
+		private static bool ServerExecutableExistsAndIsInvalid => File.Exists(CrashServer.SERVER_FILEPATH) &&
+			new FileInfo(CrashServer.SERVER_FILEPATH).Length < 10_000;
 
-		static ServerInstaller()
+
+		public static async Task<bool> EnsureServerExecutableExists()
 		{
-			var app_data = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create);
-			CRASH_SERVER_FILEPATH = Path.Combine(app_data, nameof(Crash), "Server", CRASH_SERVER_FILENAME);
-		}
-
-		public static async Task<bool> DownloadAsync()
-		{
-			var crashServerExeUrl = "url";
-
 			if (ServerExecutableExists)
 			{
-				// Remove old file
+				return true;
 			}
 
-			Directory.CreateDirectory(Path.GetDirectoryName(CRASH_SERVER_FILEPATH));
-
-			using (var client = new WebClient())
+			if (!File.Exists(DOWNLOADED_FILEPATH))
 			{
-				client.DownloadProgressChanged += Client_DownloadProgressChanged;
-				var urcrashServerExeUri = new Uri(crashServerExeUrl);
-				await client.DownloadFileTaskAsync(urcrashServerExeUri, CRASH_SERVER_FILEPATH);
+				await DownloadAsync();
+			}
+			if (File.Exists(DOWNLOADED_FILEPATH))
+			{
+				RemoveOldServer();
+				ExtractDownloadAsync();
+				RemoveDownloadedArchive();
 			}
 
 			return ServerExecutableExists;
 		}
 
+		internal static void RemoveOldServer()
+		{
+			Directory.Delete(CrashServer.SERVER_DIRECTORY, true);
+			Directory.CreateDirectory(CrashServer.SERVER_DIRECTORY);
+		}
+
+		internal static async Task<bool> DownloadAsync()
+		{
+			TimeSpan cancelSpan = TimeSpan.FromSeconds(60);
+			if (ServerExecutableExists) return true;
+			if (ServerExecutableExistsAndIsInvalid)
+			{
+				RemoveDownloadedArchive();
+			}
+
+			try
+			{
+				// Use HttpClient
+				using (var client = new WebClient())
+				{
+					client.DownloadProgressChanged += Client_DownloadProgressChanged;
+					var urcrashServerExeUri = new Uri(ARCHIVED_SERVER_DOWNLOAD_URL);
+					await client.DownloadFileTaskAsync(urcrashServerExeUri, DOWNLOADED_FILEPATH).WithTimeout(cancelSpan);
+				}
+
+				if (ServerExecutableExistsAndIsInvalid)
+				{
+					throw new Exception($"Server download is corrupted!");
+				}
+			}
+			catch (TimeoutException)
+			{
+				return false;
+			}
+
+			return ServerExecutableExists;
+		}
+
+		internal static void ExtractDownloadAsync()
+		{
+			ZipFile.ExtractToDirectory(DOWNLOADED_FILEPATH, CrashServer.SERVER_DIRECTORY);
+		}
+
+		private static void RemoveDownloadedArchive()
+		{
+			File.Delete(DOWNLOADED_FILEPATH);
+		}
+
+		private static Dictionary<int, bool> progessSoFar = new Dictionary<int, bool>();
 		private static void Client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
 		{
-			if (e.ProgressPercentage % 25 == 0)
+			const int segment = 25;
+			int percentage = e.ProgressPercentage;
+			int chunk_segment = (percentage / segment) * segment;
+
+			if (!progessSoFar.ContainsKey(chunk_segment))
 			{
-				RhinoApp.WriteLine($"{CRASH_SERVER_FILENAME} - Downloaded {e.ProgressPercentage} of file. {e.TotalBytesToReceive}/{e.BytesReceived} bytes recieved.");
+				progessSoFar.Add(chunk_segment, true);
+
+				RhinoApp.WriteLine($"{ARCHIVED_SERVER_FILENAME} - Downloaded {e.ProgressPercentage}% of file. {e.TotalBytesToReceive}/{e.BytesReceived} bytes recieved.");
 			}
 		}
-
-		static bool Install()
-		{
-			return false;
-		}
-
 
 	}
 

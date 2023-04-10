@@ -8,9 +8,7 @@ using Rhino.Commands;
 namespace Crash.Commands
 {
 
-	/// <summary>
-	/// Command to Open a Shared Model
-	/// </summary>
+	/// <summary>Command to Open a Shared Model</summary>
 	[CommandStyle(Style.ScriptRunner)]
 	public sealed class OpenSharedModel : Command
 	{
@@ -21,9 +19,7 @@ namespace Crash.Commands
 		private string LastURL = $"{CrashClient.DefaultURL}:{CrashServer.DefaultPort}";
 
 
-		/// <summary>
-		/// Default Constructor
-		/// </summary>
+		/// <summary>Default Constructor</summary>
 		public OpenSharedModel()
 		{
 			Instance = this;
@@ -75,13 +71,20 @@ namespace Crash.Commands
 			string userName = crashDoc.Users.CurrentUser.Name;
 			var crashClient = new CrashClient(crashDoc, userName, new Uri($"{LastURL}/Crash"));
 			crashDoc.LocalClient = crashClient;
-			ClientState clientState = new ClientState(crashDoc, crashClient);
-			crashClient.StartLocalClientAsync(clientState.Init);
+			crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
+
+			crashClient.StartLocalClientAsync();
 
 			InteractivePipe.Active.Enabled = true;
 			UsersForm.ShowForm();
 
 			return Result.Success;
+		}
+
+		private void Queue_OnCompletedQueue(object sender, EventArgs e)
+		{
+			UsersForm.ReDraw();
+			rhinoDoc.Views.Redraw();
 		}
 
 		private bool _GetUsersName(ref string name)

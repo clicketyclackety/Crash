@@ -13,7 +13,7 @@ namespace Crash.Common.Tables
 
 		private readonly Dictionary<string, User> _users;
 
-		private CrashDoc crashDoc;
+		private readonly CrashDoc _crashDoc;
 
 		// TODO : Remove set from _users
 		public User CurrentUser { get; set; }
@@ -21,7 +21,7 @@ namespace Crash.Common.Tables
 		public UserTable(CrashDoc hostDoc)
 		{
 			_users = new Dictionary<string, User>();
-			crashDoc = hostDoc;
+			_crashDoc = hostDoc;
 		}
 
 		/// <summary>Adds a User only if they are not the Current User</summary>
@@ -32,7 +32,13 @@ namespace Crash.Common.Tables
 			if (!_users.ContainsKey(user.Name))
 			{
 				_users.Add(user.Name, user);
-				OnUserAdded?.Invoke(this, new UserEventArgs(user));
+
+				try
+				{
+					OnUserAdded?.Invoke(this, new UserEventArgs(user));
+				}
+				catch { }
+
 				return true;
 			}
 
@@ -81,9 +87,9 @@ namespace Crash.Common.Tables
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 		/// <summary>Fires each time a User is successfully added via Add</summary>
-		public event EventHandler<UserEventArgs> OnUserAdded;
+		public static event EventHandler<UserEventArgs> OnUserAdded;
 		/// <summary>Fires each time a User is successfuly removed via Remove</summary>
-		public event EventHandler<UserEventArgs> OnUserRemoved;
+		public static event EventHandler<UserEventArgs> OnUserRemoved;
 
 	}
 

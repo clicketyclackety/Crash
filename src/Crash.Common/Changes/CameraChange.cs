@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 using Crash.Common.View;
 
@@ -7,6 +7,9 @@ namespace Crash.Common.Changes
 
 	public sealed class CameraChange : IChange
 	{
+
+		public const string ChangeName = $"{nameof(Crash)}.{nameof(CameraChange)}";
+
 		IChange Change { get; set; }
 
 		public Camera Camera { get; set; }
@@ -26,7 +29,7 @@ namespace Crash.Common.Changes
 			set => Change.Action = value;
 		}
 
-		public string Type { get; } = nameof(CameraChange);
+		public string Type => ChangeName;
 
 		public CameraChange()
 		{
@@ -36,6 +39,7 @@ namespace Crash.Common.Changes
 		public CameraChange(IChange change)
 		{
 			Change = change;
+			Change.Action = ChangeAction.Camera;
 
 			if (string.IsNullOrEmpty(Change.Payload))
 			{

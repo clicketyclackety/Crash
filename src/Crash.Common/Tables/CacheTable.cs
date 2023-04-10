@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 
 using Crash.Common.Document;
 
@@ -10,10 +10,10 @@ namespace Crash.Common.Tables
 		private readonly CrashDoc _crashDoc;
 
 		// TODO : Should this be async? Or Concurrent?
-		private ConcurrentDictionary<Guid, IChange> _cache { get; set; }
+		private readonly ConcurrentDictionary<Guid, IChange> _cache;
 
-		public bool IsInit = false;
-		public bool SomeoneIsDone = false;
+		public bool IsInit { get; set; } = false;
+		public bool SomeoneIsDone { get; set; } = false;
 
 		/// <summary>
 		/// Local cache constructor subscribing to RhinoApp_Idle
@@ -74,14 +74,17 @@ namespace Crash.Common.Tables
 
 		public bool TryGetValue<T>(Guid id, out T change) where T : IChange
 		{
-			if (_cache.TryGetValue(id, out IChange cachedChange) &&
+			change = default;
+
+			if (_cache.TryGetValue(id, out IChange? cachedChange) &&
 				cachedChange is T changeConverted)
 			{
+				if (cachedChange == default) return false;
+
 				change = changeConverted;
 				return true;
 			}
 
-			change = default;
 			return false;
 		}
 

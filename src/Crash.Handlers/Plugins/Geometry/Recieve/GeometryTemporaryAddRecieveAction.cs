@@ -12,16 +12,22 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 
 		public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
 		{
-			var geomChange = new GeometryChange(recievedChange);
-
-			var changeArgs = new IdleArgs(crashDoc, geomChange);
-			var bakeAction = new IdleAction(AddToDocument, changeArgs);
-			crashDoc.Queue.AddAction(bakeAction);
+			if (recievedChange.Owner.Equals(crashDoc.Users.CurrentUser.Name))
+			{
+				var add = new GeometryAddRecieveAction();
+				add.OnRecieve(crashDoc, recievedChange);
+			}
+			else
+			{
+				var geomChange = new GeometryChange(recievedChange);
+				var changeArgs = new IdleArgs(crashDoc, geomChange);
+				var displayAction = new IdleAction(AddToDocument, changeArgs);
+				crashDoc.Queue.AddAction(displayAction);
+			}
 		}
 
 		private void AddToDocument(IdleArgs args)
 		{
-			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(args.Doc);
 			if (args.Change is not GeometryChange geomChange) return;
 
 			args.Doc.CacheTable.UpdateChangeAsync(geomChange);

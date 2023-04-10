@@ -5,17 +5,13 @@ using Rhino.Commands;
 namespace Crash.Commands
 {
 
-	/// <summary>
-	/// Command to Close a Shared Model
-	/// </summary>
+	/// <summary>Command to Close a Shared Model</summary>
 	[CommandStyle(Style.ScriptRunner)]
 	public sealed class CloseSharedModel : Command
 	{
 		private bool defaultValue = false;
 
-		/// <summary>
-		/// Default Constructor
-		/// </summary>
+		/// <summary>Default Constructor</summary>
 		public CloseSharedModel()
 		{
 			Instance = this;

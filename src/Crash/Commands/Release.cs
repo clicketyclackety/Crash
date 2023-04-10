@@ -7,16 +7,12 @@ using Rhino.Commands;
 namespace Crash.Commands
 {
 
-	/// <summary>
-	/// Command to Release Changes
-	/// </summary>
+	/// <summary>Command to Release Changes</summary>
 	[CommandStyle(Style.DoNotRepeat | Style.NotUndoable)]
 	public sealed class ReleaseCommand : Command
 	{
 
-		/// <summary>
-		/// Default Constructor
-		/// </summary>
+		/// <summary>Default Constructor</summary>
 		public ReleaseCommand()
 		{
 			Instance = this;
@@ -32,7 +28,7 @@ namespace Crash.Commands
 		protected override Result RunCommand(RhinoDoc doc, RunMode mode)
 		{
 			// TODO : Wait for response for data integrity check
-			CrashDoc crashDoc = CrashDocRegistry.GetRelatedDocument(doc);
+			CrashDoc? crashDoc = CrashDocRegistry.GetRelatedDocument(doc);
 			crashDoc?.LocalClient?.DoneAsync();
 
 			return Result.Success;

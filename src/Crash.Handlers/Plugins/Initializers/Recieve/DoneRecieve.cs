@@ -14,19 +14,34 @@ namespace Crash.Handlers.Plugins.Initializers.Recieve
 		{
 			var changes = crashDoc.CacheTable.GetChanges().Where(c => c.Owner == recievedChange.Owner);
 
-			var add = new GeometryAddRecieveAction();
-			foreach (var change in changes)
+			crashDoc.CacheTable.SomeoneIsDone = true;
+			try
 			{
-				if (!crashDoc.CacheTable.TryGetValue(change.Id,
-					out GeometryChange geomChange)) continue;
+				var add = new GeometryAddRecieveAction();
+				foreach (var change in changes)
+				{
+					if (!crashDoc.CacheTable.TryGetValue(change.Id,
+						out GeometryChange geomChange)) continue;
 
-				geomChange.RemoveAction(ChangeAction.Temporary);
-				// geomChange.AddAction(ChangeAction.Add);
+					geomChange.RemoveAction(ChangeAction.Temporary);
+					geomChange.AddAction(ChangeAction.Add);
 
-				add.OnRecieve(crashDoc, geomChange);
+					add.OnRecieve(crashDoc, geomChange);
+					crashDoc.CacheTable.RemoveChange(change.Id);
+				}
+			}
+			finally
+			{
+				EventHandler? _event = null;
+				_event = (sender, args) =>
+				{
+					crashDoc.CacheTable.SomeoneIsDone = false;
+					crashDoc.Queue.OnCompletedQueue -= _event;
+				};
+
+				crashDoc.Queue.OnCompletedQueue += _event;
 			}
 		}
-
 	}
 
 }

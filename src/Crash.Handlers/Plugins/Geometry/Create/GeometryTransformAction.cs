@@ -1,42 +1,42 @@
 ﻿using Crash.Common.Changes;
 using Crash.Geometry;
-using Crash.Utils;
-
-using Rhino.DocObjects;
+using Crash.Handlers.InternalEvents;
 
 namespace Crash.Handlers.Plugins.Geometry.Create
 {
+
 	internal sealed class GeometryTransformAction : IChangeCreateAction
 	{
 		public ChangeAction Action => ChangeAction.Transform;
 
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)
-			=> crashArgs.Args is RhinoTransformObjectsEventArgs;
+			=> crashArgs.Args is CrashTransformEventArgs;
 
 		public bool TryConvert(object sender, CreateRecieveArgs crashArgs, out IEnumerable<IChange> changes)
 		{
 			changes = Array.Empty<IChange>();
-			if (crashArgs.Args is not RhinoTransformObjectsEventArgs rargs) return false;
+			if (crashArgs.Args is not CrashTransformEventArgs cargs) return false;
 
 			var _user = crashArgs.Doc.Users.CurrentUser.Name;
-			var transform = rargs.Transform.ToCrash();
+			var transform = cargs.Transform;
 
-			changes = getTransforms(transform, _user, rargs.Objects);
+			changes = getTransforms(transform, _user, cargs.Objects);
 
 			return true;
 		}
 
-		private IEnumerable<IChange> getTransforms(CTransform transform, string userName, IEnumerable<RhinoObject> rhinoObjects)
+		private IEnumerable<IChange> getTransforms(CTransform transform, string userName, IEnumerable<CrashObject> crashObjects)
 		{
-			foreach (var rhinoObject in rhinoObjects)
+			foreach (var crashObject in crashObjects)
 			{
-				if (!rhinoObject.TryGetChangeId(out var changeId)) continue;
+				if (crashObject.ChangeId == Guid.Empty) continue;
 
-				var transChange = TransformChange.CreateNew(transform, userName, changeId);
+				var transChange = TransformChange.CreateNew(transform, userName, crashObject.ChangeId);
 				yield return transChange;
 			}
 		}
 
 	}
+
 
 }

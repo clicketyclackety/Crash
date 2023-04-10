@@ -15,11 +15,11 @@ namespace Crash.Handlers
 	public static class Geometry
 	{
 
-		public static Point3d ToRhino(this CPoint cPoint) => new Point3d(cPoint.X, cPoint.Y, cPoint.Z);
-		public static CPoint ToCrash(this Point3d cPoint) => new CPoint(cPoint.X, cPoint.Y, cPoint.Z);
+		public static Point3d ToRhino(this CPoint cPoint) => new(cPoint.X, cPoint.Y, cPoint.Z);
+		public static CPoint ToCrash(this Point3d cPoint) => new(cPoint.X, cPoint.Y, cPoint.Z);
 
-		public static Vector3d ToRhino(this CVector cVector) => new Vector3d(cVector.X, cVector.Y, cVector.Z);
-		public static CVector ToCrash(this Vector3d cVector) => new CVector(cVector.X, cVector.Y, cVector.Z);
+		public static Vector3d ToRhino(this CVector cVector) => new(cVector.X, cVector.Y, cVector.Z);
+		public static CVector ToCrash(this Vector3d cVector) => new(cVector.X, cVector.Y, cVector.Z);
 
 
 		public static IEnumerable<Point3d> ToRhino(this IEnumerable<CPoint> cPoints)
@@ -30,7 +30,7 @@ namespace Crash.Handlers
 		// Reverse
 
 
-		public static IEnumerable<CPoint> ToRhino(this IEnumerable<Point3d> rhinoPoints)
+		public static IEnumerable<CPoint> ToCrash(this IEnumerable<Point3d> rhinoPoints)
 		{
 			foreach (var point3d in rhinoPoints)
 				yield return point3d.ToCrash();

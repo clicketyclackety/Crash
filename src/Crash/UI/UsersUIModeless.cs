@@ -1,9 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-
-using Crash.Common.Document;
-using Crash.Handlers;
-using Crash.Properties;
+﻿using System.ComponentModel;
 
 using Eto.Drawing;
 using Eto.Forms;
@@ -14,32 +9,12 @@ using Rhino.UI;
 namespace Crash.UI
 {
 
-	public static class UserUIExtensions
-	{
-
-		private static Dictionary<CameraState, Image> cameras;
-
-		static UserUIExtensions()
-		{
-			cameras = new Dictionary<CameraState, Image>
-			{
-				{ CameraState.None, Icons.CameraNone.ToEto() },
-				{ CameraState.Visible, Icons.CameraVisible.ToEto() },
-				{ CameraState.Follow, Icons.CameraFollow.ToEto() },
-			};
-		}
-
-		public static Image GetCameraImage(this User user)
-		{
-			return cameras[user.Camera];
-		}
-
-	}
-
 	internal class UsersForm : Form
 	{
+		private UsersViewModel ViewModel;
+
+
 		private GridView m_grid;
-		private ObservableCollection<User>? m_users { get; set; }
 		internal static Crash.UI.UsersForm? ActiveForm { get; set; }
 
 		internal static void ShowForm()
@@ -68,15 +43,18 @@ namespace Crash.UI
 			ActiveForm?.Dispose();
 		}
 
-		internal static void ReDrawForm()
+		internal static void ReDraw()
 		{
-			if (null == ActiveForm) return;
-
-			ActiveForm.m_users = new ObservableCollection<User>(CrashDocRegistry.ActiveDoc.Users);
-			ActiveForm.Invalidate(true);
-
-			ActiveForm.m_grid.DataStore = ActiveForm.m_users.Cast<object>();
-			ActiveForm.m_grid.Invalidate(true);
+			if (null == ActiveForm)
+			{
+				ActiveForm = new UsersForm();
+			}
+			try
+			{
+				ActiveForm.m_grid.Invalidate(true);
+				ActiveForm.Invalidate(true);
+			}
+			catch { }
 		}
 
 		/// <summary>
@@ -88,29 +66,17 @@ namespace Crash.UI
 			UsersForm.ActiveForm = null;
 		}
 
-		private void ReDrawEvent(object sender, EventArgs e) => ReDrawForm();
+		private void ReDrawEvent(object sender, EventArgs e) => ReDraw();
 
 		internal UsersForm()
 		{
 			Owner = RhinoEtoApp.MainWindow;
+			ViewModel = new UsersViewModel();
+			CreateForm();
+		}
 
-			CrashDoc? crashDoc = CrashDocRegistry.ActiveDoc;
-			if (null == crashDoc)
-			{
-				m_users = new ObservableCollection<User>();
-				return;
-			}
-
-			m_users = new ObservableCollection<User>(crashDoc.Users);
-			RhinoDoc.ActiveDocumentChanged += ReDrawEvent;
-			// https://discourse.mcneel.com/t/are-eto-modeless-forms-supported-on-rhino-8-mac/154337/2?u=csykes
-			RhinoDoc.ActiveDocumentChanged += RhinoDoc_ActiveDocumentChanged;
-
-			// Intentional
-			crashDoc.Users.OnUserAdded += ReDrawEvent;
-			crashDoc.Users.OnUserRemoved += ReDrawEvent;
-			crashDoc.Queue.OnCompletedQueue += ReDrawEvent;
-
+		private void CreateForm()
+		{
 			Maximizable = false;
 			Minimizable = false;
 			Padding = new Padding(5);
@@ -123,27 +89,28 @@ namespace Crash.UI
 			m_grid = new GridView
 			{
 				AllowMultipleSelection = false,
-				DataStore = m_users.Cast<object>(),
+				DataStore = ViewModel.Users.Cast<object>(),
 				ShowHeader = true,
 				Width = 270,
 				Border = BorderType.Bezel,
 				AllowEmptySelection = true,
 				RowHeight = 24,
 			};
+			ViewModel.View = m_grid;
+			m_grid.CellClick += ViewModel.CycleCameraSetting;
+			m_grid.DataContextChanged += M_grid_DataContextChanged;
 
-			m_grid.CellClick += cycleCameraSetting;
-			m_grid.ColumnHeaderClick += M_grid_ColumnHeaderClick;
+			// TODO : Implement Sorting
+			// m_grid.ColumnHeaderClick += M_grid_ColumnHeaderClick;
 
 			// Camera
-			var imageCellBinding = Binding.Property<User, Image>(u => u.GetCameraImage());
-			// imageCellBinding.Changed += RedrawView;
 			var ivc = new ImageViewCell();
 
 			m_grid.Columns.Add(new GridColumn
 			{
 				DataCell = new ImageViewCell
 				{
-					Binding = imageCellBinding,
+					Binding = ViewModel.ImageCellBinding,
 				},
 				Editable = false,
 				HeaderText = "",
@@ -153,13 +120,11 @@ namespace Crash.UI
 			});
 
 			// Visible
-			var visibleCellBinding = Binding.Property<User, bool?>(u => u.Visible);
-			visibleCellBinding.Changed += VisibleCellBinding_Changed;
 			m_grid.Columns.Add(new GridColumn
 			{
 				DataCell = new CheckBoxCell
 				{
-					Binding = visibleCellBinding,
+					Binding = ViewModel.VisibleCellBinding,
 				},
 				AutoSize = true,
 				Editable = true,
@@ -185,13 +150,11 @@ namespace Crash.UI
 			});
 
 			// User
-			var textCellBinding = Binding.Property<User, string>(u => u.Name);
-			textCellBinding.Changed += RedrawView;
 			m_grid.Columns.Add(new GridColumn
 			{
 				DataCell = new TextBoxCell
 				{
-					Binding = textCellBinding
+					Binding = ViewModel.TextCellBinding
 				},
 				AutoSize = true,
 				Editable = false,
@@ -219,93 +182,17 @@ namespace Crash.UI
 
 		}
 
-		private void VisibleCellBinding_Changed(object sender, BindingChangedEventArgs e)
-		{
-			bool toggleValue = (bool)e.Value;
-			PropertyBinding<bool?> binding = (PropertyBinding<bool?>)sender;
-		}
-
-		private void RhinoDoc_ActiveDocumentChanged(object sender, DocumentEventArgs e)
-		{
-			if (CrashDocRegistry.ActiveDoc.Users is object)
-			{
-				m_users = new ObservableCollection<User>(CrashDocRegistry.ActiveDoc.Users);
-			}
-			else
-			{
-				m_users = null;
-			}
-
-			ReDrawForm();
-		}
-
-		private void Cell_Paint(object sender, CellPaintEventArgs e)
-		{
-			if (e.Item is not User user) return;
-
-			// e.Graphics.DrawEllipse(user.Color.ToEto(), new RectangleF(2, 2, 16, 16),);
-			e.Graphics.FillEllipse(user.Color.ToEto(), new RectangleF(2, 2, 16, 16));
-		}
-
-		private void M_grid_ColumnHeaderClick(object sender, GridColumnEventArgs e)
+		private void M_grid_DataContextChanged(object sender, EventArgs e)
 		{
 			;
 		}
 
-		private void cycleCameraSetting(object sender, GridCellMouseEventArgs e)
+		private void Cell_Paint(object sender, CellPaintEventArgs e)
 		{
-			int row = e.Row;
-			int col = e.Column;
+			if (e.Item is not UsersViewModel.UserObject user) return;
 
-			if (row < 0 || col != 0) return;
-			if (!e.Buttons.HasFlag(MouseButtons.Primary)) return;
-
-			if (e.Item is User user)
-			{
-				// TODO : Pass user out by ref?
-				CameraState state = CycleState(user.Camera);
-
-				if (state == CameraState.Follow)
-				{
-					var userEnumer = CrashDocRegistry.ActiveDoc.Users.GetEnumerator();
-					while (userEnumer.MoveNext())
-					{
-						User currUser = userEnumer.Current;
-						if (CameraState.Follow == currUser.Camera)
-						{
-							currUser.Camera = CameraState.Visible;
-							CrashDocRegistry.ActiveDoc.Users.Update(currUser);
-						}
-					}
-
-					CameraOperator.FollowCamera();
-				}
-
-				user.Camera = state;
-				CrashDocRegistry.ActiveDoc.Users.Update(user);
-			}
-
-			ReDrawForm();
-
-			Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
-		}
-
-		private CameraState CycleState(CameraState state)
-		{
-			int stateCount = (int)state;
-			stateCount++;
-
-			if (stateCount >= Enum.GetValues(typeof(CameraState)).Length)
-			{
-				return CameraState.None;
-			}
-
-			return (CameraState)stateCount;
-		}
-
-		private void RedrawView(object sender, BindingChangedEventArgs e)
-		{
-			Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
+			// e.Graphics.DrawEllipse(user.Color.ToEto(), new RectangleF(2, 2, 16, 16),);
+			e.Graphics.FillEllipse(user.Colour.ToEto(), new RectangleF(2, 2, 16, 16));
 		}
 
 		protected override void OnClosing(CancelEventArgs e)

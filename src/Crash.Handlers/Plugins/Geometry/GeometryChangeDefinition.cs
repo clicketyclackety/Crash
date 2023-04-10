@@ -16,7 +16,7 @@ namespace Crash.Handlers.Plugins.Geometry
 	{
 		public Type ChangeType => typeof(GeometryChange);
 
-		public string ChangeName => $"{nameof(Crash)}.{nameof(GeometryChange)}";
+		public string ChangeName => GeometryChange.ChangeType;
 
 		public IEnumerable<IChangeCreateAction> CreateActions { get; }
 
@@ -25,7 +25,7 @@ namespace Crash.Handlers.Plugins.Geometry
 
 		public GeometryChangeDefinition()
 		{
-			var createActions = new List<IChangeCreateAction>
+			CreateActions = new List<IChangeCreateAction>
 			{
 				new GeometryCreateAction(),
 				new GeometryRemoveAction(),
@@ -35,7 +35,7 @@ namespace Crash.Handlers.Plugins.Geometry
 				new GeometrySelectAction(),
 				new GeometryUnSelectAction(),
 			};
-			var receveActions = new List<IChangeRecieveAction>
+			RecieveActions = new List<IChangeRecieveAction>
 			{
 				new GeometryAddRecieveAction(),
 				new GeometryTemporaryAddRecieveAction(),

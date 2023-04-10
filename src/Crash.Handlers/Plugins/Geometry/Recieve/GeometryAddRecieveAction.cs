@@ -2,6 +2,9 @@
 using Crash.Common.Document;
 using Crash.Common.Events;
 using Crash.Events;
+using Crash.Utils;
+
+using Rhino.DocObjects;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
@@ -25,7 +28,9 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(args.Doc);
 			if (args.Change is not GeometryChange geomChange) return;
 
-			rhinoDoc.Objects.Add(geomChange.Geometry);
+			Guid rhinoId = rhinoDoc.Objects.Add(geomChange.Geometry);
+			RhinoObject rhinoObject = rhinoDoc.Objects.FindId(rhinoId);
+			ChangeUtils.SyncHost(rhinoObject, geomChange);
 		}
 
 	}

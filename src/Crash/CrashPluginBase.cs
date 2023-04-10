@@ -23,9 +23,6 @@ namespace Crash
 
 		private void CrashClient_OnInit(object sender, CrashClient.CrashInitArgs e)
 		{
-			// This should only be called once?
-			CrashClient.OnInit -= CrashClient_OnInit;
-
 			RhinoApp.WriteLine("Loading Changes ...");
 
 			if (Dispatcher is null)

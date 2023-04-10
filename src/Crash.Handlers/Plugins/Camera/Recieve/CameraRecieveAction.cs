@@ -1,5 +1,10 @@
 ﻿using Crash.Common.Changes;
 using Crash.Common.Document;
+using Crash.Common.Events;
+using Crash.Events;
+
+using Rhino;
+using Rhino.Geometry;
 
 namespace Crash.Handlers.Plugins.Camera.Recieve
 {
@@ -10,9 +15,33 @@ namespace Crash.Handlers.Plugins.Camera.Recieve
 
 		public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
 		{
-			var convertedChange = new CameraChange(recievedChange);
-			crashDoc.Cameras.TryAddCamera(convertedChange);
+			var cameraArgs = new IdleArgs(crashDoc, recievedChange);
+			var cameraAction = new IdleAction(AddToDocument, cameraArgs);
+			crashDoc.Queue.AddAction(cameraAction);
 		}
+
+		private void AddToDocument(IdleArgs args)
+		{
+			var convertedChange = new CameraChange(args.Change);
+			args.Doc.Cameras.TryAddCamera(convertedChange);
+			args.Doc.Users.Add(args.Change.Owner);
+
+			if (args.Doc.Users.Get(args.Change.Owner).Camera == CameraState.Follow)
+			{
+				FollowCamera(convertedChange);
+			}
+		}
+
+		private void FollowCamera(CameraChange change)
+		{
+			var activeView = RhinoDoc.ActiveDoc.Views.ActiveView;
+
+			Point3d cameraTarget = change.Camera.Target.ToRhino();
+			Point3d cameraLocation = change.Camera.Location.ToRhino();
+
+			activeView.ActiveViewport.SetCameraLocations(cameraTarget, cameraLocation);
+		}
+
 	}
 
 }

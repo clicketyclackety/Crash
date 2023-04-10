@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;net7.0</TargetFrameworks>
     <Version>1.1.1</Version>
     <Title>Crash</Title>
     <Description> A multi-user collaborative environment for Rhino </Description>
@@ -30,8 +30,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.5.22" />
-	  <PackageReference Include="RhinoCommon" Version="7.21.22208.13001" IncludeAssets="compile;build" Condition="'$(TargetFramework)' == 'net48'" />
-	  <PackageReference Include="RhinoCommon" Version="8.0.23094.11475-wip" IncludeAssets="compile;build" Condition="'$(TargetFramework)' == 'net7.0'" />
+	<PackageReference Include="RhinoCommon" Version="7.21.22208.13001" IncludeAssets="compile;build" Condition="'$(TargetFramework)' == 'net48'" />
+	<PackageReference Include="RhinoCommon" Version="8.0.23094.11475-wip" IncludeAssets="compile;build" Condition="'$(TargetFramework)' == 'net7.0'" />
     <PackageReference Include="System.Text.Json" Version="7.0.2" />
     <PackageReference Include="Crash.Changes" Version="1.0.2" />
   </ItemGroup>
@@ -39,6 +39,15 @@
   <ItemGroup>
     <ProjectReference Include="..\Crash.Common\Crash.Common.csproj" />
     <ProjectReference Include="..\Crash.Handlers\Crash.Handlers.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="System.Drawing.Common" Condition="'$(TargetFramework)' == 'net7.0'">
+      <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\sdk\7.0.200\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Resources.Extensions" Condition="'$(TargetFramework)' == 'net7.0'">
+      <HintPath>..\..\..\..\..\.nuget\packages\system.resources.extensions\7.0.0\lib\net7.0\System.Resources.Extensions.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
   <ItemGroup>

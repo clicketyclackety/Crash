@@ -39,42 +39,60 @@ namespace Crash.Handlers.Plugins.Camera
 		{
 			if (change is not CameraChange cameraChange) return;
 
-			var camera = cameraChange.Camera;
-			double ratio = 10;
-			var length = 5000 * ratio;
-
-			var location = camera.Location.ToRhino();
-			var target = camera.Target.ToRhino();
-			var viewAngle = target - location;
-
-			var viewLine = new Line(camera.Location.ToRhino(), viewAngle, length);
-
-			var cameraFrustrum = new Plane(viewLine.To, viewAngle);
-			// Interval heightInterval = new Interval(-width * ratio / 2, width * ratio / 2);
-			var widthInterval = new Interval(-height * ratio / 2, height * ratio / 2);
-			var rectangle = new Rectangle3d(cameraFrustrum, widthInterval, widthInterval);
-
-			var lines = new List<Line>(8);
-			lines.AddRange(rectangle.ToPolyline().GetSegments());
-			lines.Add(new Line(location, rectangle.PointAt(0)));
-			lines.Add(new Line(location, rectangle.PointAt(1)));
-			lines.Add(new Line(location, rectangle.PointAt(2)));
-			lines.Add(new Line(location, rectangle.PointAt(3)));
-
-			foreach (var line in lines)
-			{
-				drawArgs.Display.DrawPatternedLine(line, material.Diffuse, 0x00001111, thickness);
-			}
+			Active = new CameraGraphic(cameraChange.Camera);
+			Active.Draw(drawArgs, material);
 		}
 
 		public BoundingBox GetBoundingBox(IChange change)
 		{
-			if (change is not CameraChange cameraChange) return BoundingBox.Unset;
+			BoundingBox bounds = BoundingBox.Empty;
+			if (null == Active.lines || Active.lines.Count == 0)
+				return bounds;
 
-			var p1 = cameraChange.Camera.Target.ToRhino();
-			var p2 = cameraChange.Camera.Location.ToRhino();
+			bounds = new BoundingBox(Active.lines.Select(l => l.From));
+			bounds.Inflate(1.25);
 
-			return new BoundingBox(p1, p2);
+			return bounds;
+		}
+
+		CameraGraphic Active;
+
+		private struct CameraGraphic
+		{
+			double ratio = 10;
+			double length => 1000 * ratio;
+
+			internal readonly List<Line> lines;
+
+			internal CameraGraphic(Crash.Common.View.Camera camera)
+			{
+				var location = camera.Location.ToRhino();
+				var target = camera.Target.ToRhino();
+				var viewAngle = target - location;
+
+				var viewLine = new Line(camera.Location.ToRhino(), viewAngle, length);
+
+				var cameraFrustrum = new Plane(viewLine.To, viewAngle);
+				// Interval heightInterval = new Interval(-width * ratio / 2, width * ratio / 2);
+				var widthInterval = new Interval(-height * ratio / 2, height * ratio / 2);
+				var rectangle = new Rectangle3d(cameraFrustrum, widthInterval, widthInterval);
+
+				lines = new List<Line>(8);
+				lines.AddRange(rectangle.ToPolyline().GetSegments());
+				lines.Add(new Line(location, rectangle.PointAt(0)));
+				lines.Add(new Line(location, rectangle.PointAt(1)));
+				lines.Add(new Line(location, rectangle.PointAt(2)));
+				lines.Add(new Line(location, rectangle.PointAt(3)));
+			}
+
+			public void Draw(DrawEventArgs drawArgs, DisplayMaterial material)
+			{
+				foreach (var line in lines)
+				{
+					drawArgs.Display.DrawPatternedLine(line, material.Diffuse, 0x00001111, thickness);
+				}
+			}
+
 		}
 
 	}

@@ -94,7 +94,11 @@ namespace Crash.UI
 		private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName != nameof(Users)) return;
+			UpdateCrashUserTable();
+		}
 
+		private void UpdateCrashUserTable()
+		{
 			UserTable userTable = CrashDocRegistry.ActiveDoc.Users;
 			foreach (UsersViewModel.UserObject user in Users)
 			{
@@ -137,6 +141,8 @@ namespace Crash.UI
 						}
 					}
 
+					user.Camera = state;
+					UpdateCrashUserTable();
 					CameraOperator.FollowCamera();
 				}
 

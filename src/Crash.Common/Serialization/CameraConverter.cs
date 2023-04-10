@@ -55,13 +55,13 @@ namespace Crash.Common.Serialization
 
 			writer.WriteStartArray();
 
-			writer.WriteNumberValue(target.X);
-			writer.WriteNumberValue(target.Y);
-			writer.WriteNumberValue(target.Z);
+			writer.WriteNumberValue(Math.Round(target.X, 0));
+			writer.WriteNumberValue(Math.Round(target.Y, 0));
+			writer.WriteNumberValue(Math.Round(target.Z, 0));
 
-			writer.WriteNumberValue(location.X);
-			writer.WriteNumberValue(location.Y);
-			writer.WriteNumberValue(location.Z);
+			writer.WriteNumberValue(Math.Round(location.X, 0));
+			writer.WriteNumberValue(Math.Round(location.Y, 0));
+			writer.WriteNumberValue(Math.Round(location.Z, 0));
 
 			writer.WriteNumberValue(value.Time.Ticks);
 

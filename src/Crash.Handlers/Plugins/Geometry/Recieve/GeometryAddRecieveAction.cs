@@ -18,9 +18,19 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 
 		public void OnRecieve(CrashDoc crashDoc, GeometryChange geomChange)
 		{
+			if (IsDuplicate(crashDoc, geomChange)) return;
+
 			var changeArgs = new IdleArgs(crashDoc, geomChange);
 			var bakeAction = new IdleAction(AddToDocument, changeArgs);
 			crashDoc.Queue.AddAction(bakeAction);
+		}
+
+		// Prevents issues with the same user logged in twice
+		private bool IsDuplicate(CrashDoc crashDoc, IChange change)
+		{
+			bool isNotInit = !crashDoc.CacheTable.IsInit;
+			bool isByCurrentUser = change.Owner.Equals(crashDoc.Users.CurrentUser.Name);
+			return isNotInit && isByCurrentUser;
 		}
 
 		private void AddToDocument(IdleArgs args)

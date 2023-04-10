@@ -228,6 +228,8 @@ namespace Crash.Handlers.Plugins
 			// How does this get handled?
 			Doc.LocalClient.OnDone += (name) => NotifyDispatcher(Doc, DoneChange(name));
 
+			Doc.LocalClient.OnCameraChange += (user, change) => NotifyDispatcher(Doc, change);
+
 			// This works better than I expected
 			Doc.LocalClient.OnInitialize += (changes) =>
 			{

@@ -27,6 +27,10 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 					idleAction = new IdleAction(RemoveTemporaryFromDocument, idleArgs);
 					crashDoc.Queue.AddAction(idleAction);
 				}
+				else
+				{
+
+				}
 				return;
 			}
 

@@ -1,0 +1,39 @@
+---
+name: Benchmark Tests
+on:
+  pull_request:
+    paths-ignore:
+      - '*.md'
+      - '*.gh*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        rhino-version: [ '7', '8 WIP' ]
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+    
+    - name: Restore Packages
+      run: nuget restore Crash.sln
+
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          7.0
+
+    - name: Build Crash
+      run: |
+        dotnet build src/Crash/ --configuration Release
+        dotnet build tests/Crash.Benchmark.Tests/ --configuration Release
+
+    # dll changes per rhino version?
+    # Does this require a headed version of rhino? Or will headless work?
+    - name: Test
+      run: |
+        $path = 'tests/Crash.Benchmark.Tests/bin/Release/net48/*.Tests.dll'
+        python .\py\nunit-test-runner.py --version ${{ matrix.rhino-version }} --dll $path

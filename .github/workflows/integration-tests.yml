@@ -1,0 +1,36 @@
+---
+name: Integration Tests
+on:
+  pull_request:
+    paths-ignore:
+      - '*.md'
+      - '*.gh*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        rhino-version: [ '7', '8 WIP' ]
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+    
+    - name: Restore Packages
+      run: nuget restore Crash.sln
+
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          7.0
+
+    - name: Build Crash
+      run: |
+        dotnet build src/Crash/ --configuration Release
+        dotnet build tests/Crash.Handlers.Tests/ --configuration Release
+
+    - name: Test
+      run: |
+        dotnet test tests/Crash.Handlers.Tests/

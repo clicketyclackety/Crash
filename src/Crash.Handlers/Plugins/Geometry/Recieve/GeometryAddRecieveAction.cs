@@ -4,8 +4,6 @@ using Crash.Common.Events;
 using Crash.Events;
 using Crash.Utils;
 
-using Rhino.DocObjects;
-
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
 	internal sealed class GeometryAddRecieveAction : IChangeRecieveAction
@@ -13,23 +11,23 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 		/// <summary>The Action this ICreateAction responds to</summary>
 		public ChangeAction Action => ChangeAction.Add;
 
-		public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
-			=> OnRecieve(crashDoc, new GeometryChange(recievedChange));
+		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
+			=> await OnRecieveAsync(crashDoc, new GeometryChange(recievedChange));
 
-		public void OnRecieve(CrashDoc crashDoc, GeometryChange geomChange)
+		public async Task OnRecieveAsync(CrashDoc crashDoc, GeometryChange geomChange)
 		{
-			if (IsDuplicate(crashDoc, geomChange)) return;
+			if (GeometryAddRecieveAction.IsDuplicate(crashDoc, geomChange)) return;
 
 			var changeArgs = new IdleArgs(crashDoc, geomChange);
 			var bakeAction = new IdleAction(AddToDocument, changeArgs);
-			crashDoc.Queue.AddAction(bakeAction);
+			await crashDoc.Queue.AddActionAsync(bakeAction);
 		}
 
 		// Prevents issues with the same user logged in twice
-		private bool IsDuplicate(CrashDoc crashDoc, IChange change)
+		private static bool IsDuplicate(CrashDoc crashDoc, IChange change)
 		{
 			bool isNotInit = !crashDoc.CacheTable.IsInit;
-			bool isByCurrentUser = change.Owner.Equals(crashDoc.Users.CurrentUser.Name);
+			bool isByCurrentUser = change.Owner.Equals(crashDoc.Users.CurrentUser.Name, StringComparison.Ordinal);
 			return isNotInit && isByCurrentUser;
 		}
 
@@ -39,7 +37,7 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 			if (args.Change is not GeometryChange geomChange) return;
 
 			Guid rhinoId = rhinoDoc.Objects.Add(geomChange.Geometry);
-			RhinoObject rhinoObject = rhinoDoc.Objects.FindId(rhinoId);
+			Rhino.DocObjects.RhinoObject rhinoObject = rhinoDoc.Objects.FindId(rhinoId);
 			ChangeUtils.SyncHost(rhinoObject, geomChange);
 		}
 

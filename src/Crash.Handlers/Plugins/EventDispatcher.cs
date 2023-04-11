@@ -110,21 +110,23 @@ namespace Crash.Handlers.Plugins
 			}
 		}
 
-		public void NotifyDispatcher(CrashDoc Doc, Change change)
+		public async Task NotifyDispatcherAsync(CrashDoc Doc, Change change)
 		{
-			if (!_recieveActions.TryGetValue(change.Type, out List<IChangeRecieveAction> recievers)) return;
-			RegisterUser(Doc, change);
+			if (!_recieveActions.TryGetValue(change.Type, out List<IChangeRecieveAction>? recievers) ||
+				null == recievers) return;
+
+			await RegisterUserAsync(Doc, change);
 
 			foreach (IChangeRecieveAction action in recievers)
 			{
 				if (action.Action != change.Action) continue;
 
-				action.OnRecieve(Doc, change);
+				await action.OnRecieveAsync(Doc, change);
 				return;
 			}
 		}
 
-		private void RegisterUser(CrashDoc doc, Change change)
+		private async Task RegisterUserAsync(CrashDoc doc, Change change)
 		{
 			doc.Users.Add(change.Owner);
 		}
@@ -218,24 +220,24 @@ namespace Crash.Handlers.Plugins
 
 		public void RegisterDefaultServerCalls(CrashDoc Doc)
 		{
-			Doc.LocalClient.OnAdd += (name, change) => NotifyDispatcher(Doc, change);
+			Doc.LocalClient.OnAdd += (name, change) => NotifyDispatcherAsync(Doc, change);
 
 			// These are all missing a Change Type! It will need explicitly mentioning!
-			Doc.LocalClient.OnDelete += (name, changeGuid) => NotifyDispatcher(Doc, DeleteChange(changeGuid, name));
-			Doc.LocalClient.OnSelect += (name, changeGuid) => NotifyDispatcher(Doc, SelectChange(changeGuid, name));
-			Doc.LocalClient.OnUnselect += (name, changeGuid) => NotifyDispatcher(Doc, UnSelectChange(changeGuid, name));
+			Doc.LocalClient.OnDelete += (name, changeGuid) => NotifyDispatcherAsync(Doc, DeleteChange(changeGuid, name));
+			Doc.LocalClient.OnSelect += (name, changeGuid) => NotifyDispatcherAsync(Doc, SelectChange(changeGuid, name));
+			Doc.LocalClient.OnUnselect += (name, changeGuid) => NotifyDispatcherAsync(Doc, UnSelectChange(changeGuid, name));
 
 			// How does this get handled?
-			Doc.LocalClient.OnDone += (name) => NotifyDispatcher(Doc, DoneChange(name));
+			Doc.LocalClient.OnDone += (name) => NotifyDispatcherAsync(Doc, DoneChange(name));
 
-			Doc.LocalClient.OnCameraChange += (user, change) => NotifyDispatcher(Doc, change);
+			Doc.LocalClient.OnCameraChange += (user, change) => NotifyDispatcherAsync(Doc, change);
 
 			// This works better than I expected
 			Doc.LocalClient.OnInitialize += (changes) =>
 			{
 				foreach (var change in changes)
 				{
-					NotifyDispatcher(Doc, change);
+					NotifyDispatcherAsync(Doc, change);
 				}
 			};
 		}

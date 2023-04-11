@@ -44,10 +44,10 @@ namespace Crash.Common.Tables
 
 			if (_cache.ContainsKey(cache.Id))
 			{
-				_cache.TryRemove(cache.Id, out _);
+				await Task.Run(() => _cache.TryRemove(cache.Id, out _));
 			}
 
-			_cache.TryAdd(cache.Id, cache);
+			await Task.Run(() => _cache.TryAdd(cache.Id, cache));
 		}
 
 		/// <summary>

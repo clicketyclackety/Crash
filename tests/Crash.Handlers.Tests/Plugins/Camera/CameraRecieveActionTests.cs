@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Crash.Changes;
 using Crash.Common.Changes;
@@ -16,7 +17,7 @@ namespace Crash.Handlers.Tests.Plugins.Camera
 	{
 
 		[TestCaseSource(nameof(CameraChanges))]
-		public void GeometryCreateAction_CanConvert(Crash.Common.View.Camera camera)
+		public async Task GeometryCreateAction_CanConvert(Crash.Common.View.Camera camera)
 		{
 			string username = Path.GetRandomFileName().Replace(".", "");
 			IChange change = CameraChange.CreateNew(camera, username);
@@ -27,7 +28,7 @@ namespace Crash.Handlers.Tests.Plugins.Camera
 			CameraRecieveAction recieveAction = new CameraRecieveAction();
 
 			Assert.That(crashDoc.Cameras, Is.Empty);
-			recieveAction.OnRecieve(crashDoc, serverChange);
+			await recieveAction.OnRecieveAsync(crashDoc, serverChange);
 			Assert.That(crashDoc.Cameras, Is.Not.Empty);
 
 			Assert.That(crashDoc.Cameras.TryGetCamera(new User(username), out var cameras), Is.True);

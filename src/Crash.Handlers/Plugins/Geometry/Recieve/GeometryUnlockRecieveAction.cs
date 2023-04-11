@@ -10,7 +10,7 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 		/// <summary>The Action this ICreateAction responds to</summary>
 		public ChangeAction Action => ChangeAction.Unlock;
 
-		public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
+		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
 			if (!ChangeUtils.TryGetRhinoObject(recievedChange, out RhinoObject rhinoObject)) return;
 

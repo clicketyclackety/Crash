@@ -39,7 +39,7 @@ namespace Crash
 
 				foreach (Change change in e.Changes)
 				{
-					Dispatcher.NotifyDispatcher(e.CrashDoc, change);
+					Dispatcher.NotifyDispatcherAsync(e.CrashDoc, change);
 				}
 
 				e.CrashDoc.CacheTable.IsInit = false;

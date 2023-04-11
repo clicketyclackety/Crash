@@ -34,7 +34,7 @@ namespace Crash.Common.Tests.Validity
 
 				Camera camera = new Camera(location, target)
 				{
-					Time = time
+					Stamp = time
 				};
 
 				Assert.That(camera.IsValid(), Is.True);
@@ -46,7 +46,7 @@ namespace Crash.Common.Tests.Validity
 		{
 			Camera camera = new Camera(point, target)
 			{
-				Time = time,
+				Stamp = time,
 			};
 
 			return camera.IsValid();

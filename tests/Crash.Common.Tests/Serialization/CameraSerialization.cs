@@ -49,7 +49,7 @@ namespace Crash.Changes.Tests.Serialization
 
 				Camera camera = new Camera(location, target)
 				{
-					Time = time
+					Stamp = time
 				};
 
 				TestCameraSerializtion(camera);
@@ -61,7 +61,7 @@ namespace Crash.Changes.Tests.Serialization
 			var json = JsonSerializer.Serialize(Camera, TestOptions);
 			var CameraOut = JsonSerializer.Deserialize<Camera>(json, TestOptions);
 			Assert.That(Camera, Is.EqualTo(CameraOut));
-			Assert.That(Camera.Time, Is.EqualTo(CameraOut.Time));
+			Assert.That(Camera.Stamp, Is.EqualTo(CameraOut.Stamp));
 		}
 
 	}

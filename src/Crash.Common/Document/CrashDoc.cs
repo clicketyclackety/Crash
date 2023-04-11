@@ -24,7 +24,6 @@ namespace Crash.Common.Document
 		#endregion
 
 		#region Connectivity
-		// TODO : Change set?
 
 		public CrashClient? LocalClient { get; set; }
 
@@ -60,10 +59,10 @@ namespace Crash.Common.Document
 		#endregion
 
 		#region Methods
-		public bool Equals(CrashDoc other)
+		public bool Equals(CrashDoc? other)
 			=> other?.GetHashCode() == GetHashCode();
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			if (obj is not CrashDoc other) return false;
 			return Equals(other);

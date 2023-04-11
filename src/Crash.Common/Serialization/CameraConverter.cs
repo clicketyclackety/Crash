@@ -38,7 +38,7 @@ namespace Crash.Common.Serialization
 
 				return new Camera(location, target)
 				{
-					Time = new DateTime(ticks)
+					Stamp = new DateTime(ticks)
 				};
 			}
 			else
@@ -63,7 +63,7 @@ namespace Crash.Common.Serialization
 			writer.WriteNumberValue(Math.Round(location.Y, 0));
 			writer.WriteNumberValue(Math.Round(location.Z, 0));
 
-			writer.WriteNumberValue(value.Time.Ticks);
+			writer.WriteNumberValue(value.Stamp.Ticks);
 
 			writer.WriteEndArray();
 		}

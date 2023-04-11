@@ -12,7 +12,9 @@ namespace Crash.Common.Tables
 		// TODO : Should this be async? Or Concurrent?
 		private readonly ConcurrentDictionary<Guid, IChange> _cache;
 
+		// TODO : Move
 		public bool IsInit { get; set; } = false;
+		// TODO : Move
 		public bool SomeoneIsDone { get; set; } = false;
 
 		/// <summary>

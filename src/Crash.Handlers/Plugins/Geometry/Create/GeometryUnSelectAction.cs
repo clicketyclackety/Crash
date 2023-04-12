@@ -1,5 +1,6 @@
 ﻿using Crash.Common.Changes;
 using Crash.Handlers.InternalEvents;
+using Crash.Utils;
 
 namespace Crash.Handlers.Plugins.Geometry.Create
 {
@@ -19,33 +20,43 @@ namespace Crash.Handlers.Plugins.Geometry.Create
 
 			if (cargs.All)
 			{
-				// Get pre-selected
-				// De-select all
+				var guids = ChangeUtils.GetSelected().ToList();
+				ChangeUtils.ClearSelected();
+				changes = getChanges(guids, userName);
 			}
 			else
 			{
-				changes = getChanges(cargs.CrashObjects, crashArgs, userName);
+				changes = getChanges(cargs.CrashObjects, userName);
 			}
 
 			return true;
 		}
 
-		private IEnumerable<IChange> getChanges(IEnumerable<CrashObject> crashObjects,
-												CreateRecieveArgs crashArgs,
-												string userName)
+		private IEnumerable<IChange> getChanges(IEnumerable<CrashObject> crashObjects, string userName)
 		{
 			foreach (var crashObject in crashObjects)
 			{
-				if (!crashArgs.Doc.CacheTable.TryGetValue(crashObject.ChangeId,
-														out GeometryChange geomChange)) continue;
-
-				IChange change = new Change(geomChange.Id, userName, null)
-				{
-					Action = ChangeAction.Lock,
-				};
-
-				yield return change;
+				yield return CreateChange(crashObject.ChangeId, userName);
 			}
+		}
+
+		private IEnumerable<IChange> getChanges(IEnumerable<Guid> changeIds, string userName)
+		{
+			foreach (var changeId in changeIds)
+			{
+				yield return CreateChange(changeId, userName);
+			}
+		}
+
+		private Change CreateChange(Guid changeId, string userName)
+		{
+			var change = new Change(changeId, userName, null)
+			{
+				Action = ChangeAction.Unlock,
+				Type = GeometryChange.ChangeType,
+			};
+
+			return change;
 		}
 
 	}

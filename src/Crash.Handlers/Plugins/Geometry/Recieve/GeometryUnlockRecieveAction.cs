@@ -1,7 +1,7 @@
 ﻿using Crash.Common.Document;
+using Crash.Common.Events;
+using Crash.Events;
 using Crash.Utils;
-
-using Rhino.DocObjects;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
@@ -12,11 +12,18 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 
 		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
-			if (!ChangeUtils.TryGetRhinoObject(recievedChange, out RhinoObject rhinoObject)) return;
+			var changeArgs = new IdleArgs(crashDoc, recievedChange);
+			var lockAction = new IdleAction(LockChange, changeArgs);
+			await crashDoc.Queue.AddActionAsync(lockAction);
+		}
 
-			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(crashDoc);
+		private void LockChange(IdleArgs args)
+		{
+			if (!ChangeUtils.TryGetRhinoObject(args.Change, out var rhinoObject)) return;
+			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(args.Doc);
 			rhinoDoc.Objects.Unlock(rhinoObject, true);
 		}
+
 	}
 
 }

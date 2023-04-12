@@ -92,10 +92,10 @@ namespace Crash.Handlers.Plugins
 								break;
 
 							case ChangeAction.Lock:
-								tasks.Add(Doc.LocalClient.UnselectAsync(change.Id));
+								tasks.Add(Doc.LocalClient.SelectAsync(change.Id));
 								break;
 							case ChangeAction.Unlock:
-								tasks.Add(Doc.LocalClient.SelectAsync(change.Id));
+								tasks.Add(Doc.LocalClient.UnselectAsync(change.Id));
 								break;
 
 							case ChangeAction.Camera:
@@ -232,13 +232,18 @@ namespace Crash.Handlers.Plugins
 
 			Doc.LocalClient.OnCameraChange += async (user, change) => await NotifyDispatcherAsync(Doc, change);
 
-			Doc.LocalClient.OnInitialize += async (changes) =>
+			// OnInit is called on reconnect as well?
+			Action<Change[]> _event = null;
+			_event = async (changes) =>
 			{
+				Doc.LocalClient.OnInitialize -= _event;
 				foreach (var change in changes)
 				{
 					await NotifyDispatcherAsync(Doc, change);
 				}
 			};
+
+			Doc.LocalClient.OnInitialize += _event;
 		}
 #pragma warning restore VSTHRD101 // Avoid unsupported async delegates
 

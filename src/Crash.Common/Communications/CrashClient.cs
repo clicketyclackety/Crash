@@ -2,6 +2,7 @@
 
 using Crash.Common.Document;
 using Crash.Common.Events;
+using Crash.Common.Logging;
 
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -90,7 +91,7 @@ namespace Crash.Client
 		internal static HubConnection GetHubConnection(Uri url) => new HubConnectionBuilder()
 			   .WithUrl(url).AddJsonProtocol()
 			   .AddJsonProtocol((opts) => JsonOptions())
-			   .ConfigureLogging(LoggingConfigurer)
+			   // .ConfigureLogging(LoggingConfigurer)
 			   .WithAutomaticReconnect(new[] { TimeSpan.FromMilliseconds(10),
 											   TimeSpan.FromMilliseconds(100),
 											   TimeSpan.FromSeconds(1),
@@ -111,7 +112,7 @@ namespace Crash.Client
 		{
 			LogLevel logLevel = Debugger.IsAttached ? LogLevel.Trace : LogLevel.Information;
 			loggingBuilder.SetMinimumLevel(logLevel);
-			var loggingProvider = new Common.Communications.Logging.CrashLoggerProvider();
+			var loggingProvider = new CrashLoggerProvider();
 			loggingBuilder.AddProvider(loggingProvider);
 		}
 

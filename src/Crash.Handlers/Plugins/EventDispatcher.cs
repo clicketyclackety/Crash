@@ -1,8 +1,11 @@
-﻿using Crash.Common.Changes;
+using Crash.Common.Changes;
 using Crash.Common.Document;
+using Crash.Common.Logging;
 using Crash.Handlers.InternalEvents;
 using Crash.Handlers.Plugins.Initializers;
 using Crash.Utils;
+
+using Microsoft.Extensions.Logging;
 
 using Rhino;
 using Rhino.Display;
@@ -59,7 +62,11 @@ namespace Crash.Handlers.Plugins
 		// How can we prevent the same events being subscribed multiple times
 		public async Task NotifyDispatcher(ChangeAction changeAction, object sender, EventArgs args, RhinoDoc doc)
 		{
-			if (!_createActions.TryGetValue(changeAction, out var actionChain)) return;
+			if (!_createActions.TryGetValue(changeAction, out var actionChain))
+			{
+				CrashLogger.Logger.LogDebug($"Could not find a CreateAction for {changeAction}");
+				return;
+			}
 			var crashArgs = new CreateRecieveArgs(changeAction, args, doc);
 
 			CrashDoc? Doc = CrashDocRegistry.GetRelatedDocument(doc);
@@ -74,32 +81,45 @@ namespace Crash.Handlers.Plugins
 					foreach (var ichange in changes)
 					{
 						Change change = new Change(ichange);
+						string message = $"Added Change {change.Action}, {change.Id}";
+
 						switch (change.Action)
 						{
 							case ChangeAction.Add | ChangeAction.Temporary:
 								tasks.Add(Doc.LocalClient.AddAsync(change));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 							case ChangeAction.Remove:
 								tasks.Add(Doc.LocalClient.DeleteAsync(change.Id));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 
 							case ChangeAction.Transform:
 								// tasks.Add(Doc.LocalClient.TransformAsync(change));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 
 							case ChangeAction.Update:
 								tasks.Add(Doc.LocalClient.UpdateAsync(change.Id, change));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 
 							case ChangeAction.Lock:
 								tasks.Add(Doc.LocalClient.SelectAsync(change.Id));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 							case ChangeAction.Unlock:
 								tasks.Add(Doc.LocalClient.UnselectAsync(change.Id));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 
 							case ChangeAction.Camera:
 								tasks.Add(Doc.LocalClient.CameraChangeAsync(change));
+								CrashLogger.Logger.LogDebug(message);
+								break;
+
+							default:
+								CrashLogger.Logger.LogDebug(message);
 								break;
 						}
 					}
@@ -114,13 +134,19 @@ namespace Crash.Handlers.Plugins
 		public async Task NotifyDispatcherAsync(CrashDoc Doc, Change change)
 		{
 			if (!_recieveActions.TryGetValue(change.Type, out List<IChangeRecieveAction>? recievers) ||
-				null == recievers) return;
+				null == recievers)
+			{
+				CrashLogger.Logger.LogDebug($"Could not find a Recieve Action for {change.Type}, {change.Id}");
+				return;
+			}
 
 			await RegisterUserAsync(Doc, change);
 
 			foreach (IChangeRecieveAction action in recievers)
 			{
 				if (action.Action != change.Action) continue;
+
+				CrashLogger.Logger.LogDebug($"Calling action {action.GetType().Name}, {change.Action}, {change.Type}, {change.Id}");
 
 				await action.OnRecieveAsync(Doc, change);
 				return;

@@ -73,6 +73,11 @@ namespace Crash.Handlers.Plugins.Camera
 				var viewLine = new Line(camera.Location.ToRhino(), viewAngle, length);
 
 				var cameraFrustrum = new Plane(viewLine.To, viewAngle);
+				Point3d xPoint = viewLine.To;
+				xPoint.Transform(Transform.Translation(new Vector3d(100, 0, 0)));
+				double rads = Vector3d.VectorAngle(cameraFrustrum.XAxis, Vector3d.XAxis, cameraFrustrum);
+				cameraFrustrum.Rotate(rads, cameraFrustrum.ZAxis);
+
 				// Interval heightInterval = new Interval(-width * ratio / 2, width * ratio / 2);
 				var widthInterval = new Interval(-height * ratio / 2, height * ratio / 2);
 				var rectangle = new Rectangle3d(cameraFrustrum, widthInterval, widthInterval);

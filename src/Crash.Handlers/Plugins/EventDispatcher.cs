@@ -207,6 +207,8 @@ namespace Crash.Handlers.Plugins
 
 			RhinoDoc.BeforeTransformObjects += (sender, args) =>
 			{
+				if (args.GripCount > 0) return;
+
 				var crashArgs = new CrashTransformEventArgs(args.Transform.ToCrash(), args.Objects.Select(o => new CrashObject(o)), args.ObjectsWillBeCopied);
 				RhinoDoc rhinoDoc = args.Objects.FirstOrDefault(o => o.Document is not null).Document;
 				NotifyDispatcher(ChangeAction.Transform, sender, crashArgs, rhinoDoc);

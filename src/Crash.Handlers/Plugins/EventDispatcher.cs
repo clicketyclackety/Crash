@@ -263,10 +263,11 @@ namespace Crash.Handlers.Plugins
 			// OnInit is called on reconnect as well?
 			Doc.LocalClient.OnInitialize += async (changes) =>
 			{
-				CrashLogger.Logger.LogDebug($"{nameof(Doc.LocalClient.OnInitialize)} - Initial : {initialInit}");
 				if (initialInit) return;
 
 				initialInit = true;
+
+				CrashLogger.Logger.LogDebug($"{nameof(Doc.LocalClient.OnInitialize)} - Initial : {initialInit}");
 				foreach (var change in changes)
 				{
 					await NotifyDispatcherAsync(Doc, change);

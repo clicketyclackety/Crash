@@ -36,9 +36,17 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(args.Doc);
 			if (args.Change is not GeometryChange geomChange) return;
 
-			Guid rhinoId = rhinoDoc.Objects.Add(geomChange.Geometry);
-			Rhino.DocObjects.RhinoObject rhinoObject = rhinoDoc.Objects.FindId(rhinoId);
-			ChangeUtils.SyncHost(rhinoObject, geomChange);
+			args.Doc.CacheTable.IsInit = true;
+			try
+			{
+				Guid rhinoId = rhinoDoc.Objects.Add(geomChange.Geometry);
+				Rhino.DocObjects.RhinoObject rhinoObject = rhinoDoc.Objects.FindId(rhinoId);
+				ChangeUtils.SyncHost(rhinoObject, geomChange);
+			}
+			finally
+			{
+				args.Doc.CacheTable.IsInit = false;
+			}
 		}
 
 	}

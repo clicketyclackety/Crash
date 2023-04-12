@@ -191,6 +191,13 @@ namespace Crash.Handlers.Plugins
 
 			RhinoDoc.DeleteRhinoObject += (sender, args) =>
 			{
+				CrashDoc crashDoc = CrashDocRegistry.GetRelatedDocument(args.TheObject.Document);
+				if (crashDoc is not null)
+				{
+					if (crashDoc.CacheTable.IsInit) return;
+					if (crashDoc.CacheTable.SomeoneIsDone) return;
+				}
+
 				args.TheObject.TryGetChangeId(out Guid changeId);
 				if (changeId == Guid.Empty) return;
 
@@ -207,17 +214,38 @@ namespace Crash.Handlers.Plugins
 
 			RhinoDoc.DeselectObjects += (sender, args) =>
 			{
+				CrashDoc crashDoc = CrashDocRegistry.GetRelatedDocument(args.Document);
+				if (crashDoc is not null)
+				{
+					if (crashDoc.CacheTable.IsInit) return;
+					if (crashDoc.CacheTable.SomeoneIsDone) return;
+				}
+
 				var crashArgs = new CrashSelectionEventArgs(args.Selected, args.RhinoObjects.Select(o => new CrashObject(o)));
 				NotifyDispatcher(ChangeAction.Unlock, sender, crashArgs, args.Document);
 			};
 
 			RhinoDoc.DeselectAllObjects += (sender, args) =>
 			{
+				CrashDoc crashDoc = CrashDocRegistry.GetRelatedDocument(args.Document);
+				if (crashDoc is not null)
+				{
+					if (crashDoc.CacheTable.IsInit) return;
+					if (crashDoc.CacheTable.SomeoneIsDone) return;
+				}
+
 				var crashArgs = new CrashSelectionEventArgs(false);
 				NotifyDispatcher(ChangeAction.Unlock, sender, crashArgs, args.Document);
 			};
 			RhinoDoc.SelectObjects += (sender, args) =>
 			{
+				CrashDoc crashDoc = CrashDocRegistry.GetRelatedDocument(args.Document);
+				if (crashDoc is not null)
+				{
+					if (crashDoc.CacheTable.IsInit) return;
+					if (crashDoc.CacheTable.SomeoneIsDone) return;
+				}
+
 				var crashArgs = new CrashSelectionEventArgs(args.Selected, args.RhinoObjects.Select(o => new CrashObject(o)));
 				NotifyDispatcher(ChangeAction.Lock, sender, crashArgs, args.Document);
 			};

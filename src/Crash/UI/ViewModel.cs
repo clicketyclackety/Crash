@@ -114,7 +114,7 @@ namespace Crash.UI
 			NotifyPropertyChanged(nameof(Users));
 		}
 
-		protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+		private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
 			=> PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 		internal void CycleCameraSetting(object sender, GridCellMouseEventArgs e)

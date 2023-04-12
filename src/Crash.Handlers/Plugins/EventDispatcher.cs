@@ -1,4 +1,4 @@
-using Crash.Common.Changes;
+﻿using Crash.Common.Changes;
 using Crash.Common.Document;
 using Crash.Common.Logging;
 using Crash.Handlers.InternalEvents;
@@ -258,18 +258,20 @@ namespace Crash.Handlers.Plugins
 
 			Doc.LocalClient.OnCameraChange += async (user, change) => await NotifyDispatcherAsync(Doc, change);
 
+			bool initialInit = false;
+
 			// OnInit is called on reconnect as well?
-			Action<Change[]> _event = null;
-			_event = async (changes) =>
+			Doc.LocalClient.OnInitialize += async (changes) =>
 			{
-				Doc.LocalClient.OnInitialize -= _event;
+				CrashLogger.Logger.LogDebug($"{nameof(Doc.LocalClient.OnInitialize)} - Initial : {initialInit}");
+				if (initialInit) return;
+
+				initialInit = true;
 				foreach (var change in changes)
 				{
 					await NotifyDispatcherAsync(Doc, change);
 				}
-			};
-
-			Doc.LocalClient.OnInitialize += _event;
+			}; ;
 		}
 #pragma warning restore VSTHRD101 // Avoid unsupported async delegates
 

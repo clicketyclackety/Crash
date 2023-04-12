@@ -57,12 +57,13 @@ namespace Crash.Handlers.Plugins
 		}
 
 		// How can we prevent the same events being subscribed multiple times
-		public void NotifyDispatcher(ChangeAction changeAction, object sender, EventArgs args, RhinoDoc doc)
+		public async Task NotifyDispatcher(ChangeAction changeAction, object sender, EventArgs args, RhinoDoc doc)
 		{
 			if (!_createActions.TryGetValue(changeAction, out var actionChain)) return;
 			var crashArgs = new CreateRecieveArgs(changeAction, args, doc);
 
-			CrashDoc Doc = CrashDocRegistry.GetRelatedDocument(doc);
+			CrashDoc? Doc = CrashDocRegistry.GetRelatedDocument(doc);
+			if (null == Doc) return;
 
 			foreach (var action in actionChain)
 			{
@@ -103,7 +104,7 @@ namespace Crash.Handlers.Plugins
 						}
 					}
 
-					Task.WhenAll(tasks);
+					await Task.WhenAll(tasks);
 
 					return;
 				}

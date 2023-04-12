@@ -218,31 +218,30 @@ namespace Crash.Handlers.Plugins
 			};
 		}
 
+#pragma warning disable VSTHRD101 // Avoid unsupported async delegates
 		public void RegisterDefaultServerCalls(CrashDoc Doc)
 		{
-			Doc.LocalClient.OnAdd += (name, change) => NotifyDispatcherAsync(Doc, change);
+			Doc.LocalClient.OnAdd += async (name, change) => await NotifyDispatcherAsync(Doc, change);
+			Doc.LocalClient.OnDelete += async (name, changeGuid) => await NotifyDispatcherAsync(Doc, DeleteChange(changeGuid, name));
 
-			// These are all missing a Change Type! It will need explicitly mentioning!
-			Doc.LocalClient.OnDelete += (name, changeGuid) => NotifyDispatcherAsync(Doc, DeleteChange(changeGuid, name));
-			Doc.LocalClient.OnSelect += (name, changeGuid) => NotifyDispatcherAsync(Doc, SelectChange(changeGuid, name));
-			Doc.LocalClient.OnUnselect += (name, changeGuid) => NotifyDispatcherAsync(Doc, UnSelectChange(changeGuid, name));
+			Doc.LocalClient.OnSelect += async (name, changeGuid) => await NotifyDispatcherAsync(Doc, SelectChange(changeGuid, name));
+			Doc.LocalClient.OnUnselect += async (name, changeGuid) => await NotifyDispatcherAsync(Doc, UnSelectChange(changeGuid, name));
 
-			// How does this get handled?
-			Doc.LocalClient.OnDone += (name) => NotifyDispatcherAsync(Doc, DoneChange(name));
+			Doc.LocalClient.OnDone += async (name) => await NotifyDispatcherAsync(Doc, EventDispatcher.DoneChange(name));
 
-			Doc.LocalClient.OnCameraChange += (user, change) => NotifyDispatcherAsync(Doc, change);
+			Doc.LocalClient.OnCameraChange += async (user, change) => await NotifyDispatcherAsync(Doc, change);
 
-			// This works better than I expected
-			Doc.LocalClient.OnInitialize += (changes) =>
+			Doc.LocalClient.OnInitialize += async (changes) =>
 			{
 				foreach (var change in changes)
 				{
-					NotifyDispatcherAsync(Doc, change);
+					await NotifyDispatcherAsync(Doc, change);
 				}
 			};
 		}
+#pragma warning restore VSTHRD101 // Avoid unsupported async delegates
 
-		private Change DoneChange(string name)
+		private static Change DoneChange(string name)
 			=> new Change()
 			{
 				Owner = name,
@@ -252,7 +251,7 @@ namespace Crash.Handlers.Plugins
 				Stamp = DateTime.UtcNow,
 			};
 
-		private Change DeleteChange(Guid id, string name)
+		private static Change DeleteChange(Guid id, string name)
 			=> new Change()
 			{
 				Id = id,
@@ -263,7 +262,7 @@ namespace Crash.Handlers.Plugins
 				Payload = null,
 			};
 
-		private Change SelectChange(Guid id, string name)
+		private static Change SelectChange(Guid id, string name)
 			=> new Change()
 			{
 				Id = id,
@@ -274,7 +273,7 @@ namespace Crash.Handlers.Plugins
 				Payload = null,
 			};
 
-		private Change UnSelectChange(Guid id, string name)
+		private static Change UnSelectChange(Guid id, string name)
 			=> new Change()
 			{
 				Id = id,

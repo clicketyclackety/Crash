@@ -73,71 +73,69 @@ namespace Crash.Handlers.Plugins
 			CrashDoc? Doc = CrashDocRegistry.GetRelatedDocument(doc);
 			if (null == Doc) return;
 
+			IEnumerable<IChange> changes = Enumerable.Empty<IChange>();
 			foreach (var action in actionChain)
 			{
 				if (!action.CanConvert(sender, crashArgs)) continue;
-				if (action.TryConvert(sender, crashArgs, out var changes))
+				if (!action.TryConvert(sender, crashArgs, out changes)) continue;
+			}
+
+			List<Task> tasks = new List<Task>(changes.Count());
+			foreach (var iChange in changes)
+			{
+				Change change = iChange is Change castChange ? castChange : new Change(iChange);
+				string message = $"Added Change {change.Action}, {change.Id}";
+
+				switch (change.Action)
 				{
-					List<Task> tasks = new List<Task>(changes.Count());
-					foreach (var ichange in changes)
-					{
-						Change change = new Change(ichange);
-						string message = $"Added Change {change.Action}, {change.Id}";
-
-						switch (change.Action)
+					case ChangeAction.Add | ChangeAction.Temporary:
+						try
 						{
-							case ChangeAction.Add | ChangeAction.Temporary:
-								try
-								{
-									tasks.Add(Doc.LocalClient.AddAsync(change));
-									CrashLogger.Logger.LogDebug(message);
-								}
-								catch (OversizedChangeException oversized)
-								{
-									RhinoApp.WriteLine(oversized.Message);
-									CrashLogger.Logger.LogDebug($"Failed to Add Change {change.Id}");
-								}
-								break;
-							case ChangeAction.Remove:
-								tasks.Add(Doc.LocalClient.DeleteAsync(change.Id));
-								CrashLogger.Logger.LogDebug(message);
-								break;
-
-							case ChangeAction.Transform:
-								// tasks.Add(Doc.LocalClient.TransformAsync(change));
-								CrashLogger.Logger.LogDebug(message);
-								break;
-
-							case ChangeAction.Update:
-								tasks.Add(Doc.LocalClient.UpdateAsync(change.Id, change));
-								CrashLogger.Logger.LogDebug(message);
-								break;
-
-							case ChangeAction.Lock:
-								tasks.Add(Doc.LocalClient.SelectAsync(change.Id));
-								CrashLogger.Logger.LogDebug(message);
-								break;
-							case ChangeAction.Unlock:
-								tasks.Add(Doc.LocalClient.UnselectAsync(change.Id));
-								CrashLogger.Logger.LogDebug(message);
-								break;
-
-							case ChangeAction.Camera:
-								tasks.Add(Doc.LocalClient.CameraChangeAsync(change));
-								CrashLogger.Logger.LogDebug(message);
-								break;
-
-							default:
-								CrashLogger.Logger.LogDebug(message);
-								break;
+							tasks.Add(Doc.LocalClient.AddAsync(change));
+							CrashLogger.Logger.LogDebug(message);
 						}
-					}
+						catch (OversizedChangeException oversized)
+						{
+							RhinoApp.WriteLine(oversized.Message);
+							CrashLogger.Logger.LogDebug($"Failed to Add Change {change.Id}");
+						}
+						break;
+					case ChangeAction.Remove:
+						tasks.Add(Doc.LocalClient.DeleteAsync(change.Id));
+						CrashLogger.Logger.LogDebug(message);
+						break;
 
-					await Task.WhenAll(tasks);
+					case ChangeAction.Transform:
+						// tasks.Add(Doc.LocalClient.TransformAsync(change));
+						CrashLogger.Logger.LogDebug(message);
+						break;
 
-					return;
+					case ChangeAction.Update:
+						tasks.Add(Doc.LocalClient.UpdateAsync(change.Id, change));
+						CrashLogger.Logger.LogDebug(message);
+						break;
+
+					case ChangeAction.Lock:
+						tasks.Add(Doc.LocalClient.SelectAsync(change.Id));
+						CrashLogger.Logger.LogDebug(message);
+						break;
+					case ChangeAction.Unlock:
+						tasks.Add(Doc.LocalClient.UnselectAsync(change.Id));
+						CrashLogger.Logger.LogDebug(message);
+						break;
+
+					case ChangeAction.Camera:
+						tasks.Add(Doc.LocalClient.CameraChangeAsync(change));
+						CrashLogger.Logger.LogDebug(message);
+						break;
+
+					default:
+						CrashLogger.Logger.LogDebug(message);
+						break;
 				}
 			}
+
+			await Task.WhenAll(tasks);
 		}
 
 		public async Task NotifyDispatcherAsync(CrashDoc Doc, Change change)

@@ -10,7 +10,7 @@ namespace Crash.Handlers.Plugins.Initializers.Recieve
 
 		public ChangeAction Action => ChangeAction.None;
 
-		public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
+		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
 			var changes = crashDoc.CacheTable.GetChanges().Where(c => c.Owner == recievedChange.Owner);
 
@@ -26,7 +26,7 @@ namespace Crash.Handlers.Plugins.Initializers.Recieve
 					geomChange.RemoveAction(ChangeAction.Temporary);
 					geomChange.AddAction(ChangeAction.Add);
 
-					add.OnRecieve(crashDoc, geomChange);
+					await add.OnRecieveAsync(crashDoc, geomChange);
 					crashDoc.CacheTable.RemoveChange(change.Id);
 				}
 			}

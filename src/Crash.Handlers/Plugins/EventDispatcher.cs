@@ -1,8 +1,11 @@
 ﻿using Crash.Common.Changes;
 using Crash.Common.Document;
+using Crash.Common.Logging;
 using Crash.Handlers.InternalEvents;
 using Crash.Handlers.Plugins.Initializers;
 using Crash.Utils;
+
+using Microsoft.Extensions.Logging;
 
 using Rhino;
 using Rhino.Display;
@@ -57,12 +60,17 @@ namespace Crash.Handlers.Plugins
 		}
 
 		// How can we prevent the same events being subscribed multiple times
-		public void NotifyDispatcher(ChangeAction changeAction, object sender, EventArgs args, RhinoDoc doc)
+		public async Task NotifyDispatcher(ChangeAction changeAction, object sender, EventArgs args, RhinoDoc doc)
 		{
-			if (!_createActions.TryGetValue(changeAction, out var actionChain)) return;
+			if (!_createActions.TryGetValue(changeAction, out var actionChain))
+			{
+				CrashLogger.Logger.LogDebug($"Could not find a CreateAction for {changeAction}");
+				return;
+			}
 			var crashArgs = new CreateRecieveArgs(changeAction, args, doc);
 
-			CrashDoc Doc = CrashDocRegistry.GetRelatedDocument(doc);
+			CrashDoc? Doc = CrashDocRegistry.GetRelatedDocument(doc);
+			if (null == Doc) return;
 
 			foreach (var action in actionChain)
 			{
@@ -73,58 +81,79 @@ namespace Crash.Handlers.Plugins
 					foreach (var ichange in changes)
 					{
 						Change change = new Change(ichange);
+						string message = $"Added Change {change.Action}, {change.Id}";
+
 						switch (change.Action)
 						{
 							case ChangeAction.Add | ChangeAction.Temporary:
 								tasks.Add(Doc.LocalClient.AddAsync(change));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 							case ChangeAction.Remove:
 								tasks.Add(Doc.LocalClient.DeleteAsync(change.Id));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 
 							case ChangeAction.Transform:
 								// tasks.Add(Doc.LocalClient.TransformAsync(change));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 
 							case ChangeAction.Update:
 								tasks.Add(Doc.LocalClient.UpdateAsync(change.Id, change));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 
 							case ChangeAction.Lock:
-								tasks.Add(Doc.LocalClient.UnselectAsync(change.Id));
+								tasks.Add(Doc.LocalClient.SelectAsync(change.Id));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 							case ChangeAction.Unlock:
-								tasks.Add(Doc.LocalClient.SelectAsync(change.Id));
+								tasks.Add(Doc.LocalClient.UnselectAsync(change.Id));
+								CrashLogger.Logger.LogDebug(message);
 								break;
 
 							case ChangeAction.Camera:
 								tasks.Add(Doc.LocalClient.CameraChangeAsync(change));
+								CrashLogger.Logger.LogDebug(message);
+								break;
+
+							default:
+								CrashLogger.Logger.LogDebug(message);
 								break;
 						}
 					}
 
-					Task.WhenAll(tasks);
+					await Task.WhenAll(tasks);
 
 					return;
 				}
 			}
 		}
 
-		public void NotifyDispatcher(CrashDoc Doc, Change change)
+		public async Task NotifyDispatcherAsync(CrashDoc Doc, Change change)
 		{
-			if (!_recieveActions.TryGetValue(change.Type, out List<IChangeRecieveAction> recievers)) return;
-			RegisterUser(Doc, change);
+			if (!_recieveActions.TryGetValue(change.Type, out List<IChangeRecieveAction>? recievers) ||
+				null == recievers)
+			{
+				CrashLogger.Logger.LogDebug($"Could not find a Recieve Action for {change.Type}, {change.Id}");
+				return;
+			}
+
+			await RegisterUserAsync(Doc, change);
 
 			foreach (IChangeRecieveAction action in recievers)
 			{
 				if (action.Action != change.Action) continue;
 
-				action.OnRecieve(Doc, change);
+				CrashLogger.Logger.LogDebug($"Calling action {action.GetType().Name}, {change.Action}, {change.Type}, {change.Id}");
+
+				await action.OnRecieveAsync(Doc, change);
 				return;
 			}
 		}
 
-		private void RegisterUser(CrashDoc doc, Change change)
+		private async Task RegisterUserAsync(CrashDoc doc, Change change)
 		{
 			doc.Users.Add(change.Owner);
 		}
@@ -162,6 +191,13 @@ namespace Crash.Handlers.Plugins
 
 			RhinoDoc.DeleteRhinoObject += (sender, args) =>
 			{
+				CrashDoc crashDoc = CrashDocRegistry.GetRelatedDocument(args.TheObject.Document);
+				if (crashDoc is not null)
+				{
+					if (crashDoc.CacheTable.IsInit) return;
+					if (crashDoc.CacheTable.SomeoneIsDone) return;
+				}
+
 				args.TheObject.TryGetChangeId(out Guid changeId);
 				if (changeId == Guid.Empty) return;
 
@@ -171,6 +207,8 @@ namespace Crash.Handlers.Plugins
 
 			RhinoDoc.BeforeTransformObjects += (sender, args) =>
 			{
+				if (args.GripCount > 0) return;
+
 				var crashArgs = new CrashTransformEventArgs(args.Transform.ToCrash(), args.Objects.Select(o => new CrashObject(o)), args.ObjectsWillBeCopied);
 				RhinoDoc rhinoDoc = args.Objects.FirstOrDefault(o => o.Document is not null).Document;
 				NotifyDispatcher(ChangeAction.Transform, sender, crashArgs, rhinoDoc);
@@ -178,17 +216,38 @@ namespace Crash.Handlers.Plugins
 
 			RhinoDoc.DeselectObjects += (sender, args) =>
 			{
+				CrashDoc crashDoc = CrashDocRegistry.GetRelatedDocument(args.Document);
+				if (crashDoc is not null)
+				{
+					if (crashDoc.CacheTable.IsInit) return;
+					if (crashDoc.CacheTable.SomeoneIsDone) return;
+				}
+
 				var crashArgs = new CrashSelectionEventArgs(args.Selected, args.RhinoObjects.Select(o => new CrashObject(o)));
 				NotifyDispatcher(ChangeAction.Unlock, sender, crashArgs, args.Document);
 			};
 
 			RhinoDoc.DeselectAllObjects += (sender, args) =>
 			{
+				CrashDoc crashDoc = CrashDocRegistry.GetRelatedDocument(args.Document);
+				if (crashDoc is not null)
+				{
+					if (crashDoc.CacheTable.IsInit) return;
+					if (crashDoc.CacheTable.SomeoneIsDone) return;
+				}
+
 				var crashArgs = new CrashSelectionEventArgs(false);
 				NotifyDispatcher(ChangeAction.Unlock, sender, crashArgs, args.Document);
 			};
 			RhinoDoc.SelectObjects += (sender, args) =>
 			{
+				CrashDoc crashDoc = CrashDocRegistry.GetRelatedDocument(args.Document);
+				if (crashDoc is not null)
+				{
+					if (crashDoc.CacheTable.IsInit) return;
+					if (crashDoc.CacheTable.SomeoneIsDone) return;
+				}
+
 				var crashArgs = new CrashSelectionEventArgs(args.Selected, args.RhinoObjects.Select(o => new CrashObject(o)));
 				NotifyDispatcher(ChangeAction.Lock, sender, crashArgs, args.Document);
 			};
@@ -216,31 +275,38 @@ namespace Crash.Handlers.Plugins
 			};
 		}
 
+#pragma warning disable VSTHRD101 // Avoid unsupported async delegates
 		public void RegisterDefaultServerCalls(CrashDoc Doc)
 		{
-			Doc.LocalClient.OnAdd += (name, change) => NotifyDispatcher(Doc, change);
+			Doc.LocalClient.OnAdd += async (name, change) => await NotifyDispatcherAsync(Doc, change);
+			Doc.LocalClient.OnDelete += async (name, changeGuid) => await NotifyDispatcherAsync(Doc, DeleteChange(changeGuid, name));
 
-			// These are all missing a Change Type! It will need explicitly mentioning!
-			Doc.LocalClient.OnDelete += (name, changeGuid) => NotifyDispatcher(Doc, DeleteChange(changeGuid, name));
-			Doc.LocalClient.OnSelect += (name, changeGuid) => NotifyDispatcher(Doc, SelectChange(changeGuid, name));
-			Doc.LocalClient.OnUnselect += (name, changeGuid) => NotifyDispatcher(Doc, UnSelectChange(changeGuid, name));
+			Doc.LocalClient.OnSelect += async (name, changeGuid) => await NotifyDispatcherAsync(Doc, SelectChange(changeGuid, name));
+			Doc.LocalClient.OnUnselect += async (name, changeGuid) => await NotifyDispatcherAsync(Doc, UnSelectChange(changeGuid, name));
 
-			// How does this get handled?
-			Doc.LocalClient.OnDone += (name) => NotifyDispatcher(Doc, DoneChange(name));
+			Doc.LocalClient.OnDone += async (name) => await NotifyDispatcherAsync(Doc, EventDispatcher.DoneChange(name));
 
-			Doc.LocalClient.OnCameraChange += (user, change) => NotifyDispatcher(Doc, change);
+			Doc.LocalClient.OnCameraChange += async (user, change) => await NotifyDispatcherAsync(Doc, change);
 
-			// This works better than I expected
-			Doc.LocalClient.OnInitialize += (changes) =>
+			bool initialInit = false;
+
+			// OnInit is called on reconnect as well?
+			Doc.LocalClient.OnInitialize += async (changes) =>
 			{
+				if (initialInit) return;
+
+				initialInit = true;
+
+				CrashLogger.Logger.LogDebug($"{nameof(Doc.LocalClient.OnInitialize)} - Initial : {initialInit}");
 				foreach (var change in changes)
 				{
-					NotifyDispatcher(Doc, change);
+					await NotifyDispatcherAsync(Doc, change);
 				}
-			};
+			}; ;
 		}
+#pragma warning restore VSTHRD101 // Avoid unsupported async delegates
 
-		private Change DoneChange(string name)
+		private static Change DoneChange(string name)
 			=> new Change()
 			{
 				Owner = name,
@@ -250,7 +316,7 @@ namespace Crash.Handlers.Plugins
 				Stamp = DateTime.UtcNow,
 			};
 
-		private Change DeleteChange(Guid id, string name)
+		private static Change DeleteChange(Guid id, string name)
 			=> new Change()
 			{
 				Id = id,
@@ -261,7 +327,7 @@ namespace Crash.Handlers.Plugins
 				Payload = null,
 			};
 
-		private Change SelectChange(Guid id, string name)
+		private static Change SelectChange(Guid id, string name)
 			=> new Change()
 			{
 				Id = id,
@@ -272,7 +338,7 @@ namespace Crash.Handlers.Plugins
 				Payload = null,
 			};
 
-		private Change UnSelectChange(Guid id, string name)
+		private static Change UnSelectChange(Guid id, string name)
 			=> new Change()
 			{
 				Id = id,

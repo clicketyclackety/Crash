@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Crash.Changes;
 using Crash.Common.Document;
@@ -161,7 +162,7 @@ namespace Crash.Handlers.Tests.Plugins
 				Action = action;
 			}
 
-			public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
+			public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 			{
 				Assert.That(crashDoc, Is.Not.Null);
 				Assert.That(recievedChange, Is.Not.Null);
@@ -237,7 +238,7 @@ namespace Crash.Handlers.Tests.Plugins
 
 			// Assert
 			Assert.That(recieved, Is.False);
-			Dispatcher.NotifyDispatcher(crashDoc, serverChange);
+			Dispatcher.NotifyDispatcherAsync(crashDoc, serverChange);
 			Assert.That(recieved, Is.True);
 
 			Assert.That(serverChange.Id, Is.EqualTo(recievedChange.Id));

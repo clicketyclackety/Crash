@@ -21,7 +21,7 @@ namespace Crash.Common.Tests
 		}
 
 		[Test]
-		public void Count_ReturnsCorrectCount_AfterEnqueueingItems()
+		public async Task Count_ReturnsCorrectCount_AfterEnqueueingItemsAsync()
 		{
 			int expectedCount = 3;
 
@@ -29,7 +29,7 @@ namespace Crash.Common.Tests
 			var queue = new IdleQueue(new CrashDoc());
 			for (int i = 0; i < expectedCount; i++)
 			{
-				queue.AddAction(new IdleAction(null, null));
+				await queue.AddActionAsync(new IdleAction(null, null));
 			}
 
 			// Act
@@ -53,12 +53,12 @@ namespace Crash.Common.Tests
 		}
 
 		[Test]
-		public void RunNextAction_InvokesAction_WhenQueueIsNotEmpty()
+		public async Task RunNextAction_InvokesAction_WhenQueueIsNotEmpty()
 		{
 			// Arrange
 			var queue = new IdleQueue(new CrashDoc());
 			IdleAction action = new IdleAction(DisposableCrashEvent, null);
-			queue.AddAction(action);
+			await queue.AddActionAsync(action);
 
 			// Act
 			queue.RunNextAction();
@@ -68,7 +68,7 @@ namespace Crash.Common.Tests
 		}
 
 		[Test]
-		public void RunNextAction_RemovesActionFromQueue_AfterInvoking()
+		public async Task RunNextAction_RemovesActionFromQueue_AfterInvoking()
 		{
 			int expectedCount = 3;
 
@@ -76,7 +76,7 @@ namespace Crash.Common.Tests
 			var queue = new IdleQueue(new CrashDoc());
 			for (int i = 0; i < expectedCount; i++)
 			{
-				queue.AddAction(new IdleAction(DisposableCrashEvent, null));
+				await queue.AddActionAsync(new IdleAction(DisposableCrashEvent, null));
 			}
 
 			// Act
@@ -105,11 +105,11 @@ namespace Crash.Common.Tests
 		}
 
 		[Test]
-		public void RunNextAction_InvokeOnCompletedQueueEvent()
+		public async Task RunNextAction_InvokeOnCompletedQueueEvent()
 		{
 			// Arrange
 			var queue = new IdleQueue(new CrashDoc());
-			queue.AddAction(new IdleAction(DisposableCrashEvent, null));
+			await queue.AddActionAsync(new IdleAction(DisposableCrashEvent, null));
 
 			bool eventRaised = false;
 			queue.OnCompletedQueue += (sender, args) => { eventRaised = true; };

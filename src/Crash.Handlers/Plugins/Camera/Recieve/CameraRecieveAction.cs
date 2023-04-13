@@ -13,11 +13,11 @@ namespace Crash.Handlers.Plugins.Camera.Recieve
 
 		public ChangeAction Action => ChangeAction.Camera;
 
-		public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
+		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
 			var cameraArgs = new IdleArgs(crashDoc, recievedChange);
 			var cameraAction = new IdleAction(AddToDocument, cameraArgs);
-			crashDoc.Queue.AddAction(cameraAction);
+			await crashDoc.Queue.AddActionAsync(cameraAction);
 		}
 
 		private void AddToDocument(IdleArgs args)

@@ -1,5 +1,7 @@
-﻿using Crash.Common.Changes;
-using Crash.Common.Document;
+﻿using Crash.Common.Document;
+using Crash.Common.Events;
+using Crash.Events;
+using Crash.Utils;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
@@ -8,11 +10,18 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 		/// <summary>The Action this ICreateAction responds to</summary>
 		public ChangeAction Action => ChangeAction.Lock;
 
-		public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
+		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
-			if (!crashDoc.CacheTable.TryGetValue(recievedChange.Id, out GeometryChange geomChange)) return;
-			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(crashDoc);
-			rhinoDoc.Objects.Lock(geomChange.RhinoId, true);
+			var changeArgs = new IdleArgs(crashDoc, recievedChange);
+			var lockAction = new IdleAction(LockChange, changeArgs);
+			await crashDoc.Queue.AddActionAsync(lockAction);
+		}
+
+		private void LockChange(IdleArgs args)
+		{
+			if (!ChangeUtils.TryGetRhinoObject(args.Change, out var rhinoObject)) return;
+			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(args.Doc);
+			rhinoDoc.Objects.Lock(rhinoObject, true);
 		}
 	}
 

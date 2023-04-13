@@ -9,7 +9,7 @@ using Rhino.UI;
 namespace Crash.UI
 {
 
-	internal class UsersForm : Form
+	internal sealed class UsersForm : Form
 	{
 		private UsersViewModel ViewModel;
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.IO;
+using System.Threading.Tasks;
 
 using Crash.Changes;
 using Crash.Common.Changes;
@@ -17,13 +18,13 @@ namespace Crash.Handlers.Tests.Plugins.Geometry
 	{
 
 		[TestCaseSource(nameof(AddChanges))]
-		public void TestGeometryAddRecieveAction(Change change)
+		public async Task TestGeometryAddRecieveAction(Change change)
 		{
 			CrashDoc crashDoc = new CrashDoc();
 			RhinoDoc rhinoDoc = RhinoDoc.CreateHeadless(null);
 
 			var addAction = new GeometryAddRecieveAction();
-			addAction.OnRecieve(crashDoc, change);
+			await addAction.OnRecieveAsync(crashDoc, change);
 			while (crashDoc.Queue.Count > 0)
 			{
 				crashDoc.Queue.RunNextAction();

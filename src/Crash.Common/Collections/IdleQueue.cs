@@ -19,20 +19,20 @@ namespace Crash.Events
 		}
 
 		/// <summary>Adds an Action to the Queue</summary>
-		public void AddAction(IdleAction action)
+		public async Task AddActionAsync(IdleAction action)
 		{
-			_idleQueue.Enqueue(action);
+			await Task.Run(() => _idleQueue.Enqueue(action));
 		}
 
 		/// <summary>Attempts to run the next Action</summary>
 		public void RunNextAction()
 		{
-			if (_idleQueue.Count == 0) return;
+			if (_idleQueue.IsEmpty) return;
 
 			if (!_idleQueue.TryDequeue(out var action)) return;
 			action?.Invoke();
 
-			if (0 == _idleQueue.Count)
+			if (_idleQueue.IsEmpty)
 			{
 				OnCompletedQueue?.Invoke(this, null);
 			}

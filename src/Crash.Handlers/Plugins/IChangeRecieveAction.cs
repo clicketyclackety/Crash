@@ -14,7 +14,7 @@ namespace Crash.Handlers.Plugins
 		ChangeAction Action { get; }
 
 		/// <summary>Deserializes a Server Sent Change</summary>
-		public void OnRecieve(CrashDoc crashDoc, Change recievedChange);
+		public Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange);
 
 	}
 

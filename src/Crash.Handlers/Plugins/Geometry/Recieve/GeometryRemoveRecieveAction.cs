@@ -13,7 +13,7 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 		/// <summary>The Action this ICreateAction responds to</summary>
 		public ChangeAction Action => ChangeAction.Remove;
 
-		public void OnRecieve(CrashDoc crashDoc, Change recievedChange)
+		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
 			IdleArgs idleArgs;
 			IdleAction idleAction;
@@ -25,7 +25,7 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 				{
 					idleArgs = new IdleArgs(crashDoc, recievedChange);
 					idleAction = new IdleAction(RemoveTemporaryFromDocument, idleArgs);
-					crashDoc.Queue.AddAction(idleAction);
+					await crashDoc.Queue.AddActionAsync(idleAction);
 				}
 				else
 				{
@@ -36,7 +36,7 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 
 			idleArgs = new IdleArgs(crashDoc, recievedChange);
 			idleAction = new IdleAction(RemoveFromDocument, idleArgs);
-			crashDoc.Queue.AddAction(idleAction);
+			await crashDoc.Queue.AddActionAsync(idleAction);
 		}
 
 		private void RemoveFromDocument(IdleArgs args)

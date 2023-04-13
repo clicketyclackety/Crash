@@ -1,5 +1,6 @@
 ﻿using Crash.Handlers.Changes;
 
+using Rhino;
 using Rhino.DocObjects;
 
 namespace Crash.Utils
@@ -10,11 +11,32 @@ namespace Crash.Utils
 	{
 		private static string ChangeIdKey = "ChangeID";
 
+		// TODO : Not multi-doc compatible!!!
 		private static Dictionary<Guid, RhinoObject> RhinoChangeKeys;
+		private static HashSet<Guid> SelectedObjects;
+		internal static void ClearSelected() => SelectedObjects.Clear();
+		internal static HashSet<Guid> GetSelected() => SelectedObjects;
 
 		static ChangeUtils()
 		{
 			RhinoChangeKeys = new();
+			SelectedObjects = new();
+			RhinoDoc.SelectObjects += (sender, args) =>
+			{
+				foreach (var obj in args.RhinoObjects)
+				{
+					if (!TryGetChangeId(obj, out Guid ChangeId)) continue;
+					SelectedObjects.Add(ChangeId);
+				}
+			};
+			RhinoDoc.DeselectObjects += (sender, args) =>
+			{
+				foreach (var obj in args.RhinoObjects)
+				{
+					if (!TryGetChangeId(obj, out Guid ChangeId)) continue;
+					SelectedObjects.Remove(ChangeId);
+				}
+			};
 		}
 
 		/// <summary>Acquires the ChangeId from the Rhino Object</summary>

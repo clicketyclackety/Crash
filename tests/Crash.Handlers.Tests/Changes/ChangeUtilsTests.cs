@@ -1,5 +1,4 @@
 ﻿using Crash.Changes;
-using Crash.Handlers.Changes;
 using Crash.Utils;
 
 using Rhino;
@@ -50,10 +49,8 @@ namespace Crash.Handlers.Tests.Changes
 			ChangeUtils.SyncHost(rhinoObject, null);
 		}
 
-		private sealed class ExampleRhinoChange : IRhinoChange
+		private sealed class ExampleRhinoChange : IChange
 		{
-			public Guid RhinoId { get; set; } = Guid.NewGuid();
-
 			public DateTime Stamp => DateTime.Now;
 
 			public Guid Id => Guid.NewGuid();

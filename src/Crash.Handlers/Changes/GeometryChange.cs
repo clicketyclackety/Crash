@@ -1,7 +1,5 @@
 ﻿using System.Text.Json;
 
-using Crash.Handlers.Changes;
-
 using Rhino.FileIO;
 using Rhino.Geometry;
 using Rhino.Runtime;
@@ -12,13 +10,11 @@ namespace Crash.Common.Changes
 	/// <summary>
 	/// Local instance of a received Change.
 	/// </summary>
-	public sealed class GeometryChange : IRhinoChange
+	public sealed class GeometryChange : IChange
 	{
 		public const string ChangeType = $"{nameof(Crash)}.{nameof(GeometryChange)}";
 
 		public GeometryBase Geometry { get; private set; }
-
-		public Guid RhinoId { get; set; }
 
 		public DateTime Stamp { get; private set; }
 

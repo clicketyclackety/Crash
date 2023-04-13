@@ -1,6 +1,4 @@
-﻿using Crash.Handlers.Changes;
-
-using Rhino;
+﻿using Rhino;
 using Rhino.DocObjects;
 
 namespace Crash.Utils
@@ -58,7 +56,7 @@ namespace Crash.Utils
 		}
 
 		/// <summary>Adds the ChangeId to the Rhino Object and vice Verse.</summary>
-		public static void SyncHost(this RhinoObject rObj, IRhinoChange Change)
+		public static void SyncHost(this RhinoObject rObj, IChange Change)
 		{
 			if (null == Change || rObj == null) return;
 
@@ -68,10 +66,8 @@ namespace Crash.Utils
 				RhinoChangeKeys.Remove(changeId);
 			}
 
-			rObj.UserDictionary.Set(ChangeIdKey, (Change as IChange).Id);
+			rObj.UserDictionary.Set(ChangeIdKey, Change.Id);
 			RhinoChangeKeys.Add(Change.Id, rObj);
-
-			Change.RhinoId = rObj.Id;
 		}
 
 	}

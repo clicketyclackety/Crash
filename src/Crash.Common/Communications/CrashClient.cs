@@ -2,6 +2,7 @@
 
 using Crash.Common.Document;
 using Crash.Common.Events;
+using Crash.Common.Exceptions;
 using Crash.Common.Logging;
 
 using Microsoft.AspNetCore.SignalR;
@@ -205,6 +206,14 @@ namespace Crash.Client
 		/// <summary>Adds a change to database </summary>
 		public async Task AddAsync(Change Change)
 		{
+			int changeLength = Change.Payload.Length;
+			if (changeLength >= ushort.MaxValue)
+			{
+				throw new OversizedChangeException($"Change is over maximum size. {changeLength}/{ushort.MaxValue}");
+			}
+
+			CrashLogger.Logger.LogInformation($"Change {Change.Id} size is {changeLength}");
+
 			await _connection.InvokeAsync(ADD, _user, Change);
 		}
 

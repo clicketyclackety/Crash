@@ -1,5 +1,6 @@
 ﻿using Crash.Common.Changes;
 using Crash.Common.Document;
+using Crash.Common.Exceptions;
 using Crash.Common.Logging;
 using Crash.Handlers.InternalEvents;
 using Crash.Handlers.Plugins.Initializers;
@@ -86,8 +87,16 @@ namespace Crash.Handlers.Plugins
 						switch (change.Action)
 						{
 							case ChangeAction.Add | ChangeAction.Temporary:
-								tasks.Add(Doc.LocalClient.AddAsync(change));
-								CrashLogger.Logger.LogDebug(message);
+								try
+								{
+									tasks.Add(Doc.LocalClient.AddAsync(change));
+									CrashLogger.Logger.LogDebug(message);
+								}
+								catch (OversizedChangeException oversized)
+								{
+									RhinoApp.WriteLine(oversized.Message);
+									CrashLogger.Logger.LogDebug($"Failed to Add Change {change.Id}");
+								}
 								break;
 							case ChangeAction.Remove:
 								tasks.Add(Doc.LocalClient.DeleteAsync(change.Id));

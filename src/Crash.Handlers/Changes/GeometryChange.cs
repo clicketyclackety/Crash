@@ -32,6 +32,10 @@ namespace Crash.Common.Changes
 
 		public ChangeAction Action { get; set; }
 
+
+		public bool IsOversized => Payload?.Length > ushort.MaxValue;
+
+
 		public GeometryChange() { }
 
 		public GeometryChange(IChange change) : this()

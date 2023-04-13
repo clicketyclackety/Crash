@@ -12,17 +12,22 @@ using Point = Rhino.Geometry.Point;
 namespace Crash.Handlers.Plugins.Geometry
 {
 
+	/// <summary>Defines the Geometry Change Type to handle default Rhino Geometry</summary>
 	public sealed class GeometryChangeDefinition : IChangeDefinition
 	{
+		/// <inheritdoc/>
 		public Type ChangeType => typeof(GeometryChange);
 
+		/// <inheritdoc/>
 		public string ChangeName => GeometryChange.ChangeType;
 
+		/// <inheritdoc/>
 		public IEnumerable<IChangeCreateAction> CreateActions { get; }
 
+		/// <inheritdoc/>
 		public IEnumerable<IChangeRecieveAction> RecieveActions { get; }
 
-
+		/// <summary>Default Constructor</summary>
 		public GeometryChangeDefinition()
 		{
 			CreateActions = new List<IChangeCreateAction>
@@ -48,7 +53,7 @@ namespace Crash.Handlers.Plugins.Geometry
 			};
 		}
 
-
+		/// <inheritdoc/>
 		public void Draw(DrawEventArgs drawArgs, DisplayMaterial material, IChange change)
 		{
 			if (change is not GeometryChange geomChange) return;
@@ -92,6 +97,7 @@ namespace Crash.Handlers.Plugins.Geometry
 			}
 		}
 
+		/// <inheritdoc/>
 		public BoundingBox GetBoundingBox(IChange change)
 		{
 			if (change is not GeometryChange geomChange)

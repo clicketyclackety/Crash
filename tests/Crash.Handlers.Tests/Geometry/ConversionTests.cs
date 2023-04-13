@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 using Crash.Geometry;
 
@@ -40,29 +39,6 @@ namespace Crash.Handlers.Tests.Geometry
 		{
 			CVector converted = Crash.Handlers.Geometry.ToCrash(vec);
 			Assert.That(converted, Is.EqualTo(cvec));
-		}
-
-		[Test]
-		public void Point3dEnumerable_ToCPointEnumerable_Successful()
-		{
-			var pointPairs = Valid_PointPairs.Cast<TestCaseData>();
-			var cpoints = pointPairs.Select(p => (CPoint)p.Arguments[0]);
-			var point3ds = pointPairs.Select(p => (Point3d)p.Arguments[1]);
-			var converted_point3ds = cpoints.ToRhino();
-
-			Assert.That(point3ds, Is.EqualTo(converted_point3ds));
-		}
-
-		[Test]
-		public void CPointEnumerable_ToPoint3dEnumerable_Successful()
-		{
-			var pointPairs = Valid_PointPairs.Cast<TestCaseData>();
-			var cpoints = pointPairs.Select(p => (CPoint)p.Arguments[0]);
-			var point3ds = pointPairs.Select(p => (Point3d)p.Arguments[1]);
-
-			var converted_cpoints = point3ds.ToCrash();
-
-			Assert.That(cpoints, Is.EqualTo(converted_cpoints));
 		}
 
 		[TestCaseSource(nameof(TransformData))]

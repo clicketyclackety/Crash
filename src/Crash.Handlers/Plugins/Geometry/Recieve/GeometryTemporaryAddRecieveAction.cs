@@ -5,11 +5,15 @@ using Crash.Events;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
+
+	/// <summary>Handles temporary objects from the server</summary>
 	internal sealed class GeometryTemporaryAddRecieveAction : IChangeRecieveAction
 	{
-		/// <summary>The Action this ICreateAction responds to</summary>
+
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Add | ChangeAction.Temporary;
 
+		/// <inheritdoc/>
 		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
 			if (recievedChange.Owner.Equals(crashDoc.Users.CurrentUser.Name))

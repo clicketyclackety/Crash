@@ -1,17 +1,24 @@
-﻿using Crash.Handlers.InternalEvents;
+﻿using Crash.Common.Changes;
+using Crash.Handlers.InternalEvents;
 
 namespace Crash.Handlers.Plugins.Geometry.Create
 {
+
+	/// <summary>Handles Selection</summary>
 	internal sealed class GeometrySelectAction : IChangeCreateAction
 	{
+
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Lock;
 
+		/// <inheritdoc/>
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)
 		{
 			if (crashArgs.Args is not CrashSelectionEventArgs cargs) return false;
 			return cargs.Selected;
 		}
 
+		/// <inheritdoc/>
 		public bool TryConvert(object sender, CreateRecieveArgs crashArgs, out IEnumerable<IChange> changes)
 		{
 			changes = Array.Empty<IChange>();
@@ -19,23 +26,22 @@ namespace Crash.Handlers.Plugins.Geometry.Create
 
 			var userName = crashArgs.Doc.Users.CurrentUser.Name;
 
-			changes = getChanges(cargs.CrashObjects, crashArgs, userName);
+			changes = getChanges(cargs.CrashObjects, userName);
 
 			return true;
 		}
 
 		private IEnumerable<IChange> getChanges(IEnumerable<CrashObject> crashObjects,
-												CreateRecieveArgs crashArgs,
 												string userName)
 		{
 			foreach (var crashObject in crashObjects)
 			{
 				if (crashObject.ChangeId == Guid.Empty) continue;
 
-
 				IChange change = new Change(crashObject.ChangeId, userName, null)
 				{
 					Action = ChangeAction.Lock,
+					Type = GeometryChange.ChangeType
 				};
 
 				yield return change;

@@ -5,13 +5,18 @@ using Crash.Handlers.InternalEvents;
 namespace Crash.Handlers.Plugins.Geometry.Create
 {
 
+	/// <summary>Handles Transform Changes</summary>
 	internal sealed class GeometryTransformAction : IChangeCreateAction
 	{
+
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Transform;
 
+		/// <inheritdoc/>
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)
 			=> crashArgs.Args is CrashTransformEventArgs;
 
+		/// <inheritdoc/>
 		public bool TryConvert(object sender, CreateRecieveArgs crashArgs, out IEnumerable<IChange> changes)
 		{
 			changes = Array.Empty<IChange>();

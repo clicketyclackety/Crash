@@ -5,23 +5,30 @@ using Crash.Common.View;
 namespace Crash.Common.Changes
 {
 
+	/// <summary>Captues a Change of Camera</summary>
 	public sealed class CameraChange : IChange
 	{
-
+		/// <summary>The Unique Name of this Change</summary>
 		public const string ChangeName = $"{nameof(Crash)}.{nameof(CameraChange)}";
 
+		/// <inheritdoc/>
 		IChange Change { get; set; }
 
 		public Camera Camera { get; set; }
 
+		/// <inheritdoc/>
 		public DateTime Stamp => Change.Stamp;
 
+		/// <inheritdoc/>
 		public Guid Id => Change.Id;
 
+		/// <inheritdoc/>
 		public string? Owner => Change.Owner;
 
+		/// <inheritdoc/>
 		public string? Payload => Change.Payload;
 
+		/// <inheritdoc/>
 		public ChangeAction Action
 		{
 			get => Change.Action;
@@ -29,13 +36,16 @@ namespace Crash.Common.Changes
 			set => Change.Action = value;
 		}
 
+		/// <inheritdoc/>
 		public string Type => ChangeName;
 
+		/// <summary>Empty Constructor</summary>
 		public CameraChange()
 		{
 
 		}
 
+		/// <summary>IChange wrapping constructor</summary>
 		public CameraChange(IChange change)
 		{
 			Change = change;
@@ -56,6 +66,7 @@ namespace Crash.Common.Changes
 			Camera = camera;
 		}
 
+		/// <summary>Creates a new Camera Change</summary>
 		public static CameraChange CreateNew(Camera camera, string userName)
 		{
 			string json = JsonSerializer.Serialize(camera, Serialization.Options.Default);

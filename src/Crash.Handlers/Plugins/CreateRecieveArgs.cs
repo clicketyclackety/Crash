@@ -5,18 +5,18 @@ using Rhino;
 namespace Crash.Handlers.Plugins
 {
 
-	/// <summary></summary>
+	/// <summary>A wrapper for Crash Args</summary>
 	public class CreateRecieveArgs : EventArgs
 	{
 
-		/// <summary></summary>
+		/// <summary>The Action</summary>
 		public readonly ChangeAction Action;
-		/// <summary></summary>
+		/// <summary>The EventArgs, often wrapped Rhino Args</summary>
 		public readonly EventArgs Args;
-		/// <summary></summary>
+		/// <summary>The current Crash Document</summary>
 		public readonly CrashDoc Doc;
 
-		/// <summary></summary>
+		/// <summary>Internal Constructor</summary>
 		public CreateRecieveArgs(ChangeAction action, EventArgs args, CrashDoc doc)
 		{
 			Action = action;
@@ -24,7 +24,7 @@ namespace Crash.Handlers.Plugins
 			Doc = doc ?? throw new ArgumentNullException(nameof(CrashDoc));
 		}
 
-		/// <summary></summary>
+		/// <summary>Constructor with Rhino Doc</summary>
 		public CreateRecieveArgs(ChangeAction action, EventArgs args, RhinoDoc doc)
 			: this(action, args, CrashDocRegistry.GetRelatedDocument(doc))
 		{

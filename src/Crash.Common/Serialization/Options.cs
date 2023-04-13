@@ -1,27 +1,29 @@
-﻿using System.Text.Json.Serialization;
-using System.Text.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Crash.Common.Serialization
 {
-    
-    internal static class Options
-    {
 
-        static Options()
-        {
-            Default = new JsonSerializerOptions()
-            {
-                IgnoreReadOnlyFields = true,
-                IgnoreReadOnlyProperties = true,
-                IncludeFields = true,
-                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-                ReadCommentHandling = JsonCommentHandling.Skip,
-                WriteIndented = true, // TODO : Should this be avoided? Does it add extra memory?
-            };
-        }
+	/// <summary>Default Internal Json Serialization.
+	/// This has nothing to do with the SignalR Hub</summary>
+	internal static class Options
+	{
 
-        internal readonly static JsonSerializerOptions Default;
+		static Options()
+		{
+			Default = new JsonSerializerOptions()
+			{
+				IgnoreReadOnlyFields = true,
+				IgnoreReadOnlyProperties = true,
+				IncludeFields = true,
+				NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+				ReadCommentHandling = JsonCommentHandling.Skip,
+				WriteIndented = true,
+			};
+		}
 
-    }
+		internal readonly static JsonSerializerOptions Default;
+
+	}
 
 }

@@ -6,6 +6,7 @@ using System.Text;
 namespace Crash.Common.Document
 {
 
+	/// <summary>The state of the Camera for this user</summary>
 	public enum CameraState
 	{
 		None = 0,
@@ -13,13 +14,12 @@ namespace Crash.Common.Document
 		Follow = 2,
 	}
 
-	/// <summary>
-	/// User class
-	/// </summary>
+	/// <summary>User class</summary>
 	public struct User : IEquatable<User>
 	{
 		private string _name;
 
+		/// <summary>Is this user Visible?</summary>
 		public bool Visible { get; set; } = true;
 
 		/// <summary>Name of the user</summary>
@@ -33,6 +33,7 @@ namespace Crash.Common.Document
 		public Color Color { get; set; }
 
 		public CameraState Camera { get; set; } = CameraState.Visible;
+
 
 		/// <summary>
 		/// User Constructor 
@@ -54,17 +55,18 @@ namespace Crash.Common.Document
 			}
 		}
 
-
+		/// <summary>Checks user for being valid</summary>
 		public bool IsValid() => !string.IsNullOrEmpty(Name);
 
+		/// <inheritdoc/>
 		public override int GetHashCode() => string.IsNullOrEmpty(Name) ? -1 : Name.GetHashCode();
-
-		public override bool Equals(object obj)
+		/// <inheritdoc/>
+		public override bool Equals(object? obj)
 		{
 			if (obj is not User user) return false;
 			return Equals(user);
 		}
-
+		/// <inheritdoc/>
 		public bool Equals(User other) => this.GetHashCode() == other.GetHashCode();
 
 		// TODO : Add cleaning methods

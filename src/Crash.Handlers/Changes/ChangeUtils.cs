@@ -70,6 +70,10 @@ namespace Crash.Utils
 			RhinoChangeKeys.Add(Change.Id, rObj);
 		}
 
+		/// <summary>Check for Oversied Payload</summary>
+		public static bool IsOversized(this IChange change)
+			=> change.Payload?.Length > ushort.MaxValue;
+
 	}
 
 }

@@ -8,15 +8,18 @@ using Rhino.Geometry;
 namespace Crash.Handlers.Plugins.Geometry.Create
 {
 
+	/// <summary>Captures Creating </summary>
 	internal sealed class GeometryCreateAction : IChangeCreateAction
 	{
-
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Add | ChangeAction.Temporary;
 
+		/// <inheritdoc/>
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)
 			=> crashArgs.Args is CrashObjectEventArgs rargs &&
 			   rargs.Geometry is not null;
 
+		/// <inheritdoc/>
 		public bool TryConvert(object sender, CreateRecieveArgs crashArgs, out IEnumerable<IChange> changes)
 		{
 			if (crashArgs.Args is CrashObjectEventArgs cargs)

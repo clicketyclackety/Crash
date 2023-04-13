@@ -5,8 +5,7 @@ namespace Crash.Handlers.Plugins
 	// TODO :
 	// How do we handle the fact we have Add/Remove/Transform endpoints?
 	// This only handles the initial creation
-
-	/// <summary></summary>
+	/// <summary>Handles recieved changes from the Server</summary>
 	public interface IChangeRecieveAction
 	{
 

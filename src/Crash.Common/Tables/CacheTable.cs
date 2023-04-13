@@ -5,6 +5,7 @@ using Crash.Common.Document;
 namespace Crash.Common.Tables
 {
 
+	/// <summary>Holds Temporary Changes only</summary>
 	public sealed class ChangeTable : IEnumerable<IChange>
 	{
 		private readonly CrashDoc _crashDoc;
@@ -98,11 +99,13 @@ namespace Crash.Common.Tables
 		/// <returns>returns a list of the Changes</returns>
 		public IEnumerable<IChange> GetChanges() => _cache.Values;
 
+		/// <inheritdoc/>
 		public IEnumerator<IChange> GetEnumerator() => _cache.Values.GetEnumerator();
-
+		/// <inheritdoc/>
 		public IEnumerator<T> GetEnumerator<T>() => _cache.Values.Where(x => x is T).Cast<T>().GetEnumerator();
-
+		/// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => _cache.Values.GetEnumerator();
+
 	}
 }
 

@@ -8,11 +8,15 @@ using Rhino.DocObjects;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
+
+	/// <summary>Handles Deleted objects from the Server</summary>
 	internal sealed class GeometryRemoveRecieveAction : IChangeRecieveAction
 	{
-		/// <summary>The Action this ICreateAction responds to</summary>
+
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Remove;
 
+		/// <inheritdoc/>
 		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
 			IdleArgs idleArgs;

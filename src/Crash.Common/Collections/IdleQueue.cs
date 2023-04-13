@@ -11,7 +11,7 @@ namespace Crash.Events
 		readonly ConcurrentQueue<IdleAction> _idleQueue;
 		readonly CrashDoc _hostDoc;
 
-
+		/// <summary>Constructs an Idle Queue</summary>
 		public IdleQueue(CrashDoc hostDoc)
 		{
 			this._hostDoc = hostDoc;
@@ -41,10 +41,10 @@ namespace Crash.Events
 		/// <summary>The number of items in the Queue</summary>
 		public int Count => _idleQueue.Count;
 
-		/// <summary></summary>
+		/// <summary>GetEnumerator</summary>
 		public IEnumerator<IdleAction> GetEnumerator() => _idleQueue.GetEnumerator();
 
-		/// <summary></summary>
+		/// <summary>GetEnumerator</summary>
 		IEnumerator IEnumerable.GetEnumerator() => _idleQueue.GetEnumerator();
 
 		/// <summary>Fires when the queue has finished parsing more than 1 item.</summary>

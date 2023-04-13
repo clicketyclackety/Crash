@@ -6,6 +6,7 @@ using Rhino;
 namespace Crash.Handlers
 {
 	// TODO : Make internal
+	// TODO : Is this needed?
 	public sealed class CrashDocumentState : IDisposable
 	{
 

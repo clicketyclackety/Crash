@@ -5,6 +5,7 @@ using Rhino;
 namespace Crash.Handlers
 {
 
+	// TODO : Is this needed?
 	public sealed partial class CrashDocRegistry
 	{
 		static BidirectionalMap.BiMap<RhinoDoc, CrashDocumentState> DocumentRelationship;

@@ -6,14 +6,19 @@ using Crash.Utils;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
+
+	/// <summary>Handles recieving of Geometry</summary>
 	internal sealed class GeometryAddRecieveAction : IChangeRecieveAction
 	{
-		/// <summary>The Action this ICreateAction responds to</summary>
+
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Add;
 
+		/// <inheritdoc/>
 		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 			=> await OnRecieveAsync(crashDoc, new GeometryChange(recievedChange));
 
+		/// <summary>Handles recieved Geometry Changes</summary>
 		public async Task OnRecieveAsync(CrashDoc crashDoc, GeometryChange geomChange)
 		{
 			if (GeometryAddRecieveAction.IsDuplicate(crashDoc, geomChange)) return;

@@ -14,15 +14,17 @@ using Rhino.Display;
 namespace Crash.Handlers.Plugins
 {
 
-	// This needs updating
+	/// <summary>Handles all events that should be communicated through the server</summary>
 	public sealed class EventDispatcher
 	{
 
 		private readonly Dictionary<ChangeAction, List<IChangeCreateAction>> _createActions;
 		private readonly Dictionary<string, List<IChangeRecieveAction>> _recieveActions;
 
+		/// <summary>The current Dispatcher. This is used across Docs</summary>
 		public static EventDispatcher Instance;
 
+		/// <summary>Default Constructor</summary>
 		public EventDispatcher()
 		{
 			Instance = this;
@@ -33,6 +35,7 @@ namespace Crash.Handlers.Plugins
 			RegisterDefaultEvents();
 		}
 
+		/// <summary>Registeres a Definition and all of the Create and recieve actions within</summary>
 		public void RegisterDefinition(IChangeDefinition definition)
 		{
 			foreach (var create in definition.CreateActions)
@@ -60,7 +63,16 @@ namespace Crash.Handlers.Plugins
 			}
 		}
 
-		// How can we prevent the same events being subscribed multiple times
+		// TODO : How can we prevent the same events being subscribed multiple times?
+		/// <summary>
+		/// Notifies the Dispatcher of any Events that should notify the server
+		/// Avoid Subscribing to events and pinging the server yourself
+		/// Wrap any related events with this method.
+		/// </summary>
+		/// <param name="changeAction">The ChangeAction</param>
+		/// <param name="sender">The sender of the Event</param>
+		/// <param name="args">The EventArgs</param>
+		/// <param name="doc">The associated RhinoDoc</param>
 		public async Task NotifyDispatcher(ChangeAction changeAction, object sender, EventArgs args, RhinoDoc doc)
 		{
 			if (!_createActions.TryGetValue(changeAction, out var actionChain))
@@ -138,6 +150,11 @@ namespace Crash.Handlers.Plugins
 			await Task.WhenAll(tasks);
 		}
 
+		/// <summary>
+		/// Captures Calls from the Server
+		/// </summary>
+		/// <param name="Doc">The related Crash Doc</param>
+		/// <param name="change">The Change from the Server</param>
 		public async Task NotifyDispatcherAsync(CrashDoc Doc, Change change)
 		{
 			if (!_recieveActions.TryGetValue(change.Type, out List<IChangeRecieveAction>? recievers) ||
@@ -208,7 +225,7 @@ namespace Crash.Handlers.Plugins
 				args.TheObject.TryGetChangeId(out Guid changeId);
 				if (changeId == Guid.Empty) return;
 
-				var crashArgs = new CrashObjectEventArgs(args.TheObject.Geometry, args.TheObject.Id, changeId);
+				var crashArgs = new CrashObjectEventArgs(args.TheObject, changeId);
 				NotifyDispatcher(ChangeAction.Remove, sender, crashArgs, args.TheObject.Document);
 			};
 
@@ -283,6 +300,11 @@ namespace Crash.Handlers.Plugins
 		}
 
 #pragma warning disable VSTHRD101 // Avoid unsupported async delegates
+		/// <summary>
+		/// Registers all default server calls.
+		/// If you need to create custom calls do this elsewhere.
+		/// These calls cannot currently be overriden or switched off
+		/// </summary>
 		public void RegisterDefaultServerCalls(CrashDoc Doc)
 		{
 			Doc.LocalClient.OnAdd += async (name, change) => await NotifyDispatcherAsync(Doc, change);

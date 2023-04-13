@@ -4,21 +4,26 @@ using Crash.Utils;
 
 namespace Crash.Handlers.Plugins.Geometry.Create
 {
+
+	/// <summary>Handles unselction</summary>
 	internal sealed class GeometryUnSelectAction : IChangeCreateAction
 	{
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Unlock;
 
+		/// <inheritdoc/>
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)
 			=> crashArgs.Args is CrashSelectionEventArgs cargs &&
 			!cargs.Selected;
 
+		/// <inheritdoc/>
 		public bool TryConvert(object sender, CreateRecieveArgs crashArgs, out IEnumerable<IChange> changes)
 		{
 			changes = Array.Empty<IChange>();
 			if (crashArgs.Args is not CrashSelectionEventArgs cargs) return false;
 			string userName = crashArgs.Doc.Users.CurrentUser.Name;
 
-			if (cargs.All)
+			if (cargs.DeselectAll)
 			{
 				var guids = ChangeUtils.GetSelected().ToList();
 				ChangeUtils.ClearSelected();

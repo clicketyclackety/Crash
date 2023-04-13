@@ -19,12 +19,13 @@ namespace Crash.Handlers.Server
 		private const string ARCHIVED_SERVER_DOWNLOAD_URL = $"https://github.com/crashcloud/crash.server/releases/{VERSION}/download/{ARCHIVED_SERVER_FILENAME}";
 		private static string DOWNLOADED_FILEPATH => Path.Combine(CrashServer.BASE_DIRECTORY, ARCHIVED_SERVER_FILENAME);
 
+		/// <summary>Checks for an exiting Crash.Server.exe</summary>
 		public static bool ServerExecutableExists => File.Exists(CrashServer.SERVER_FILEPATH) &&
 			new FileInfo(CrashServer.SERVER_FILEPATH).Length > 10_000;
 		private static bool ServerExecutableExistsAndIsInvalid => File.Exists(CrashServer.SERVER_FILEPATH) &&
 			new FileInfo(CrashServer.SERVER_FILEPATH).Length < 10_000;
 
-
+		/// <summary>Checks for a server exe, and it doesn't exist, downloads it</summary>
 		public static async Task<bool> EnsureServerExecutableExists()
 		{
 			if (ServerExecutableExists)

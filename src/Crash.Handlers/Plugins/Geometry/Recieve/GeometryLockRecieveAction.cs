@@ -5,11 +5,15 @@ using Crash.Utils;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
+
+	/// <summary>Handles Selected objects from the server</summary>
 	internal sealed class GeometryLockRecieveAction : IChangeRecieveAction
 	{
-		/// <summary>The Action this ICreateAction responds to</summary>
+
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Lock;
 
+		/// <inheritdoc/>
 		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
 			var changeArgs = new IdleArgs(crashDoc, recievedChange);
@@ -23,6 +27,7 @@ namespace Crash.Handlers.Plugins.Geometry.Recieve
 			var rhinoDoc = CrashDocRegistry.GetRelatedDocument(args.Doc);
 			rhinoDoc.Objects.Lock(rhinoObject, true);
 		}
+
 	}
 
 }

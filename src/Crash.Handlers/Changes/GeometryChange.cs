@@ -7,33 +7,36 @@ using Rhino.Runtime;
 namespace Crash.Common.Changes
 {
 
-	/// <summary>
-	/// Local instance of a received Change.
-	/// </summary>
+	/// <summary>A Change encapuslating Rhino Geometry</summary>
 	public sealed class GeometryChange : IChange
 	{
+		/// <summary>The TYpe of this Change</summary>
 		public const string ChangeType = $"{nameof(Crash)}.{nameof(GeometryChange)}";
 
+		/// <summary>The Related Rhino Geometry</summary>
 		public GeometryBase Geometry { get; private set; }
 
+		/// <inheritdoc/>
 		public DateTime Stamp { get; private set; }
 
+		/// <inheritdoc/>
 		public Guid Id { get; internal set; }
 
+		/// <inheritdoc/>
 		public string? Owner { get; private set; }
 
+		/// <inheritdoc/>
 		public string? Payload { get; private set; }
 
+		/// <inheritdoc/>
 		public string Type => ChangeType;
-
+		/// <inheritdoc/>
 		public ChangeAction Action { get; set; }
 
-
-		public bool IsOversized => Payload?.Length > ushort.MaxValue;
-
-
+		/// <summary>Deserialization Constructor</summary>
 		public GeometryChange() { }
 
+		/// <summary>Inheritance Constructor</summary>
 		public GeometryChange(IChange change) : this()
 		{
 			var options = new SerializationOptions();

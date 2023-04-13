@@ -8,11 +8,15 @@ using Rhino.Geometry;
 
 namespace Crash.Handlers.Plugins.Camera.Recieve
 {
+
+	/// <summary>Handles recieving a camera from the Server</summary>
 	internal sealed class CameraRecieveAction : IChangeRecieveAction
 	{
 
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Camera;
 
+		/// <inheritdoc/>
 		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
 			var cameraArgs = new IdleArgs(crashDoc, recievedChange);

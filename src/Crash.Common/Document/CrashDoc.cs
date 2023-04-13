@@ -9,39 +9,39 @@ using Crash.Events;
 namespace Crash.Common.Document
 {
 
+	/// <summary>The Crash Document</summary>
 	public sealed class CrashDoc : IEquatable<CrashDoc>, IDisposable
 	{
-		private readonly Guid _id;
+		public readonly Guid Id;
 
 		#region Tables
-
+		/// <summary>The Users Table for the Crash Doc</summary>
 		public readonly UserTable Users;
-
+		/// <summary>The Changes Table for the Crash Doc</summary>
 		public readonly ChangeTable CacheTable;
-
+		/// <summary>The Camera Table for the crash Doc</summary>
 		public readonly CameraTable Cameras;
-
 		#endregion
 
 		#region Connectivity
-
+		/// <summary>The Local Client for the Crash Doc</summary>
 		public CrashClient? LocalClient { get; set; }
-
+		/// <summary>The Local Server for the Crash Doc</summary>
 		public CrashServer? LocalServer { get; set; }
-
 		#endregion
 
 		#region Queue
-
+		/// <summary>The Idle Queue for the Crash Document</summary>
 		public IdleQueue Queue { get; private set; }
 
 		#endregion
 
 		#region constructors
 
+		/// <summary>Constructs a Crash Doc</summary>
 		public CrashDoc()
 		{
-			_id = Guid.NewGuid();
+			Id = Guid.NewGuid();
 
 			Users = new UserTable(this);
 			CacheTable = new ChangeTable(this);
@@ -50,30 +50,26 @@ namespace Crash.Common.Document
 			Queue = new IdleQueue(this);
 		}
 
-
-		internal static CrashDoc CreateHeadless()
-		{
-			return new CrashDoc();
-		}
-
 		#endregion
 
 		#region Methods
+		/// <inheritdoc/>
 		public bool Equals(CrashDoc? other)
 			=> other?.GetHashCode() == GetHashCode();
 
+		/// <inheritdoc/>
 		public override bool Equals(object? obj)
 		{
 			if (obj is not CrashDoc other) return false;
 			return Equals(other);
 		}
 
-		public override int GetHashCode() => _id.GetHashCode();
+		/// <inheritdoc/>
+		public override int GetHashCode() => Id.GetHashCode();
 
 		#endregion
 
-		// Disposal
-
+		/// <inheritdoc/>
 		public void Dispose()
 		{
 			LocalClient?.StopAsync();

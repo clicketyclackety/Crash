@@ -3,14 +3,19 @@ using Crash.Handlers.InternalEvents;
 
 namespace Crash.Handlers.Plugins.Geometry.Create
 {
+
+	/// <summary>Handles Removed Objects</summary>
 	internal sealed class GeometryRemoveAction : IChangeCreateAction
 	{
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Remove;
 
+		/// <inheritdoc/>
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)
 			=> crashArgs.Args is CrashObjectEventArgs rargs &&
 			   rargs.ChangeId != Guid.Empty;
 
+		/// <inheritdoc/>
 		public bool TryConvert(object sender, CreateRecieveArgs crashArgs, out IEnumerable<IChange> changes)
 		{
 			changes = Array.Empty<IChange>();

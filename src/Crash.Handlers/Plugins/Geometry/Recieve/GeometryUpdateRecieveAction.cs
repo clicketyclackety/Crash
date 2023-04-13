@@ -3,11 +3,15 @@ using Crash.Common.Document;
 
 namespace Crash.Handlers.Plugins.Geometry.Recieve
 {
+
+	/// <summary>Handles updates from the server</summary>
 	internal sealed class GeometryUpdateRecieveAction : IChangeRecieveAction
 	{
-		/// <summary>The Action this ICreateAction responds to</summary>
+
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Update;
 
+		/// <inheritdoc/>
 		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
 			if (!crashDoc.CacheTable.TryGetValue(recievedChange.Id, out GeometryChange geomChange)) return;

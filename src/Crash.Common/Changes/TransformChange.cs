@@ -5,26 +5,34 @@ using Crash.Geometry;
 namespace Crash.Common.Changes
 {
 
+	/// <summary>Captures a Transformation Change</summary>
 	public struct TransformChange : IChange
 	{
-
+		/// <summary>The CTransform</summary>
 		public CTransform Transform { get; private set; }
 
+		/// <inheritdoc/>
 		public DateTime Stamp { get; private set; }
 
+		/// <inheritdoc/>
 		public Guid Id { get; private set; }
 
+		/// <inheritdoc/>
 		public string? Owner { get; private set; }
 
+		/// <inheritdoc/>
 		public string? Payload { get; private set; }
 
+		/// <inheritdoc/>
 		public string Type => $"{nameof(Crash)}.{nameof(TransformChange)}";
 
+		/// <inheritdoc/>
 		public ChangeAction Action { get; set; }
 
-
+		/// <summary>Empty Constructor</summary>
 		public TransformChange() { }
 
+		/// <summary>IChange wrapping Constructor</summary>
 		public TransformChange(IChange change)
 		{
 			if (string.IsNullOrEmpty(change.Payload))
@@ -40,6 +48,7 @@ namespace Crash.Common.Changes
 			Id = change.Id;
 		}
 
+		/// <summary>Creates a Transform Cahnge</summary>
 		public static TransformChange CreateNew(CTransform transform, string userName, Guid id)
 		{
 			string json = JsonSerializer.Serialize(transform, Serialization.Options.Default);

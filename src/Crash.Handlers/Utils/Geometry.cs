@@ -9,35 +9,20 @@ using Rhino.Geometry;
 namespace Crash.Handlers
 {
 
-	/// <summary>
-	/// Geometry Converter Classes
-	/// </summary>
+	/// <summary>Crash to RhinoGeometry Converter Classes</summary>
 	public static class Geometry
 	{
-
+		/// <summary>Converts a CPoint to a Point3d</summary>
 		public static Point3d ToRhino(this CPoint cPoint) => new(cPoint.X, cPoint.Y, cPoint.Z);
+		/// <summary>Converts a Point3d to a CPoint</summary>
 		public static CPoint ToCrash(this Point3d cPoint) => new(cPoint.X, cPoint.Y, cPoint.Z);
 
+		/// <summary>Converts a CVector to a Vector3d</summary>
 		public static Vector3d ToRhino(this CVector cVector) => new(cVector.X, cVector.Y, cVector.Z);
+		/// <summary>Converts a Vector3d to a CVector</summary>
 		public static CVector ToCrash(this Vector3d cVector) => new(cVector.X, cVector.Y, cVector.Z);
 
-
-		public static IEnumerable<Point3d> ToRhino(this IEnumerable<CPoint> cPoints)
-		{
-			foreach (var cPoint in cPoints)
-				yield return cPoint.ToRhino();
-		}
-		// Reverse
-
-
-		public static IEnumerable<CPoint> ToCrash(this IEnumerable<Point3d> rhinoPoints)
-		{
-			foreach (var point3d in rhinoPoints)
-				yield return point3d.ToCrash();
-		}
-		// Reverse
-
-
+		/// <summary>Converts a CTransform to a Transform</summary>
 		public static CTransform ToCrash(this Transform transform)
 		{
 			return new CTransform(transform.M00, transform.M01, transform.M02, transform.M03,
@@ -45,6 +30,7 @@ namespace Crash.Handlers
 									transform.M20, transform.M21, transform.M22, transform.M23,
 									transform.M30, transform.M31, transform.M32, transform.M33);
 		}
+		/// <summary>Converts a Transform to a CTransform</summary>
 		public static Transform ToRhino(this CTransform transform)
 		{
 			return new Transform()
@@ -71,6 +57,6 @@ namespace Crash.Handlers
 			};
 		}
 
-
 	}
+
 }

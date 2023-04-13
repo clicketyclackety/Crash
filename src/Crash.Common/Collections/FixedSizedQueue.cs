@@ -8,6 +8,7 @@ namespace Crash.Common.Collections
 	{
 		private readonly Queue<T> _idleQueue;
 
+		/// <summary>The Size of the Queue</summary>
 		public readonly int Size;
 
 		/// <summary></summary>
@@ -28,13 +29,13 @@ namespace Crash.Common.Collections
 			_idleQueue.Enqueue(item);
 		}
 
-		/// <summary></summary>
+		/// <summary>Current count of the Queue</summary>
 		public int Count => _idleQueue.Count;
 
-		/// <summary></summary>
+		/// <summary>GetEnumerator</summary>
 		public IEnumerator<T> GetEnumerator() => _idleQueue.GetEnumerator();
 
-		/// <summary></summary>
+		/// <summary>GetEnumerator</summary>
 		IEnumerator IEnumerable.GetEnumerator() => _idleQueue.GetEnumerator();
 
 	}

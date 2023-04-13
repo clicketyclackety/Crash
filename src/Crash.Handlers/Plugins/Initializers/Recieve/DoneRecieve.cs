@@ -5,11 +5,15 @@ using Crash.Handlers.Plugins.Geometry.Recieve;
 
 namespace Crash.Handlers.Plugins.Initializers.Recieve
 {
+
+	/// <summary>Handles 'Done' calls from the Server</summary>
 	internal class DoneRecieve : IChangeRecieveAction
 	{
 
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.None;
 
+		/// <inheritdoc/>
 		public async Task OnRecieveAsync(CrashDoc crashDoc, Change recievedChange)
 		{
 			var changes = crashDoc.CacheTable.GetChanges().Where(c => c.Owner == recievedChange.Owner);
@@ -42,6 +46,7 @@ namespace Crash.Handlers.Plugins.Initializers.Recieve
 				crashDoc.Queue.OnCompletedQueue += _event;
 			}
 		}
+
 	}
 
 }

@@ -8,18 +8,22 @@ using Rhino.Geometry;
 namespace Crash.Handlers.Plugins.Camera
 {
 
+	/// <summary>Defines the Camera Change Type</summary>
 	public sealed class CameraChangeDefinition : IChangeDefinition
 	{
-
+		/// <inheritdoc/>
 		public Type ChangeType => typeof(CameraChange);
 
-		public string ChangeName => $"{nameof(Crash)}.{nameof(CameraChange)}";
+		/// <inheritdoc/>
+		public string ChangeName => CameraChange.ChangeName;
 
+		/// <inheritdoc/>
 		public IEnumerable<IChangeCreateAction> CreateActions { get; }
 
+		/// <inheritdoc/>
 		public IEnumerable<IChangeRecieveAction> RecieveActions { get; }
 
-
+		/// <summary>Constructs the Definition</summary>
 		public CameraChangeDefinition()
 		{
 			CreateActions = new List<IChangeCreateAction>
@@ -32,9 +36,8 @@ namespace Crash.Handlers.Plugins.Camera
 			};
 		}
 
-		const double width = 1000;
-		const double height = 500;
-		const int thickness = 4;
+
+		/// <inheritdoc/>
 		public void Draw(DrawEventArgs drawArgs, DisplayMaterial material, IChange change)
 		{
 			if (change is not CameraChange cameraChange) return;
@@ -43,6 +46,7 @@ namespace Crash.Handlers.Plugins.Camera
 			Active.Draw(drawArgs, material);
 		}
 
+		/// <inheritdoc/>
 		public BoundingBox GetBoundingBox(IChange change)
 		{
 			BoundingBox bounds = BoundingBox.Empty;
@@ -57,6 +61,7 @@ namespace Crash.Handlers.Plugins.Camera
 
 		CameraGraphic Active;
 
+		/// <summary>The Camera Graphic for the Pipeline</summary>
 		private struct CameraGraphic
 		{
 

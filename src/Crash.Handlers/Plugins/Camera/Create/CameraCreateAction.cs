@@ -4,8 +4,11 @@ using Crash.Handlers.InternalEvents;
 
 namespace Crash.Handlers.Plugins.Camera.Create
 {
+
+	/// <summary>Creates a Camera from a View Event</summary>
 	internal sealed class CameraCreateAction : IChangeCreateAction
 	{
+		/// <inheritdoc/>
 		public ChangeAction Action => ChangeAction.Camera;
 
 		DateTime lastSentTime;
@@ -13,14 +16,15 @@ namespace Crash.Handlers.Plugins.Camera.Create
 		CPoint lastTarget;
 		static TimeSpan maxPerSecond = TimeSpan.FromMilliseconds(250);
 
-		public CameraCreateAction()
+		/// <summary>Default Constructor</summary>
+		internal CameraCreateAction()
 		{
 			lastSentTime = DateTime.MinValue;
 			lastLocation = CPoint.None;
 			lastTarget = CPoint.None;
 		}
 
-		public double DistanceBetween(CPoint p1, CPoint p2)
+		private double DistanceBetween(CPoint p1, CPoint p2)
 		{
 			// https://www.mathsisfun.com/algebra/distance-2-points.html
 			double dist = Math.Sqrt(
@@ -32,6 +36,7 @@ namespace Crash.Handlers.Plugins.Camera.Create
 			return dist;
 		}
 
+		/// <inheritdoc/>
 		public bool CanConvert(object sender, CreateRecieveArgs crashArgs)
 		{
 			if (crashArgs.Args is not CrashViewArgs viewArgs) return false;
@@ -55,6 +60,7 @@ namespace Crash.Handlers.Plugins.Camera.Create
 			return true;
 		}
 
+		/// <inheritdoc/>
 		public bool TryConvert(object sender, CreateRecieveArgs crashArgs, out IEnumerable<IChange> changes)
 		{
 			changes = Array.Empty<IChange>();

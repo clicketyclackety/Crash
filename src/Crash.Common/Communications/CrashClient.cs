@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
 
 using Crash.Common.Document;
 using Crash.Common.Events;
 using Crash.Common.Exceptions;
 using Crash.Common.Logging;
+using Crash.Common.Tables;
 
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -27,6 +29,7 @@ namespace Crash.Client
 		const string UNSELECT = "Unselect";
 		const string INITIALIZE = "Initialize";
 		const string CAMERACHANGE = "CameraChange";
+		const string UPDATEUSER = "UpdateUser";
 
 		// TODO : Move to https
 		public const string DefaultURL = "http://localhost";
@@ -56,6 +59,7 @@ namespace Crash.Client
 		public event Action<string, Guid> OnUnselect;
 		public event Action<Change[]> OnInitialize;
 		public event Action<string, Change> OnCameraChange;
+		public event Action<Change> OnUpdateUser;
 
 		/// <summary>
 		/// Stop async task
@@ -87,6 +91,17 @@ namespace Crash.Client
 			_user = userName;
 			_connection = GetHubConnection(url);
 			RegisterConnections();
+
+			UserTable.OnUserAdded += (sender, userArgs) =>
+			{
+				string json = JsonSerializer.Serialize(userArgs.User);
+				Change userChange = new Change(Guid.NewGuid(), userName, json)
+				{
+					Action = ChangeAction.Update,
+				};
+
+				UpdateUserAsync(userChange);
+			};
 		}
 
 		internal static HubConnection GetHubConnection(Uri url) => new HubConnectionBuilder()
@@ -127,6 +142,7 @@ namespace Crash.Client
 			_connection.On<string, Guid>(UNSELECT, (user, id) => OnUnselect?.Invoke(user, id));
 			_connection.On<Change[]>(INITIALIZE, (Changes) => OnInitialize?.Invoke(Changes));
 			_connection.On<string, Change>(CAMERACHANGE, (user, Change) => OnCameraChange?.Invoke(user, Change));
+			_connection.On<Change>(UPDATEUSER, (Change) => OnUpdateUser?.Invoke(Change));
 
 			_connection.Reconnected += ConnectionReconnectedAsync;
 			_connection.Closed += ConnectionClosedAsync;
@@ -246,7 +262,13 @@ namespace Crash.Client
 		/// <returns></returns>
 		public async Task CameraChangeAsync(Change Change)
 		{
-			await _connection.InvokeAsync(CAMERACHANGE, _user, Change);
+			await _connection.InvokeAsync(CAMERACHANGE, Change.Owner, Change);
+		}
+
+		/// <summary>Updates a User</summary>
+		public async Task UpdateUserAsync(Change Change)
+		{
+			await _connection.InvokeAsync(UPDATEUSER, Change);
 		}
 
 		/// <summary>

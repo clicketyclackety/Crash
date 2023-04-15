@@ -31,22 +31,12 @@
 		<PackageReference Include="RhinoCommon" Version="8.0.23094.11475-wip" IncludeAssets="compile;build" Condition="'$(TargetFramework)' == 'net7.0'" />
 		<PackageReference Include="System.Text.Json" Version="7.0.2" />
 		<PackageReference Include="Crash.Changes" Version="1.0.2" />
+		<PackageReference Include="System.Resources.Extensions" Version="7.0.0"/>
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Crash.Common\Crash.Common.csproj" />
 		<ProjectReference Include="..\Crash.Handlers\Crash.Handlers.csproj" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-		<Reference Include="System.Drawing.Common">
-			<HintPath>..\..\..\..\..\..\..\Program Files\dotnet\sdk\7.0.200\System.Drawing.Common.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-	<ItemGroup>
-		<Reference Include="System.Resources.Extensions">
-			<HintPath>..\..\..\..\..\..\..\Program Files\dotnet\sdk\7.0.200\System.Resources.Extensions.dll</HintPath>
-		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>

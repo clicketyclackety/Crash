@@ -2,60 +2,40 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (web)",
+            "name": "Run Rhino 8 WIP (Mac)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build-server",
-            "program": "${workspaceFolder}/Crash.Server/bin/Debug/net6.0/Crash.Server.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "stopAtEntry": false,
-            "serverReadyAction": {
-                "action": "openExternally",
-                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-            },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
-            }
-        },
-        {
-            "name": "Run Rhino 8 WIP",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build-plugin",
+            "preLaunchTask": "build-plugin-netcore",
             "program": "/Applications/RhinoWIP.app/Contents/MacOS/Rhinoceros",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "console": "internalConsole",
             "env": {
-                "RHINO_PLUGIN_PATH": "${workspaceFolder}/Crash/bin/Debug/net48/Crash.rhp"
+                "RHINO_PLUGIN_PATH": "${workspaceFolder}/src/Crash/bin/Debug/net7.0/Crash.rhp"
             } 
         },
         {
-            "name": "Run Rhino 7 (Mac)",
-            "type": "rhino",
+            "name": "Run Rhino 8 WIP (Windows)",
+            "type": "clr",
             "request": "launch",
-            "preLaunchTask": "build-plugin",
-            "program": "/Applications/Rhino 7.app/Contents/MacOS/Rhinoceros",
-            "args": [],
+            "preLaunchTask": "build-plugin-netcore",
+            "program": "C:\\Program Files\\Rhino 7\\System\\Rhino.exe",
+            "args": [
+                "${workspaceFolder}\\src\\Crash\\bin\\Debug\\net7.0\\Crash.rhp"
+            ],
             "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
             "console": "internalConsole",
-            "env": {
-                "RHINO_PLUGIN_PATH": "${workspaceFolder}/Crash/bin/Debug/net48/Crash.rhp"
-            } 
         },
         {
             "name": "Run Rhino 7 (Windows)",
             "type": "clr",
             "request": "launch",
-            "preLaunchTask": "build-plugin",
+            "preLaunchTask": "build-plugin-netframework",
             "program": "C:\\Program Files\\Rhino 7\\System\\Rhino.exe",
             "args": [
-                "${workspaceFolder}\\Crash\\bin\\Debug\\net48\\Crash.rhp"
+                "${workspaceFolder}\\src\\Crash\\bin\\Debug\\net48\\Crash.rhp"
             ],
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",

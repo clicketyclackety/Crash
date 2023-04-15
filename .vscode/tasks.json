@@ -2,8 +2,8 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build-server",
-            "command": "dotnet build ${workspaceFolder}/Crash.Server/Crash.Server.csproj",
+            "label": "build-plugin-netcore",
+            "command": "dotnet build ${workspaceFolder}/src/Crash/Crash.csproj -f net7.0",
             "type": "shell",
             "args": [],
             "problemMatcher": [
@@ -15,8 +15,8 @@
             "group": "build"
         },
         {
-            "label": "build-plugin",
-            "command": "dotnet build ${workspaceFolder}/Crash/Crash.csproj",
+            "label": "build-plugin-netframework",
+            "command": "dotnet build ${workspaceFolder}/src/Crash/Crash.csproj -f net48",
             "type": "shell",
             "args": [],
             "problemMatcher": [
@@ -27,18 +27,5 @@
             },
             "group": "build"
         },
-        {
-            "label": "publish-server",
-            "command": "dotnet publish -c Release -r win-x64 ${workspaceFolder}/Crash.Server/Crash.Server.csproj && dotnet publish -c Release -r osx-x64 ${workspaceFolder}/Crash.Server/Crash.Server.csproj && dotnet publish -c Release -r osx-arm64 ${workspaceFolder}/Crash.Server/Crash.Server.csproj",
-            "type": "shell",
-            "args": [],
-            "problemMatcher": [
-                "$msCompile"
-            ],
-            "presentation": {
-                "reveal": "always"
-            },
-            "group": "build"
-        }
     ]
 }

@@ -21,10 +21,10 @@ jobs:
     - name: Restore Packages
       run: nuget restore Crash.sln
 
-    - name: Setup .NET Core 6.0
+    - name: Setup .NET Core 7.0
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0
+        dotnet-version: 7.0
 
     - uses: FranzDiebold/github-env-vars-action@v2
 

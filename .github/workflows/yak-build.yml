@@ -27,14 +27,14 @@ jobs:
     - name: Build Crash
       run: dotnet build Crash.sln --configuration Release
 
-    - name: Build Yak Package for Windows
-      run: |
-        $config = "Release"
-        $in = Resolve-Path("src\Crash\bin\$config\net48")
-        $out = $in
-
-        .\scripts\YakCompiler.ps1 -Path $in -DestinationPath $out -Config Release -os win
-      shell: powershell
+    - id: yak
+      uses: crashcloud/yak-publish@main
+      with:
+        package-name: 'NUnitTestRunner'
+        token: ${{ secrets.YAK_TOKEN }}
+        build-path: 'src/bin/**/**/net48/'
+        publish: 'production'
+        platform: 'win'
 
     - name: Upload Windows Yak Package
       uses: actions/upload-artifact@v3

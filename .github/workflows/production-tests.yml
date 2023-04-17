@@ -1,0 +1,38 @@
+---
+name: Benchmark Tests
+on:
+  pull_request:
+    paths-ignore:
+      - '*.md'
+      - '*.gh*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        rhino-version: [ '7', '8 WIP' ]
+    runs-on: windows-latest
+    steps:
+
+    - name: Pull Crash.Server Docker
+      uses: docker/pull-action
+      with:
+        pull: crashserver/crash.server:latest
+    
+    - name: Start Docker Container
+      uses: docker/run
+      with:
+        run: docker start crashserver/crash.server:latest -p 5000/5000
+ 
+    - name: Install Yak
+      run: |
+        python .\py\install-yak.py --version ${{ matrix.rhino-version }}
+
+    - name: Start Crash
+      run: |
+        python .\py\start-crash.py --version ${{ matrix.rhino-version }}
+
+    - name: Run Production Tests
+      run: |
+        $path = 'tests/Crash.Production.Tests/bin/Release/net48/*.Tests.dll'
+        python .\py\nunit-test-runner.py --version ${{ matrix.rhino-version }} --dll $path

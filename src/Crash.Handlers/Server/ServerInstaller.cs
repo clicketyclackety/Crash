@@ -1,10 +1,9 @@
 ﻿using System.IO;
 using System.IO.Compression;
-using System.Net;
+using System.Net.Http;
+using System.Threading;
 
 using Crash.Communications;
-
-using Microsoft.VisualStudio.Threading;
 
 using Rhino;
 
@@ -21,9 +20,9 @@ namespace Crash.Handlers.Server
 
 		/// <summary>Checks for an exiting Crash.Server.exe</summary>
 		public static bool ServerExecutableExists => File.Exists(CrashServer.SERVER_FILEPATH) &&
-			new FileInfo(CrashServer.SERVER_FILEPATH).Length > 10_000;
+			new FileInfo(CrashServer.SERVER_FILEPATH).Length > 100_000;
 		private static bool ServerExecutableExistsAndIsInvalid => File.Exists(CrashServer.SERVER_FILEPATH) &&
-			new FileInfo(CrashServer.SERVER_FILEPATH).Length < 10_000;
+			new FileInfo(CrashServer.SERVER_FILEPATH).Length < 100_000;
 
 		/// <summary>Checks for a server exe, and it doesn't exist, downloads it</summary>
 		public static async Task<bool> EnsureServerExecutableExists()
@@ -33,9 +32,11 @@ namespace Crash.Handlers.Server
 				return true;
 			}
 
+			bool downloaded = false;
 			if (!File.Exists(DOWNLOADED_FILEPATH))
 			{
-				await DownloadAsync();
+				RemoveOldServer();
+				downloaded = await DownloadAsync();
 			}
 			if (File.Exists(DOWNLOADED_FILEPATH))
 			{
@@ -49,13 +50,19 @@ namespace Crash.Handlers.Server
 
 		internal static void RemoveOldServer()
 		{
-			Directory.Delete(CrashServer.SERVER_DIRECTORY, true);
-			Directory.CreateDirectory(CrashServer.SERVER_DIRECTORY);
+			if (Directory.Exists(CrashServer.SERVER_DIRECTORY))
+			{
+				Directory.Delete(CrashServer.SERVER_DIRECTORY, true);
+			}
+			if (!Directory.Exists(CrashServer.SERVER_DIRECTORY))
+			{
+				Directory.CreateDirectory(CrashServer.SERVER_DIRECTORY);
+			}
 		}
 
 		internal static async Task<bool> DownloadAsync()
 		{
-			TimeSpan cancelSpan = TimeSpan.FromSeconds(60);
+			TimeSpan cancelSpan = TimeSpan.FromSeconds(300);
 			if (ServerExecutableExists) return true;
 			if (ServerExecutableExistsAndIsInvalid)
 			{
@@ -64,12 +71,23 @@ namespace Crash.Handlers.Server
 
 			try
 			{
-				// Use HttpClient
-				using (var client = new WebClient())
+				Progress<float> progress = new Progress<float>();
+				progress.ProgressChanged += (send, perc) => Client_DownloadProgressChanged(perc);
+
+				// Seting up the http client used to download the data
+				using (var client = new HttpClient())
 				{
-					client.DownloadProgressChanged += Client_DownloadProgressChanged;
-					var urcrashServerExeUri = new Uri(ARCHIVED_SERVER_DOWNLOAD_URL);
-					await client.DownloadFileTaskAsync(urcrashServerExeUri, DOWNLOADED_FILEPATH).WithTimeout(cancelSpan);
+					client.Timeout = TimeSpan.FromMinutes(5);
+
+					// Create a file stream to store the downloaded data.
+					// This really can be any type of writeable stream.
+					using (var file = new FileStream(DOWNLOADED_FILEPATH, FileMode.Create, FileAccess.Write, FileShare.None))
+					{
+
+						// Use the custom extension method below to download the data.
+						// The passed progress-instance will receive the download status updates.
+						await client.DownloadAsync(ARCHIVED_SERVER_DOWNLOAD_URL, file, progress);
+					}
 				}
 
 				if (ServerExecutableExistsAndIsInvalid)
@@ -96,20 +114,77 @@ namespace Crash.Handlers.Server
 		}
 
 		private static Dictionary<int, bool> progessSoFar = new Dictionary<int, bool>();
-		private static void Client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+		private static void Client_DownloadProgressChanged(float progressPercentage)
 		{
-			const int segment = 25;
-			int percentage = e.ProgressPercentage;
-			int chunk_segment = (percentage / segment) * segment;
+			int chunk_segment = (int)(progressPercentage * 100);
+			if (chunk_segment % 10 != 0) return;
 
 			if (!progessSoFar.ContainsKey(chunk_segment))
 			{
 				progessSoFar.Add(chunk_segment, true);
 
-				RhinoApp.WriteLine($"{ARCHIVED_SERVER_FILENAME} - Downloaded {e.ProgressPercentage}% of file. {e.TotalBytesToReceive}/{e.BytesReceived} bytes recieved.");
+				RhinoApp.WriteLine($"{ARCHIVED_SERVER_FILENAME} - Downloaded {chunk_segment}% of file.");
 			}
 		}
 
+	}
+
+	// https://stackoverflow.com/questions/20661652/progress-bar-with-httpclient
+	internal static class HttpClientExtensions
+	{
+		internal static async Task DownloadAsync(this HttpClient client, string requestUri, Stream destination, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+		{
+			// Get the http headers first to examine the content length
+			using (var response = await client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead))
+			{
+				var contentLength = response.Content.Headers.ContentLength;
+
+				using (var download = await response.Content.ReadAsStreamAsync())
+				{
+
+					// Ignore progress reporting when no progress reporter was 
+					// passed or when the content length is unknown
+					if (progress == null || !contentLength.HasValue)
+					{
+						await download.CopyToAsync(destination);
+						return;
+					}
+
+					// Convert absolute progress (bytes downloaded) into relative progress (0% - 100%)
+					var relativeProgress = new Progress<long>(totalBytes => progress.Report((float)totalBytes / contentLength.Value));
+					// Use extension method to report progress while downloading
+					await download.CopyToAsync(destination, 81920, relativeProgress, cancellationToken);
+					progress.Report(1);
+				}
+			}
+		}
+	}
+
+	internal static class StreamExtensions
+	{
+		public static async Task CopyToAsync(this Stream source, Stream destination, int bufferSize, IProgress<long> progress = null, CancellationToken cancellationToken = default)
+		{
+			if (source == null)
+				throw new ArgumentNullException(nameof(source));
+			if (!source.CanRead)
+				throw new ArgumentException("Has to be readable", nameof(source));
+			if (destination == null)
+				throw new ArgumentNullException(nameof(destination));
+			if (!destination.CanWrite)
+				throw new ArgumentException("Has to be writable", nameof(destination));
+			if (bufferSize < 0)
+				throw new ArgumentOutOfRangeException(nameof(bufferSize));
+
+			var buffer = new byte[bufferSize];
+			long totalBytesRead = 0;
+			int bytesRead;
+			while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) != 0)
+			{
+				await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+				totalBytesRead += bytesRead;
+				progress?.Report(totalBytesRead);
+			}
+		}
 	}
 
 }

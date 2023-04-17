@@ -65,7 +65,7 @@ namespace Crash
 
 		/// <inheritdoc />
 		public sealed override PlugInLoadTime LoadTime
-			=> this.GetType() == typeof(CrashPlugin) ?
+			=> this is CrashPlugin ?
 				PlugInLoadTime.AtStartup :
 				PlugInLoadTime.WhenNeeded;
 

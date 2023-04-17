@@ -50,7 +50,7 @@ namespace Crash.Commands
 		}
 
 		private bool? _GetReleaseChoice()
-			=> CommandUtils.GetBoolean(ref defaultValue,
+			=> SelectionUtils.GetBoolean(ref defaultValue,
 				"Would you like to Release before exiting?",
 				"JustExit",
 				"ReleaseThenExit");

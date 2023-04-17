@@ -51,21 +51,13 @@ namespace Crash.Commands
 		{
 			rhinoDoc = doc;
 			crashDoc = CrashDocRegistry.GetRelatedDocument(doc);
-			if (crashDoc?.LocalServer is object && crashDoc.LocalServer.IsRunning)
+
+			if (!CommandUtils.CheckForRunningServer(crashDoc))
+				return Result.Cancel;
+
+			if (!CommandUtils.GetUserName(out string name))
 			{
-				string closeCommand = CloseSharedModel.Instance.EnglishName;
-				RhinoApp.WriteLine("You are currently part of a Shared Model Session. " +
-					$"Please use the {closeCommand} command.");
-
-				return Result.Success;
-			}
-
-			string name = Environment.UserName;
-
-			if (!_GetUsersName(ref name))
-			{
-				RhinoApp.WriteLine("Invalid name!");
-				return Result.Nothing;
+				return Result.Cancel;
 			}
 
 			// TODO : Add Port Validation
@@ -91,27 +83,25 @@ namespace Crash.Commands
 			{
 				crashDoc.LocalServer = new CrashServer(crashDoc);
 
-				crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
 				crashDoc.LocalServer.OnConnected += Server_OnConnected;
 				crashDoc.LocalServer.OnFailure += Server_OnFailure;
 
 				crashDoc.LocalServer.Start(LastServerURLAndPort);
+
+				InteractivePipe.Active.Enabled = true;
+				UsersForm.ShowForm();
 			}
 			catch (Exception ex)
 			{
 				RhinoApp.WriteLine("The server ran into difficulties starting.");
 				RhinoApp.WriteLine($"More specifically ; {ex.Message}.");
+
+				if (_GetForceCloseOptions() != true) return Result.Cancel;
+				if (!CrashServer.ForceCloselocalServers(1000)) return Result.Cancel;
+				RhinoApp.RunScript(EnglishName, true);
 			}
 
-			InteractivePipe.Active.Enabled = true;
-
 			return Result.Success;
-		}
-
-		private void Queue_OnCompletedQueue(object sender, EventArgs e)
-		{
-			UsersForm.ReDraw();
-			rhinoDoc.Views.Redraw();
 		}
 
 		private void AddPreExistingGeometry(CrashDoc crashDoc)
@@ -134,7 +124,7 @@ namespace Crash.Commands
 		}
 
 		private bool? _ContinueOrQuit(bool defaultValue = false)
-			=> CommandUtils.GetBoolean(ref defaultValue,
+			=> SelectionUtils.GetBoolean(ref defaultValue,
 				"Would you like to include preExisting Geometry?",
 				"dontInclude",
 				"include");
@@ -177,8 +167,9 @@ namespace Crash.Commands
 
 			try
 			{
-				string userName = crashDoc.Users.CurrentUser.Name;
-				var crashClient = new CrashClient(crashDoc, userName, new Uri(LastClientURLAndPort));
+				string userName = e.CrashDoc.Users.CurrentUser.Name;
+				var crashClient = new CrashClient(e.CrashDoc, userName, new Uri(LastClientURLAndPort));
+				e.CrashDoc.LocalClient = crashClient;
 
 				crashClient.StartLocalClientAsync();
 
@@ -232,10 +223,10 @@ namespace Crash.Commands
 
 		// TODO : Ensure name is not already taken!
 		private bool _GetUsersName(ref string name)
-			=> CommandUtils.GetValidString("Your Name", ref name);
+			=> SelectionUtils.GetValidString("Your Name", ref name);
 
 		private bool _GetPortFromUser(ref int port)
-			=> CommandUtils.GetInteger("Server port", ref port);
+			=> SelectionUtils.GetInteger("Server port", ref port);
 
 		private void _CreateCurrentUser(string name)
 		{

@@ -37,25 +37,11 @@ namespace Crash.Commands
 			rhinoDoc = doc;
 			crashDoc = CrashDocRegistry.GetRelatedDocument(doc);
 
-			// Check Crash Doc
-			if (crashDoc?.LocalClient?.IsConnected == true)
+			CommandUtils.CheckAlreadyConnected(crashDoc);
+
+			if (!CommandUtils.GetUserName(out string name))
 			{
-				RhinoApp.WriteLine("You are currently part of a Shared Model Session.");
-
-				if (_NewModelOrExit(false) != true)
-					return Result.Cancel;
-
-				if (RhinoApp.RunScript(CloseSharedModel.Instance.EnglishName, true))
-					RhinoApp.RunScript(OpenSharedModel.Instance.EnglishName, true);
-
-				return Result.Success;
-			}
-
-			string name = Environment.UserName;
-			if (!_GetUsersName(ref name))
-			{
-				RhinoApp.WriteLine("Invalid Name Input");
-				return Result.Nothing;
+				return Result.Cancel;
 			}
 
 			if (!_GetServerURL(ref LastURL))
@@ -67,13 +53,7 @@ namespace Crash.Commands
 			crashDoc = CrashDocRegistry.CreateAndRegisterDocument(doc);
 			_CreateCurrentUser(crashDoc, name);
 
-			// TODO : Ensure Requested Server is available, and notify if not
-			string userName = crashDoc.Users.CurrentUser.Name;
-			var crashClient = new CrashClient(crashDoc, userName, new Uri($"{LastURL}/Crash"));
-			crashDoc.LocalClient = crashClient;
-			crashDoc.Queue.OnCompletedQueue += Queue_OnCompletedQueue;
-
-			crashClient.StartLocalClientAsync();
+			CommandUtils.StartLocalClient(crashDoc, LastURL);
 
 			InteractivePipe.Active.Enabled = true;
 			UsersForm.ShowForm();
@@ -81,23 +61,9 @@ namespace Crash.Commands
 			return Result.Success;
 		}
 
-		private void Queue_OnCompletedQueue(object sender, EventArgs e)
-		{
-			UsersForm.ReDraw();
-			rhinoDoc.Views.Redraw();
-		}
-
-		private bool _GetUsersName(ref string name)
-			=> CommandUtils.GetValidString("Your Name", ref name);
-
-		private bool? _NewModelOrExit(bool defaultValue)
-			=> CommandUtils.GetBoolean(ref defaultValue,
-				"Would you like to close this model?",
-				"ExitCommand",
-				"CloseModel");
 
 		private bool _GetServerURL(ref string url)
-			=> CommandUtils.GetValidString("Server URL", ref url);
+			=> SelectionUtils.GetValidString("Server URL", ref url);
 
 		private void _CreateCurrentUser(CrashDoc crashDoc, string name)
 		{

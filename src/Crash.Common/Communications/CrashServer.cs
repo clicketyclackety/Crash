@@ -204,7 +204,7 @@ namespace Crash.Communications
 			if (started)
 			{
 				Connected = true;
-				OnConnected?.Invoke(this, null);
+				OnConnected?.Invoke(this, new CrashEventArgs(_crashDoc));
 			}
 		}
 

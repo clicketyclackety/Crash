@@ -1,71 +1,75 @@
-﻿using Rhino.Commands;
-using Rhino.Input;
-using Rhino.Input.Custom;
+﻿using System.Threading.Tasks;
+
+using Crash.Client;
+using Crash.Common.Document;
+
+using Rhino.Commands;
 
 namespace Crash.Commands
 {
 
-	/// <summary>Reusable Utilities for commands</summary>
-	internal static class CommandUtils
+	public static class CommandUtils
 	{
 
-		/// <summary>
-		/// Asks a user to toggle between two options
-		/// </summary>
-		/// <param name="defaultValue">The default value iput</param>
-		/// <param name="prompt">The Prompt for the User</param>
-		/// <param name="offValue">The message for false</param>
-		/// <param name="onValue">The message for true</param>
-		/// <returns>null on Cancel. True or False from the user choice</returns>
-		internal static bool? GetBoolean(ref bool defaultValue, string prompt, string offValue, string onValue)
+		public static Result CheckAlreadyConnected(CrashDoc crashDoc)
 		{
-			GetOption go = new GetOption();
-			go.AcceptEnterWhenDone(true);
-			go.AcceptNothing(true);
-			go.SetCommandPrompt(prompt);
-			OptionToggle releaseValue = new OptionToggle(defaultValue, offValue, onValue);
-			int releaseIndex = go.AddOptionToggle("Choose", ref releaseValue);
-
-			while (true)
+			if (crashDoc?.LocalClient?.IsConnected == true)
 			{
-				GetResult result = go.Get();
-				if (result == GetResult.Option && go.OptionIndex() == releaseIndex)
-					defaultValue = !defaultValue;
+				RhinoApp.WriteLine("You are currently part of a Shared Model Session.");
 
-				else if (result == GetResult.Cancel)
-					return null;
+				if (_NewModelOrExit(false) != true)
+					return Result.Cancel;
 
-				else if (result == GetResult.Nothing)
-					return defaultValue;
+				if (RhinoApp.RunScript(CloseSharedModel.Instance.EnglishName, true))
+					RhinoApp.RunScript(OpenSharedModel.Instance.EnglishName, true);
 			}
+
+			return Result.Success;
 		}
 
-		/// <summary>
-		/// Asks the user to input a string
-		/// </summary>
-		/// <param name="prompt">The Prompt for the User</param>
-		/// <param name="value">The chosen Value, can set a default</param>
-		/// <returns>bool on success, false on cancel or empty value</returns>
-		internal static bool GetValidString(string prompt, ref string value)
-		{
-			Result getUrl = RhinoGet.GetString(prompt, true, ref value);
-			if (string.IsNullOrEmpty(value)) return false;
+		private static bool? _NewModelOrExit(bool defaultValue)
+			=> SelectionUtils.GetBoolean(ref defaultValue,
+				"Would you like to close this model?",
+				"ExitCommand",
+				"CloseModel");
 
-			return getUrl == Result.Success;
+		public static bool GetUserName(out string name)
+		{
+			name = Environment.UserName;
+			if (!_GetUsersName(ref name))
+			{
+				RhinoApp.WriteLine("Invalid Name Input");
+				return false;
+			}
+
+			return true;
 		}
 
-		/// <summary>
-		/// Asks the user to input an integer
-		/// </summary>
-		/// <param name="prompt">The Prompt for the User</param>
-		/// <param name="value">The chosen Value, can set a default</param>
-		/// <returns>bool on success, false on cancel or integer < 0</returns>
-		internal static bool GetInteger(string prompt, ref int value)
-		{
-			Result getPort = RhinoGet.GetInteger(prompt, false, ref value);
-			if (value <= 0) return false;
+		private static bool _GetUsersName(ref string name)
+			=> SelectionUtils.GetValidString("Your Name", ref name);
 
-			return getPort == Result.Success;
+		public static async Task StartLocalClient(CrashDoc crashDoc, string url)
+		{
+			// TODO : Ensure Requested Server is available, and notify if not
+			string userName = crashDoc.Users.CurrentUser.Name;
+			var crashClient = new CrashClient(crashDoc, userName, new Uri($"{url}/Crash"));
+			crashDoc.LocalClient = crashClient;
+
+			await crashClient.StartLocalClientAsync();
+		}
+
+		public static bool CheckForRunningServer(CrashDoc crashDoc)
+		{
+			if (crashDoc?.LocalServer is object && crashDoc.LocalServer.IsRunning)
+			{
+				string closeCommand = CloseSharedModel.Instance.EnglishName;
+				RhinoApp.WriteLine("You are currently part of a Shared Model Session. " +
+					$"Please use the {closeCommand} command.");
+
+				return false;
+			}
+
+			return true;
 		}
 
 	}
